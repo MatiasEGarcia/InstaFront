@@ -3,13 +3,14 @@ import { SIGN_IN } from "./Util/UtilTexts"
 import MainContainer from "./Components/MainContainer"
 import PublicationCard from "./Components/PublicationCard"
 import ChatContainer from "./Components/ChatContainer"
+import Modal from "./Components/Modal"
 
 function App() {
   return (
     <>
       {/*<Access typeOfAccess={SIGN_IN}/>*/}
-      {/*<MainContainer/>*/}
-      <ChatContainer/>
+      <MainContainer/>
+      {/*<ChatContainer/>*/}
     </>
   )
 }

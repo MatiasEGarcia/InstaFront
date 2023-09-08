@@ -3,7 +3,7 @@ import { Search, PlusCircle, ChatSquareText, ExclamationCircle, Compass, Person 
 /**
  * @returns {JSX.Element} - The rendered bottom sticky nav.
  */
-function StickyBottomNavigation() {
+function StickyBottomIconNavigation() {
     return (
         <nav className="position-sticky bottom-0 start-0 col-12 d-md-none">
             <ul className="nav justify-content-between bg-light">
@@ -42,4 +42,4 @@ function StickyBottomNavigation() {
     )
 }
 
-export default StickyBottomNavigation;
+export default StickyBottomIconNavigation;

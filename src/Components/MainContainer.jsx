@@ -1,7 +1,7 @@
 
 import HomeMain from "./HomeMain";
 import LeftNavigation from "./LeftNavigation";
-import StickyBottomNavigation from "./StickyBottomNavigation";
+import StickyBottomIconNavigation from "./StickyBottomIconNavigation";
 
 function MainContainer() {
     return (
@@ -9,7 +9,7 @@ function MainContainer() {
             <div className="row vh-100 position-relative">
                 <LeftNavigation />
                 <HomeMain/>
-                <StickyBottomNavigation />
+                <StickyBottomIconNavigation />
             </div>
         </div>
     )
