@@ -1,0 +1,36 @@
+.custom-popover-container {
+    position: absolute;
+    top: calc(100% - 135px);
+    left: calc(100% + 8px);
+    border-radius: 5%;
+    width: 300px;
+    height: 300px;
+
+    &::after {
+        content: "";
+        display: block;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        border-right: 10px solid $gray-600;
+        position: absolute;
+        top: 35%;
+        left: -10px;
+    }
+
+}
+
+
+.custom-icon-popover-container {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    bottom: 50%;
+    left: 50%;
+    box-shadow: $box-shadow-lg;
+    transition: 1s;
+
+    &:hover{
+        width: 350px;
+        height: 400px;
+    }
+}

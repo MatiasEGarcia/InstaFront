@@ -1,0 +1,16 @@
+//adding width responsive, more height and width values
+$utilities: map-merge($map1: $utilities,
+        $map2: (
+        'width': map-merge(map-get($utilities, 'width'),
+            (values: map-merge(map-get(map-get($utilities, "width"), "values"),
+                    $custom-width-values,
+                ), responsive:true),
+        ),
+        "height": map-merge(map-get($utilities, "height"),
+            (values: map-merge(map-get(map-get($utilities, "height"), "values"),
+                    $custom-height-values,
+                ),
+            ),
+        ),
+    )
+);
