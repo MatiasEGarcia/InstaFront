@@ -2,23 +2,25 @@ import PublicationCard from "./PublicationCard";
 import { Heart, XCircle } from "react-bootstrap-icons";
 import { useState } from "react";
 import Modal from "./Modal";
+import { useModal } from "../hooks/useModal";
+
+//cuando me comunique con el server esto lo borro
+function JustReturnModelContentExample(){
+    return({
+        username: "matias",
+        date: 22 - 5 - 23,
+        description: "Some quick example text to build on the card title and make up thebulk of the card's content. "
+    })
+}
 
 /**
  * @returns {JSX.Element} - show every user main page.
  */
 function UserMainHome() {
-    const [modalState, setModalState] = useState(false);
-    const [publicationModal, setPublicationModal] = useState({});
-
-
-    function showModal(id) {
-        setPublicationModal({
-            username: "matias",
-            date: 22 - 5 - 23,
-            description: "Some quick example text to build on the card title and make up thebulk of the card's content. "
-        });
-        setModalState(true);
-    }
+    const {modalState,
+        setModalState,
+        publicationModal,
+        showModal} = useModal(JustReturnModelContentExample);
 
     return (
         <main className="col-12 col-md-8 col-xl-10">
@@ -115,3 +117,11 @@ function UserMainHome() {
 }
 
 export default UserMainHome;
+
+
+
+
+/**
+ * TENGO QUE CREAR UN COMPONENTE QUE RETORNE ALGO COMO PUBLICATIONMODAL, y eso es lo que meto como childre
+ * dentro dle componente MODAL
+ */

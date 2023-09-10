@@ -1,28 +1,28 @@
-import { useState } from "react";
+import { useModal } from "../hooks/useModal";
 import { Heart, XCircle } from "react-bootstrap-icons";
 import PublicationCard from "./PublicationCard";
 import Modal from "./Modal";
+
+//cuando me comunique con el server esto lo borro
+function JustReturnModelContentExample(){
+    return({
+        username: "matias",
+        date: 22 - 5 - 23,
+        description: "Some quick example text to build on the card title and make up thebulk of the card's content. "
+    })
+}
+
 
 /**
  * 
  * @returns {JSX.Element} - The rendered main part of the Home page
  */
 function HomeMain() {
-    const [modalState, setModalState] = useState(false);
-    const [publicationModal, setPublicationModal] = useState({});
 
-    /**
-     * Function to show a modal with publication selected information.
-     * @param {string} id - publication id.
-     */
-    function showModal(id) {
-        setPublicationModal({
-            username: "matias",
-            date: 22 - 5 - 23,
-            description: "Some quick example text to build on the card title and make up thebulk of the card's content. "
-        });
-        setModalState(true);
-    }
+    const {modalState,
+        setModalState,
+        publicationModal,
+        showModal} = useModal(JustReturnModelContentExample);
 
     return (
         <main className="col-12 col-md-8 col-xl-10">
