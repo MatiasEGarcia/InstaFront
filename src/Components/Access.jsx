@@ -1,6 +1,7 @@
 import { PersonFillAdd, PersonUp } from "react-bootstrap-icons";
-import { PASSWORD_LABEL, USERNAME_LABEL } from "../Util/UtilTexts";
+import { PASSWORD_LABEL, SIGN_IN, USERNAME_LABEL } from "../Util/UtilTexts";
 import { useForm } from "../hooks/useForm";
+import { Link } from "react-router-dom";
 
 /**
  * initial values in the authenticationForm inputs
@@ -73,7 +74,7 @@ function Access({ typeOfAccess }) {
                             onChange={handleChange}
                             onBlur={handleBlur}
                         />
-                        <small className={`${fieldsTouched.username && !!errors.username ? "d-block": "d-none"} text-danger `}>
+                        <small className={`${fieldsTouched.username && !!errors.username ? "d-block" : "d-none"} text-danger `}>
                             {errors.username}
                         </small>
                     </div>
@@ -91,7 +92,7 @@ function Access({ typeOfAccess }) {
                             onChange={handleChange}
                             onBlur={handleBlur}
                         />
-                        <small className={`${fieldsTouched.password && !!errors.password ? "d-block": "d-none"} text-danger`}>
+                        <small className={`${fieldsTouched.password && !!errors.password ? "d-block" : "d-none"} text-danger`}>
                             {errors.password}
                         </small>
                     </div>
@@ -100,6 +101,12 @@ function Access({ typeOfAccess }) {
                             Submit
                         </button>
                     </div>
+                    {typeOfAccess === SIGN_IN &&
+                        <Link to="/signUp" className="col-12 text-center
+                                                link-offset-2 link-underline link-underline-opacity-0 link-underline-opacity-100-hover">
+                            <small>Are you new? Create an account.</small>
+                        </Link>
+                    }
                 </div>
             </form>
         </main>

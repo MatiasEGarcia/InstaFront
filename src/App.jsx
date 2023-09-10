@@ -1,17 +1,22 @@
 import Access from "./Components/Access"
-import { SIGN_IN } from "./Util/UtilTexts"
+import { SIGN_IN, SIGN_UP } from "./Util/UtilTexts"
 import MainContainer from "./Components/MainContainer"
-import PublicationCard from "./Components/PublicationCard"
 import ChatContainer from "./Components/ChatContainer"
-import Modal from "./Components/Modal"
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 function App() {
   return (
-    <>
-      {/*<Access typeOfAccess={SIGN_IN}/>*/}
-      <MainContainer/>
-      {/*<ChatContainer/>*/}
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route exact path="/" element={<Access typeOfAccess={SIGN_IN}/>}></Route>
+        <Route exact path="/signUp" element={<Access typeOfAccess={SIGN_UP}/>}></Route>
+
+        {/**This should be protected */}
+        <Route exact path="/home" element={<MainContainer wichMain='home'/>}></Route>
+        <Route exact path="/userHome" element={<MainContainer wichMain='userMainhome'/>}></Route>
+        <Route exact path="/chat" element={<ChatContainer/>}></Route> 
+      </Routes>
+    </BrowserRouter>
   )
 }
 

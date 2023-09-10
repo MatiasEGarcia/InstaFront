@@ -1,16 +1,19 @@
 import { PencilSquare, InfoCircle, House } from "react-bootstrap-icons";
+import { Link } from 'react-router-dom';
 
 function ChatContainer() {
     return (
         <div className="container-lg">
             <div className="row">
                 <nav className="col-4 col-md-3 pt-2 border vh-100">
-                    <div className="d-flex justify-content-center justify-content-md-between">
-                        <House size={40} />
-                        <h2 className="ps-2 d-none d-lg-block">
-                            FrontReact
-                        </h2>
-                    </div>
+                    <Link to="/home" className="link-underline link-underline-opacity-0">
+                        <button className="btn btn-light w-100 d-flex justify-content-center justify-content-md-between ">
+                            <House size={40} />
+                            <h2 className="ps-2 d-none d-lg-block">
+                                FrontReact
+                            </h2>
+                        </button>
+                    </Link>
                     <div className="p-2 d-flex justify-content-center justify-content-md-between">
                         <span className="fs-4 d-none d-md-block">Username</span>
                         <button className="btn">
@@ -51,17 +54,6 @@ function ChatContainer() {
                         <div className="p-2">Second item</div>
                         <div className="p-2">Third item</div>
                         <div className="p-2">First item</div>
-                        <div className="p-2">Second item</div>
-                        <div className="p-2">Third item</div>
-                        <div className="p-2">First item</div>
-                        <div className="p-2">Second item</div>
-                        <div className="p-2">Third item</div>
-                        <div className="p-2">First item</div>
-                        <div className="p-2">Second item</div>
-                        <div className="p-2">Third item</div>
-                        <div className="p-2">First item</div>
-                        <div className="p-2">Second item</div>
-                        <div className="p-2">Third item</div>
                     </div>
                 </nav>
                 <main className="col-8 col-md-9">
@@ -200,7 +192,7 @@ function ChatContainer() {
                         </div>
                     </div>
                 </main>
-            </div >
+            </div>
         </div >
     )
 }

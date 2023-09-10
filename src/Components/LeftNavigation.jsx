@@ -3,6 +3,7 @@ import { Search, PlusCircle, ChatSquareText, ExclamationCircle, Compass, Gear } 
 import SearchPopover from "./Popovers/SearchPopover";
 import NotificationsPopover from "./Popovers/NotificationsPopover";
 import ConfigurationPopover from "./Popovers/ConfigurationPopover";
+import { Link } from "react-router-dom";
 
 
 /**
@@ -48,10 +49,10 @@ function LeftNavigation() {
                         <span className="ms-2">Search</span>
                     </button>
                     {navItemPopovers === 'search' &&
-                        <SearchPopover  hidePopover={hidePopover}
-                                        container="custom-popover-container"
-                                        username={username}
-                                        searchByUsername={searchByUsername}/>
+                        <SearchPopover hidePopover={hidePopover}
+                            container="custom-popover-container"
+                            username={username}
+                            searchByUsername={searchByUsername} />
                     }
                 </li>
                 <li className="nav-item position-relative">
@@ -60,15 +61,17 @@ function LeftNavigation() {
                         <span className="ms-2">Notifications</span>
                     </button>
                     {navItemPopovers === 'notifications' &&
-                        <NotificationsPopover   hidePopover={hidePopover}
-                                                container="custom-popover-container"/>
+                        <NotificationsPopover hidePopover={hidePopover}
+                            container="custom-popover-container" />
                     }
                 </li>
                 <li className="nav-item">
-                    <button type="button" className="btn btn-light w-100 text-start fs-5">
-                        <ChatSquareText size={30} />
-                        <span className="ms-2">Chats</span>
-                    </button>
+                    <Link to="/chat">
+                        <button type="button" className="btn btn-light w-100 text-start fs-5">
+                            <ChatSquareText size={30} />
+                            <span className="ms-2">Chats</span>
+                        </button>
+                    </Link>
                 </li>
                 <li className="nav-item">
                     <button type="button" className="btn btn-light w-100 text-start fs-5">
@@ -88,8 +91,8 @@ function LeftNavigation() {
                         <span className="ms-2">Configuration</span>
                     </button>
                     {navItemPopovers === 'config' &&
-                       <ConfigurationPopover    hidePopover={hidePopover}
-                                                container="custom-popover-container"/>
+                        <ConfigurationPopover hidePopover={hidePopover}
+                            container="custom-popover-container" />
                     }
                 </li>
             </ul>

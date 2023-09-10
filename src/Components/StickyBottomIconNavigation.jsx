@@ -3,6 +3,7 @@ import { useState } from "react";
 import SearchPopover from "./Popovers/SearchPopover";
 import NotificationsPopover from "./Popovers/NotificationsPopover";
 import ConfigurationPopover from "./Popovers/ConfigurationPopover";
+import { Link } from "react-router-dom";
 
 /**
  * @returns {JSX.Element} - The rendered bottom sticky nav.
@@ -14,7 +15,7 @@ function StickyBottomIconNavigation() {
     const [navItemPopovers, setItemPopovers] = useState('');
     const [username, setUsername] = useState('');
 
-    
+
     /**
      * To show a nav item popover
      * @param {String} wichPopover - name of the nav item that need to be showed 
@@ -49,10 +50,10 @@ function StickyBottomIconNavigation() {
                         <Search />
                     </button>
                     {navItemPopovers === 'search' &&
-                        <SearchPopover  hidePopover={hidePopover}
-                                        container="custom-icon-popover-container"
-                                        username={username}
-                                        searchByUsername={searchByUsername}/>
+                        <SearchPopover hidePopover={hidePopover}
+                            container="custom-icon-popover-container"
+                            username={username}
+                            searchByUsername={searchByUsername} />
                     }
                 </li>
                 <li className="nav-item position-relative">
@@ -61,14 +62,16 @@ function StickyBottomIconNavigation() {
                         <ExclamationCircle />
                     </button>
                     {navItemPopovers === 'notifications' &&
-                        <NotificationsPopover   hidePopover={hidePopover}
-                                                container="custom-icon-popover-container"/>
+                        <NotificationsPopover hidePopover={hidePopover}
+                            container="custom-icon-popover-container" />
                     }
                 </li>
                 <li className="nav-item">
-                    <button type="button" className="btn btn-light w-100 text-start fs-1 px-3">
-                        <ChatSquareText />
-                    </button>
+                    <Link to="/chat">
+                        <button type="button" className="btn btn-light w-100 text-start fs-1 px-3">
+                            <ChatSquareText />
+                        </button>
+                    </Link>
                 </li>
                 <li className="nav-item">
                     <button type="button" className="btn btn-light w-100 text-start fs-1 px-3">
@@ -86,8 +89,8 @@ function StickyBottomIconNavigation() {
                         <Gear />
                     </button>
                     {navItemPopovers === 'config' &&
-                       <ConfigurationPopover    hidePopover={hidePopover}
-                                                container="custom-icon-popover-container"/>
+                        <ConfigurationPopover hidePopover={hidePopover}
+                            container="custom-icon-popover-container" />
                     }
                 </li>
             </ul>
