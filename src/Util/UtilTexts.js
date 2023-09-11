@@ -17,3 +17,7 @@ export const NAV_OPTIONS = ['Search','Notifications', 'Chats', 'Navigate', 'Crea
 
 export const SIGN_IN = 'signIn';
 export const SIGN_UP = 'signUp';
+
+//DIRECTIONS FOR SEARCH
+export const DIR_ASC_DIRECTION = "ASC";
+export const DIR_DESC_DIRECTION = "DESC"

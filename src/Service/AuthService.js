@@ -1,6 +1,7 @@
 import { SIGN_UP, MESS_ERROR_SERVER_CONNECTION, SIGN_IN, ACTION_NO_EXIST } from "../Util/UtilTexts";
 import { AUTH_ENDPOINT } from "../Util/endpoints";
 import { RefreshTokenException } from "../Errors/Errors";
+import { getBasicUserInfo } from "./UserService";
 
 /**
  * Function to set authentication token for requests by the user.
@@ -26,15 +27,27 @@ function removeLocalStorageTokens(){
     localStorage.removeItem('authRefreshToken');
 }
 
+/**
+ * Performs user access to the server based on the specified action, username, and password.
+ * @param {Object} options - The options for user access.
+ * @param {string} options.action - The action to perform (either 'signUp' or 'signIn').
+ * @param {string} options.username - The username for the user.
+ * @param {string} options.password - The password for the user.
+ * @returns {Promise} - A promise that resolves to the basic user information.
+ * @throws {Error} - If the specified action is not supported or if there was some error with the server. 
+ */
 export async function userAccess({action, username, password}){
     switch(action){
         case SIGN_UP:
             await register({username,password});
+            break;
         case SIGN_IN:
             await authenticate({username, password});
+            break;
         default:
             throw new Error(ACTION_NO_EXIST);
     }
+    return await getBasicUserInfo();
 }
 
 /**
