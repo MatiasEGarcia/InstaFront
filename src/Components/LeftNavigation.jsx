@@ -4,6 +4,7 @@ import SearchPopover from "./Popovers/SearchPopover";
 import NotificationsPopover from "./Popovers/NotificationsPopover";
 import ConfigurationPopover from "./Popovers/ConfigurationPopover";
 import { Link } from "react-router-dom";
+import { APP_TITLE, NAV_OPTIONS } from "../Util/UtilTexts";
 
 
 /**
@@ -42,13 +43,13 @@ function LeftNavigation() {
             <ul className="position-sticky top-0 start-0 nav flex-column pt-2 gap-3">
                 <li className="nav-item m-3">
                     <Link to="/home" className="btn btn-light">
-                        <h2>FrontReact</h2>
+                        <h2>{APP_TITLE}</h2>
                     </Link>
                 </li>
                 <li className="nav-item position-relative">
                     <button type="button" className="btn btn-light w-100 text-start fs-5" onClick={() => showPopover('search')}>
                         <Search size={30} />
-                        <span className="ms-2">Search</span>
+                        <span className="ms-2">{NAV_OPTIONS[0]}</span>
                     </button>
                     {navItemPopovers === 'search' &&
                         <SearchPopover hidePopover={hidePopover}
@@ -60,7 +61,7 @@ function LeftNavigation() {
                 <li className="nav-item position-relative">
                     <button type="button" className="btn btn-light w-100 text-start fs-5" onClick={() => showPopover('notifications')}>
                         <ExclamationCircle size={30} />
-                        <span className="ms-2">Notifications</span>
+                        <span className="ms-2">{NAV_OPTIONS[1]}</span>
                     </button>
                     {navItemPopovers === 'notifications' &&
                         <NotificationsPopover hidePopover={hidePopover}
@@ -71,26 +72,26 @@ function LeftNavigation() {
                     <Link to="/chat">
                         <button type="button" className="btn btn-light w-100 text-start fs-5">
                             <ChatSquareText size={30} />
-                            <span className="ms-2">Chats</span>
+                            <span className="ms-2">{NAV_OPTIONS[2]}</span>
                         </button>
                     </Link>
                 </li>
                 <li className="nav-item">
                     <button type="button" className="btn btn-light w-100 text-start fs-5">
                         <Compass size={30} />
-                        <span className="ms-2">Navigate</span>
+                        <span className="ms-2">{NAV_OPTIONS[3]}</span>
                     </button>
                 </li>
                 <li className="nav-item">
                     <button type="button" className="btn btn-light w-100 text-start fs-5">
                         <PlusCircle size={30} />
-                        <span className="ms-2">Create</span>
+                        <span className="ms-2">{NAV_OPTIONS[4]}</span>
                     </button>
                 </li>
                 <li className="nav-item">
                     <button type="button" className="btn btn-light w-100 text-start fs-5" onClick={() => showPopover('config')}>
                         <Gear size={30} />
-                        <span className="ms-2">Configuration</span>
+                        <span className="ms-2">{NAV_OPTIONS[5]}</span>
                     </button>
                     {navItemPopovers === 'config' &&
                         <ConfigurationPopover hidePopover={hidePopover}

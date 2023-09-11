@@ -3,6 +3,7 @@ import HomeMain from "./HomeMain";
 import LeftNavigation from "./LeftNavigation";
 import StickyBottomIconNavigation from "./StickyBottomIconNavigation";
 import UserMainHome from "./UserMainHome";
+import { APP_TITLE } from "../Util/UtilTexts";
 
 function MainContainer({ wichMain }) {
     let main;
@@ -21,7 +22,7 @@ function MainContainer({ wichMain }) {
         <div className="container-fluid">
             <div className="row d-flex justify-content-center d-md-none mt-2">
                 <Link to="/home" className="btn btn-light w-50">
-                    <h1 className="display-3 m-0 px-2 pb-1">FrontReact</h1>
+                    <h1 className="display-3 m-0 px-2 pb-1">{APP_TITLE}</h1>
                 </Link>
             </div>
             <div className="row vh-100 position-relative">
