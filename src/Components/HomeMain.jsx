@@ -2,6 +2,7 @@ import { useModal } from "../hooks/useModal";
 import PublicationCard from "./PublicationCard";
 import Modal from "./Modal";
 import PublicationModal from "./PublicationModal";
+import { Link } from "react-router-dom";
 
 //cuando me comunique con el server esto lo borro
 function JustReturnModelContentExample(){
@@ -24,6 +25,10 @@ function HomeMain() {
         contentModal,
         showModal} = useModal(JustReturnModelContentExample);
 
+        function print(){
+            console.log('se ejecuto')
+        }
+
     return (
         <main className="col-12 col-md-8 col-xl-10">
             <div className="row">
@@ -43,30 +48,24 @@ function HomeMain() {
                 <aside className="d-none d-lg-block col-lg-4 mt-5">
                     <ul className="nav flex-column gap-3">
                         <li className="nav-item">
-       {/**solucionar esto, no puede haber un button isndie otro */}                     <button className="btn btn-light w-100 d-flex justify-content-between">
+                            <Link to="/userHome" className="btn btn-light w-80 d-flex justify-content-between">
                                 <div>
                                     <img height="60px" width="60px" className="rounded-circle"
                                         src="/defaultImg/profile.jpg"
                                         alt="userImage" />
-                                    <span className="ps-2 fs-5">Username</span>
+                                    <span className="ps-3 fs-5">Username</span>
                                 </div>
-                                <button className="btn btn-link">
-                                    Follow
-                                </button>
-                            </button>
+                            </Link>
                         </li>
                         <li className="nav-item">
-                            <button className="btn btn-light w-100 d-flex justify-content-between">
+                            <Link to="/userHome" className="btn btn-light w-80 d-flex justify-content-between">
                                 <div>
                                     <img height="60px" width="60px" className="rounded-circle"
                                         src="/defaultImg/profile.jpg"
                                         alt="userImage" />
-                                    <span className="ps-2 fs-5">Username</span>
+                                    <span className="ps-3 fs-5">Username</span>
                                 </div>
-                                <button className="btn btn-link">
-                                    Follow
-                                </button>
-                            </button>
+                            </Link>
                         </li>
                     </ul>
                 </aside>

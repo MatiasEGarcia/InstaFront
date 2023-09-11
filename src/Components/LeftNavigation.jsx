@@ -41,7 +41,9 @@ function LeftNavigation() {
                                 h-auto border-end bg-light position-relative z-1">{/*position relative for popover*/}
             <ul className="position-sticky top-0 start-0 nav flex-column pt-2 gap-3">
                 <li className="nav-item m-3">
-                    <h2>FrontReact</h2>
+                    <Link to="/home" className="btn btn-light">
+                        <h2>FrontReact</h2>
+                    </Link>
                 </li>
                 <li className="nav-item position-relative">
                     <button type="button" className="btn btn-light w-100 text-start fs-5" onClick={() => showPopover('search')}>
