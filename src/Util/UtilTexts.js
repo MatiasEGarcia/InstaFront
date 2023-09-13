@@ -20,6 +20,6 @@ export const SIGN_UP = 'signUp';
 
 //DIRECTIONS FOR SEARCH
 export const DIR_ASC_DIRECTION = "ASC";
-export const DIR_DESC_DIRECTION = "DESC"
+export const DIR_DESC_DIRECTION = "DESC";
 
 export const NOTIFICATION_SEVERITIES=['Success', 'Error'];

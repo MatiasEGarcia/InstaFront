@@ -1,7 +1,11 @@
 import { PersonFillAdd, PersonUp } from "react-bootstrap-icons";
-import { PASSWORD_LABEL, SIGN_IN, USERNAME_LABEL } from "../Util/UtilTexts";
+import { NOTIFICATION_SEVERITIES, PASSWORD_LABEL, SIGN_IN, USERNAME_LABEL } from "../Util/UtilTexts";
 import { useForm } from "../hooks/useForm";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNotification } from "../hooks/useNotification";
+import Loading from "./Loading";
+import { userAccess } from "../Service/AuthService";
 
 /**
  * initial values in the authenticationForm inputs
@@ -37,6 +41,9 @@ const validationsForm = (form) => {
  * @returns {JSX.Element} - The rendered AccessForm component.
  */
 function Access({ typeOfAccess }) {
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const setNotification = useNotification();
     const { form,
         fieldsTouched,
         errors,
@@ -45,8 +52,38 @@ function Access({ typeOfAccess }) {
         handleSubmit
     } = useForm(initialForm, validationsForm);
 
+    /**
+     * 
+     * @param {Event} evt - event to manage user authentication.
+     */   
     function authSubmit(evt) {
-        console.log('formulario enviado');
+        setLoading(true);
+        userAccess({
+            action:typeOfAccess,
+            username: evt.target.username.value,
+            password: evt.target.password.value,
+        }).then((data) => {
+            console.log(data)
+            setNotification({
+                sev:NOTIFICATION_SEVERITIES[0],
+                msg:`Welcome ${data.username}`
+            });
+            navigate('/home');
+        }).catch((error) => {
+            console.log(error)
+            setNotification({
+                sev: NOTIFICATION_SEVERITIES[1],
+                msg: error.message
+            });
+        }).finally(() => {
+            setLoading(false);
+        })
+    }
+
+    if(loading){
+        return(
+            <Loading/>
+        )
     }
 
     return (

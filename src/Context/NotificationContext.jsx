@@ -1,8 +1,8 @@
 import { NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
+import { useContext,createContext, useState } from 'react';
 import NotificationToast from "../Components/NotificationToast";
-import { createContext, useState } from 'react';
 
-const NotificationContext = createContext();
+export const NotificationContext = createContext();
 
 export function NotificationProvider({children}){
     const [msgConfig, setMsgConfig] =  useState({
@@ -15,10 +15,10 @@ export function NotificationProvider({children}){
      * 
      * @param {NOTIFICATION_SEVERITIES} props.sev - Type of message,success,error,etc.
      * @param {String} props.msg - Notification content.
-     * @param {Number} props.timeout - Notification time of existence. no required.(default 5).
+     * @param {Number} props.timeout - Notification time of existence. no required.(default 7).
      * @returns {JSX.Element} - NotificationContext provider
      */
-    function setNotification({sev,msg,timeout = 5}){
+    function setNotification({sev,msg,timeout = 7}){
         setMsgConfig({severity:sev, message:msg})
 
         setTimeout(() => {
@@ -27,11 +27,11 @@ export function NotificationProvider({children}){
     }
 
     return(
-        <NotificationProvider value={setNotification}>
+        <NotificationContext.Provider value={setNotification}>
             <NotificationToast message={msgConfig.message} severity={msgConfig.severity}/>
             {children}
-        </NotificationProvider>
+        </NotificationContext.Provider>
     )
 }
 
-export default NotificationContext;
+

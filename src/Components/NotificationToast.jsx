@@ -22,9 +22,12 @@ function NotificationToast({ message, severity }) {
     if (message === '') return
 
     return (
-        <div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div className={`toast-body ${bgSeverityColor}`}>
+        <div className="position-fixed top-0 end-0 z-3 w-50 w-md-25">
+            <div className="card">
+                <div className={`card-header p-1 ps-2 ${bgSeverityColor} bg-opacity-75`}>
+                    <h3 className="m-0">{severity}</h3>
+                </div>
+                <div className="card-body p-1 ps-2 py-2">
                     {message}
                 </div>
             </div>

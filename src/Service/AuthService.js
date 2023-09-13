@@ -159,5 +159,9 @@ export async function refreshToken(){
         const errorData = await res.json();
         console.warn(res.status);
         throw new RefreshTokenException(errorData.message);
+    }else {
+        const errorData = await res.json();
+        console.warn(res.status);
+        throw new Error(errorData.message);
     }
 }

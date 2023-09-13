@@ -4,7 +4,7 @@
  * User should auth again.
  * @extends Error
  */
-export class RefreshTokenException extends Error(){
+export class RefreshTokenException extends Error{
 
      /**
      * Creates a new instance of the RefreshTokenException class.
