@@ -6,6 +6,7 @@ import UserMainHome from "./UserMainHome";
 import { APP_TITLE } from "../Util/UtilTexts";
 
 function MainContainer({ wichMain }) {
+    console.log("entrando en el MainContainer");
     let main;
 
     switch (wichMain) {

@@ -2,10 +2,11 @@ import { PersonFillAdd, PersonUp } from "react-bootstrap-icons";
 import { NOTIFICATION_SEVERITIES, PASSWORD_LABEL, SIGN_IN, USERNAME_LABEL } from "../Util/UtilTexts";
 import { useForm } from "../hooks/useForm";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNotification } from "../hooks/useNotification";
 import Loading from "./Loading";
 import { userAccess } from "../Service/AuthService";
+import useAuth from "../hooks/useAuth";
 
 /**
  * initial values in the authenticationForm inputs
@@ -41,8 +42,8 @@ const validationsForm = (form) => {
  * @returns {JSX.Element} - The rendered AccessForm component.
  */
 function Access({ typeOfAccess }) {
-    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const auth = useAuth();
     const setNotification = useNotification();
     const { form,
         fieldsTouched,
@@ -51,6 +52,15 @@ function Access({ typeOfAccess }) {
         handleBlur,
         handleSubmit
     } = useForm(initialForm, validationsForm);
+    const navigate = useNavigate();
+
+    //if user is already authenticated then we send it to home page.
+    useEffect(() => {
+        if(auth.user){
+            navigate("/home");
+        }
+    },[])
+
 
     /**
      * 

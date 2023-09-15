@@ -1,24 +1,34 @@
-import Access from "./Components/Access"
-import { SIGN_IN, SIGN_UP } from "./Util/UtilTexts"
-import MainContainer from "./Components/MainContainer"
-import ChatContainer from "./Components/ChatContainer"
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { NotificationProvider } from "./Context/NotificationContext";
+import { publicNav, privateNav } from "./Util/Navigation";
+import { AuthProvider } from "./Context/AuthContext";
+import RequireAuth from "./Components/Auth/RequireAuth";
+import NoRequireAuth from "./Components/Auth/NoRequireAuth";
 
 function App() {
   return (
     <NotificationProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route exact path="/" element={<Access typeOfAccess={SIGN_IN} />}></Route>
-          <Route exact path="/signUp" element={<Access typeOfAccess={SIGN_UP} />}></Route>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<NoRequireAuth />}>
+              {publicNav.map((r, i) => {
+                return <Route key={i} path={r.path} element={r.element} />
+              })
+              }
+            </Route>
 
-          {/**This should be protected */}
-          <Route exact path="/home" element={<MainContainer wichMain='home' />}></Route>
-          <Route exact path="/userHome" element={<MainContainer wichMain='userMainhome' />}></Route>
-          <Route exact path="/chat" element={<ChatContainer />}></Route>
-        </Routes>
-      </BrowserRouter>
+            {/**This should be protected */}
+            <Route element={<RequireAuth />}>
+              {
+                privateNav.map((r, i) => {
+                  return <Route key={i} path={r.path} element={r.element} />
+                })
+              }
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </NotificationProvider>
 
   )
