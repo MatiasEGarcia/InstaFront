@@ -5,6 +5,7 @@ import NotificationsPopover from "./Popovers/NotificationsPopover";
 import ConfigurationPopover from "./Popovers/ConfigurationPopover";
 import { Link } from "react-router-dom";
 import { APP_TITLE, NAV_OPTIONS } from "../Util/UtilTexts";
+import useAuth from "../hooks/useAuth";
 
 
 /**
@@ -17,6 +18,7 @@ function LeftNavigation() {
     */
     const [navItemPopovers, setItemPopovers] = useState('');
     const [username, setUsername] = useState('');
+    const {logout} = useAuth();
 
     /**
      * To show a nav item popover
@@ -95,7 +97,8 @@ function LeftNavigation() {
                     </button>
                     {navItemPopovers === 'config' &&
                         <ConfigurationPopover hidePopover={hidePopover}
-                            container="custom-popover-container" />
+                            container="custom-popover-container"
+                            logoutAction = {logout}/>
                     }
                 </li>
             </ul>

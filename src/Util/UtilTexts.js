@@ -5,7 +5,7 @@ export const MESS_TOKENS_INVALID = "Invalid tokens, user need to authenticate ag
 //I use this message when I need to pass a flag to another method but the type of the flag doesn't exist
 export const ACTION_NO_EXIST = "Action passed as param don't exist";
 
-
+export const NOTI_MESSAGE_LOGOUT_SUCCESSFULLY = 'User logout successfully!';
 
 //FORMS
 export const USERNAME_LABEL = 'Username';

@@ -4,6 +4,7 @@ import SearchPopover from "./Popovers/SearchPopover";
 import NotificationsPopover from "./Popovers/NotificationsPopover";
 import ConfigurationPopover from "./Popovers/ConfigurationPopover";
 import { Link } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 /**
  * @returns {JSX.Element} - The rendered bottom sticky nav.
@@ -14,6 +15,7 @@ function StickyBottomIconNavigation() {
     */
     const [navItemPopovers, setItemPopovers] = useState('');
     const [username, setUsername] = useState('');
+    const {logout} = useAuth();
 
 
     /**
@@ -90,7 +92,8 @@ function StickyBottomIconNavigation() {
                     </button>
                     {navItemPopovers === 'config' &&
                         <ConfigurationPopover hidePopover={hidePopover}
-                            container="custom-icon-popover-container" />
+                            container="custom-icon-popover-container" 
+                            logoutAction = {logout}/>
                     }
                 </li>
             </ul>

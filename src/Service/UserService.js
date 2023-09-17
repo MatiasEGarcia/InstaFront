@@ -10,7 +10,7 @@ import { refreshToken } from "./AuthService";
 export async function logout(){
     let res;
     const token = localStorage.getItem('authToken');
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = localStorage.getItem('authRefreshToken');
 
     const options = {
         method: 'POST',
