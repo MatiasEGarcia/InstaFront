@@ -7,9 +7,9 @@
  */
 function NotificationsPopover({ hidePopover, container }) {
     return (
-        <div className={`${container} card`} onMouseLeave={() => hidePopover()}>
-            <div className="card-header text-center"><h3>Notifications</h3></div>
-            <div className="card-body overflow-auto">
+        <div className={`${container} border rounded p-3 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
+            <div className="text-center"><h3>Notifications</h3></div>
+            <div className="">
                 Notifications body not implemented
             </div>
         </div>

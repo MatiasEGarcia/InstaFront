@@ -9,8 +9,8 @@
  */
 function SearchPopover({ hidePopover, username, searchByUsername, container }) {
     return (
-        <div className={`${container} card`} onMouseLeave={() => hidePopover()}>
-            <div className="card-header">
+        <div className={`${container} border rounded p-3 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
+            <div className="mb-2">
                 <input type="text"
                     className="form-control"
                     id="username"
@@ -19,62 +19,17 @@ function SearchPopover({ hidePopover, username, searchByUsername, container }) {
                     value={username}
                     onChange={(evt) => searchByUsername(evt)} />
             </div>
-            <div className="card-body overflow-auto p-0">
-
-                <button className="btn btn-light w-100 d-flex justify-content-between">
+            <div className="vstack gap-2 h-80 overflow-auto">
+                <button className="btn btn-light w-100 d-flex justify-content-between align-items-center">
                     <div>
                         <img height="60px" width="60px" className="rounded-circle"
                             src="/defaultImg/profile.jpg"
                             alt="userImage" />
                         <span className="ps-2 fs-5">Username</span>
                     </div>
-                    <button className="btn btn-sm btn-link">
+                    <span className="btn btn-sm btn-link">
                         Follow
-                    </button>
-                </button>
-                <button className="btn btn-light w-100 d-flex justify-content-between">
-                    <div>
-                        <img height="60px" width="60px" className="rounded-circle"
-                            src="/defaultImg/profile.jpg"
-                            alt="userImage" />
-                        <span className="ps-2 fs-5">Username</span>
-                    </div>
-                    <button className="btn btn-sm btn-link">
-                        Follow
-                    </button>
-                </button>
-                <button className="btn btn-light w-100 d-flex justify-content-between">
-                    <div>
-                        <img height="60px" width="60px" className="rounded-circle"
-                            src="/defaultImg/profile.jpg"
-                            alt="userImage" />
-                        <span className="ps-2 fs-5">Username</span>
-                    </div>
-                    <button className="btn btn-sm btn-link">
-                        Follow
-                    </button>
-                </button>
-                <button className="btn btn-light w-100 d-flex justify-content-between">
-                    <div>
-                        <img height="60px" width="60px" className="rounded-circle"
-                            src="/defaultImg/profile.jpg"
-                            alt="userImage" />
-                        <span className="ps-2 fs-5">Username</span>
-                    </div>
-                    <button className="btn btn-sm btn-link">
-                        Follow
-                    </button>
-                </button>
-                <button className="btn btn-light w-100 d-flex justify-content-between">
-                    <div>
-                        <img height="60px" width="60px" className="rounded-circle"
-                            src="/defaultImg/profile.jpg"
-                            alt="userImage" />
-                        <span className="ps-2 fs-5">Username</span>
-                    </div>
-                    <button className="btn btn-sm btn-link">
-                        Follow
-                    </button>
+                    </span>
                 </button>
             </div>
         </div>

@@ -1,10 +1,11 @@
 .custom-popover-container {
     position: absolute;
     top: calc(100% - 135px);
-    left: calc(100% + 8px);
+    left: calc(100% + 15px);
     border-radius: 5%;
     width: 300px;
     height: 300px;
+    max-height: 300px;
 
     &::after {
         content: "";
@@ -22,15 +23,17 @@
 
 .custom-icon-popover-container {
     position: fixed;
+    bottom: calc(50% - 150px); // - 150 = half of the height
+    left: calc(50% - 150px);// -150 = half of the width
     width: 300px;
     height: 300px;
-    bottom: 50%;
-    left: 50%;
     box-shadow: $box-shadow-lg;
     transition: 1s;
 
-    &:hover{
-        width: 350px;
+    &:hover {
+        bottom: calc(50% - 200px); // -200 = half of the hieght
+        left: calc(50% - 200px); // -200 = half of the width
+        width: 400px;
         height: 400px;
     }
 }

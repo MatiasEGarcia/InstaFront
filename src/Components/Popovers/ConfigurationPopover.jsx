@@ -7,10 +7,10 @@
  */
 function ConfigurationPopover({ hidePopover , container}) {
     return (
-        <div className={`${container} card`} onMouseLeave={() => hidePopover()}>
-            <div className="card-header"><h3>Configuration</h3></div>
-            <div className="card-body">body</div>
-            <div className="card-footer">
+        <div className={`${container} border rounded p-2 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
+            <div className=""><h3>Configuration</h3></div>
+            <div className="">body</div>
+            <div className="">
                 <button className="btn btn-danger">
                     Logout
                 </button>

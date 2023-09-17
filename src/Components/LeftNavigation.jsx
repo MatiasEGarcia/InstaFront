@@ -88,7 +88,7 @@ function LeftNavigation() {
                         <span className="ms-2">{NAV_OPTIONS[4]}</span>
                     </button>
                 </li>
-                <li className="nav-item">
+                <li className="nav-item position-relative">
                     <button type="button" className="btn btn-light w-100 text-start fs-5" onClick={() => showPopover('config')}>
                         <Gear size={30} />
                         <span className="ms-2">{NAV_OPTIONS[5]}</span>
