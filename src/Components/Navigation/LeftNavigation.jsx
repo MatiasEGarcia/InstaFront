@@ -24,7 +24,9 @@ function LeftNavigation({
     logout,
     showPopover,
     setShowPopover,
-    hidePopover
+    hidePopover,
+    userVisibiliy,
+    setUserVisibility
 }) {
 
 
@@ -88,7 +90,9 @@ function LeftNavigation({
                     {showPopover === 'config' &&
                         <ConfigurationPopover hidePopover={hidePopover}
                             container="custom-popover-container"
-                            logoutAction = {logout}/>
+                            logoutAction = {logout}
+                            userVisibiliy = {userVisibiliy}
+                            setUserVisibility = {setUserVisibility}/>
                     }
                 </li>
             </ul>

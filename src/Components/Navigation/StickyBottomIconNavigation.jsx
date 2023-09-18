@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
  * @param {String} param.showPopover - wich popover should be active.
  * @param {Function} param.setShowPopover - function to change wich popover should be active.
  * @param {Function} param.hidePopover - function to hide the active popover.
+ * @param {String} param.userVisibiliy - if authenticated user is private or public.
  * @returns {JSX.Element} - The rendered bottom sticky nav.
  */
 function StickyBottomIconNavigation({
@@ -22,7 +23,9 @@ function StickyBottomIconNavigation({
     logout,
     showPopover,
     setShowPopover,
-    hidePopover
+    hidePopover,
+    userVisibiliy,
+    setUserVisibility
 }) {
 
 
@@ -78,7 +81,9 @@ function StickyBottomIconNavigation({
                     {showPopover === 'config' &&
                         <ConfigurationPopover hidePopover={hidePopover}
                             container="custom-icon-popover-container"
-                            logoutAction={logout} />
+                            logoutAction={logout}
+                            userVisibiliy = {userVisibiliy}
+                            setUserVisibility = {setUserVisibility} />
                     }
                 </li>
             </ul>

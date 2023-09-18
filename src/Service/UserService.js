@@ -48,6 +48,44 @@ export async function logout() {
     }
 }
 
+export async function changeUserVisibility(){
+    let isTokenRefreshed = false;
+    let res;
+    const options = {
+        method: 'PUT',
+        headers: {
+            'Content-type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+    }
+
+    try {
+        res = await fetch(`${USERS_ENDPOINT}/visible`,options);
+    } catch (error) {
+        console.error(`Error trying to connect to server -> ${error}`);
+        throw new Error(MESS_ERROR_SERVER_CONNECTION);
+    }
+
+    if (res.status >= 200 && res.status <= 299) {
+        const data = await res.json();
+        return data;
+    } else if (res.status === 401) {//means that that the auth token is invalid and user needs to auth again with refreshToken.
+        console.warn(MESS_AUTH_TOKEN_EXPIRED);
+        if (!isTokenRefreshed) {//to avoid circle loop
+            isTokenRefreshed = true;
+            await refreshToken();
+            // Call the function again, now that the token has been refreshed
+            return changeUserVisibility();
+        } else {
+            throw new RefreshTokenException(MESS_TOKENS_INVALID);
+        }
+    } else {
+        const errorData = await res.json();
+        console.warn(res.status);
+        throw new Error(errorData.message);
+    }
+}
+
 /**
  * Just search user profile image,username and if is visible.
   * @returns {Promise} A promise that resolves with the response data if the request is successful.
