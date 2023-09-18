@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
 import HomeMain from "./HomeMain";
-import LeftNavigation from "./LeftNavigation";
-import StickyBottomIconNavigation from "./StickyBottomIconNavigation";
 import UserMainHome from "./UserMainHome";
-import { APP_TITLE } from "../Util/UtilTexts";
+import { APP_TITLE , TYPE_NAV } from "../Util/UtilTexts";
+import Navigation from "./Navigation/Navigation";
 
 function MainContainer({ wichMain }) {
     console.log("entrando en el MainContainer");
@@ -27,9 +26,9 @@ function MainContainer({ wichMain }) {
                 </Link>
             </div>
             <div className="row vh-100 position-relative">
-                <LeftNavigation />
+                <Navigation typeNavigation={TYPE_NAV[0]}/>
                 {main}
-                <StickyBottomIconNavigation />
+                <Navigation typeNavigation={TYPE_NAV[1]}/>
             </div>
         </div>
     )

@@ -7,7 +7,7 @@ import { refreshToken } from "./AuthService";
  * Logs out the user by sending a request to the server with the authentication token and refresh token.
  * @returns {Promise} A promise that resolves with the response data if the logout is successful.
  */
-export async function logout(){
+export async function logout() {
     let res;
     const token = localStorage.getItem('authToken');
     const refreshToken = localStorage.getItem('authRefreshToken');
@@ -18,30 +18,30 @@ export async function logout(){
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({token, refreshToken}),
+        body: JSON.stringify({ token, refreshToken }),
     }
 
     try {
-        res = await fetch(`${USERS_ENDPOINT}/logout`,options);
+        res = await fetch(`${USERS_ENDPOINT}/logout`, options);
     } catch (error) {
         console.error(`Error trying to connect to server -> ${error}`);
         throw new Error(MESS_ERROR_SERVER_CONNECTION);
     }
 
-    if(res.status >= 200 & res.status <= 299){
+    if (res.status >= 200 & res.status <= 299) {
         const data = await res.json();
         return data;
-    }else if(res.status === 401){//means that that the auth token is invalid and user needs to auth again with refreshToken.
+    } else if (res.status === 401) {//means that that the auth token is invalid and user needs to auth again with refreshToken.
         console.warn(MESS_AUTH_TOKEN_EXPIRED);
-        if(!isTokenRefreshed){//to avoid circle loop
+        if (!isTokenRefreshed) {//to avoid circle loop
             isTokenRefreshed = true;
             await refreshToken();
             // Call the function again, now that the token has been refreshed
             return logout();
-        }else{
+        } else {
             throw new RefreshTokenException(MESS_TOKENS_INVALID);
         }
-    }else{
+    } else {
         const errorData = await res.json();
         console.warn(res.status);
         throw new Error(`There was a error: ${errorData.message}`)
@@ -52,38 +52,38 @@ export async function logout(){
  * Just search user profile image,username and if is visible.
   * @returns {Promise} A promise that resolves with the response data if the request is successful.
  */
-export async function getBasicUserInfo(){
+export async function getBasicUserInfo() {
     let isTokenRefreshed = false;
     let res;
-    const options={
-        method:'GET',
-        headers:{
-            'Content-Type':'application/json',
+    const options = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
     }
 
     try {
-        res = await fetch(`${USERS_ENDPOINT}/userBasicInfo`,options);
+        res = await fetch(`${USERS_ENDPOINT}/userBasicInfo`, options);
     } catch (error) {
         console.error(`Error trying to connect to server -> ${error}`);
-        throw new Error(MESS_ERROR_SERVER_CONNECTION);  
+        throw new Error(MESS_ERROR_SERVER_CONNECTION);
     }
 
-    if(res.status >= 200 && res.status <= 299){
+    if (res.status >= 200 && res.status <= 299) {
         const data = await res.json();
         return data;
-    }else if(res.status === 401){//means that that the auth token is invalid and user needs to auth again with refreshToken.
+    } else if (res.status === 401) {//means that that the auth token is invalid and user needs to auth again with refreshToken.
         console.warn(MESS_AUTH_TOKEN_EXPIRED);
-        if(!isTokenRefreshed){//to avoid circle loop
+        if (!isTokenRefreshed) {//to avoid circle loop
             isTokenRefreshed = true;
             await refreshToken();
             // Call the function again, now that the token has been refreshed
             return getBasicUserInfo();
-        }else{
+        } else {
             throw new RefreshTokenException(MESS_TOKENS_INVALID);
         }
-    }else{
+    } else {
         const errorData = await res.json();
         console.warn(res.status);
         throw new Error(errorData.message);
@@ -92,14 +92,14 @@ export async function getBasicUserInfo(){
 
 export async function searchUsersByOneCondition({
     column, value, page, pageSize, sortDir, operation
-}){
+}) {
     let isTokenRefreshed = false;
     let res;
     const params = new URLSearchParams({
-        page : page || '0',
+        page: page || '0',
         pageSize: pageSize || '20',
-        sortField: 'userId',
-        sortDir:sortDir || DIR_ASC_DIRECTION,
+        sortField: 'username',
+        sortDir: sortDir || DIR_ASC_DIRECTION,
     });
     const bodyRequest = {
         column,
@@ -108,35 +108,38 @@ export async function searchUsersByOneCondition({
         operation
     };
     const options = {
-        method : 'POST',
+        method: 'POST',
         headers: {
-            'Content-Type':'application/json',
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
         body: JSON.stringify(bodyRequest),
     }
 
     try {
-        res = await fetch(`${USERS_ENDPOINT}/searchAll/oneCondition?` + params.toString(),options);
+        res = await fetch(`${USERS_ENDPOINT}/searchAll/oneCondition?` + params.toString(), options);
     } catch (error) {
         console.error(`Error trying to connect to server -> ${error}`);
         throw new Error(`${MESS_ERROR_SERVER_CONNECTION}`)
     }
 
-    if(res.status >= 200 && res.status <= 299){
+    if (res.status === 204) { //if is 204, no users were found.
+        const headers = res.headers; //in the headers there is one with info, is called 'moreInfo'
+        return headers;
+    } else if (res.status >= 200 && res.status <= 299) {
         const data = await res.json();
         return data;
-    }else if(res.status === 401){//means that that the auth token is invalid and user needs to auth again with refreshToken.
+    } else if (res.status === 401) {//means that that the auth token is invalid and user needs to auth again with refreshToken.
         console.warn(MESS_AUTH_TOKEN_EXPIRED);
-        if(!isTokenRefreshed){//to avoid circle loop
+        if (!isTokenRefreshed) {//to avoid circle loop
             isTokenRefreshed = true;
             await refreshToken();
             // Call the function again, now that the token has been refreshed
             return searchUsersByOneCondition(column, value, page, pageSize, sortDir, operation);
-        }else{
+        } else {
             throw new Error(MESS_TOKENS_INVALID);
         }
-    }else{
+    } else {
         const errorData = await res.json();
         console.warn(res.status);
         throw new Error(errorData.message);
