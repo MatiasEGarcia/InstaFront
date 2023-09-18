@@ -1,12 +1,16 @@
+import UserImageProfile from "../UserImageProfile";
+
+
 /**
  * Components that returns search popover to use in some navigation.
- * @param {Object} param0 - The component props.
- * @param {Function} param.hidePopover - function to close popover
- * @param {String} param.username - username to search
- * @param {Function} param.searchByUsername - function to search user.
- * @param {String} param.container - type of container , for bottom navigation or left navigation
+ * @param {Object} param - The component props.
+ * @param {Function} param.hidePopover - function to close popover.
+ * @param {String} param.username - username to search.
+ * @param {Function} param.setUsername - function to search users.
+ * @param {String} param.container - type of container , for bottom navigation or left navigation.
+ * @param {Array} param.usersFound - array with users found.
  * @returns {JSX.Element} - search popover.
- *//*CORREGIR COMMENT*/
+ */
 function SearchPopover({ hidePopover, username, setUsername, container, usersFound }) {
     return (
         <div className={`${container} border rounded p-3 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
@@ -28,9 +32,7 @@ function SearchPopover({ hidePopover, username, setUsername, container, usersFou
                         return (
                             <button className="btn btn-light w-100 d-flex justify-content-between align-items-center" key={index}>
                                 <div>
-                                    <img height="60px" width="60px" className="rounded-circle"
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
+                                    <UserImageProfile imgWith="60px" imgHeight="60px" img={user.image}/>
                                     <span className="ps-2 fs-5">{user.username}</span>
                                 </div>
                                 <span className="btn btn-sm btn-link">

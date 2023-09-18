@@ -13,7 +13,6 @@ import useCheckUserEffect from "../../hooks/useCheckUserEffect";
  * @returns {JSX.Element} 
  */
 export default function RequireAuth(){
-    console.log("entrando en RequireAuth")
     const {auth, setAuth} = useAuth();
     const [loading, setLoading] = useState(true);
     const setNotification = useNotification();

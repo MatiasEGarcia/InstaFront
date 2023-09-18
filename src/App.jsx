@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { NotificationProvider } from "./Context/NotificationContext";
-import { publicNav, privateNav } from "./Util/Navigation";
+import { publicNav, privateNav } from "./Util/UtilNavigation";
 import { AuthProvider } from "./Context/AuthContext";
 import RequireAuth from "./Components/Auth/RequireAuth";
 import NoRequireAuth from "./Components/Auth/NoRequireAuth";

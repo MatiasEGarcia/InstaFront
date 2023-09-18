@@ -6,6 +6,12 @@ import useAuth from "../../hooks/useAuth";
 import { searchUsersByOneCondition } from "../../Service/UserService";
 import { useNotification } from "../../hooks/useNotification";
 
+/**
+ * 
+ * @param {Object} param0 - The component props.
+ * @param {String} param.typeNavigation -which navigator is needed
+ * @returns {JSX.Element} - One of the posibles types of navigations
+ */
 export default function Navigation({ typeNavigation }) {
     const [showPopover, setShowPopover] = useState('');//should containe name of the popover to show, if is empty then no one.
     const [username, setUsername] = useState('');

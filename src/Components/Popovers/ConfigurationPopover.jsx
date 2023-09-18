@@ -3,9 +3,10 @@ import Loading from "../Loading";
 
 /**
  * Component that returns configuration details popover to use in some navigation.
- * @param {Object} param0 - The component props.
+ * @param {Object} param - The component props.
  * @param {Function} param.hidePopover - function to close popover
  * @param {String} param.container - type of container , for bottom navigation or left navigation
+ * @param {Function} param.logoutAction - user logout function.
  * @returns {JSX.Element} - configuration popover.
  */
 function ConfigurationPopover({ hidePopover, container, logoutAction }) {

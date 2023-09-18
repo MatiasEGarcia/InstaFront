@@ -1,16 +1,21 @@
 import { Heart } from "react-bootstrap-icons";
+import UserImageProfile from "./UserImageProfile";
 
 /**
  * Component to show publication general information.
  * @param {Object} props - The component props.
  * @param {Function} props.showModal - will open a modal that have the publication info + comentaries.
+ * @param {String} props.width - publication card width.
  * @returns {JSX.Element} - The rendered Publication component.
  */
-function PublicationCard({ showModal , width }) {
+function PublicationCard({ showModal, width }) {
     return (
         <div className={`card ${width}`}>
             <div className="card-header d-flex justify-content-between">
-                <p>Username</p>
+                <div>
+                    <UserImageProfile imgWith="60px" imgHeight="60px"/>
+                    <span className="ps-2 fs-5">Username</span>
+                </div>
                 <p>11-12-22</p>
             </div>
             <img src="..." className="card-img-top" alt="..." />

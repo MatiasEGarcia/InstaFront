@@ -1,6 +1,6 @@
 /**
  * Component that returns notifications popover to use in some navigation.
- * @param {Object} param0 - The component props.
+ * @param {Object} param - The component props.
  * @param {Function} param.hidePopover - function to close popover
  * @param {String} param.container - type of container , for bottom navigation or left navigation
  * @returns {JSX.Element} - notifications popover.

@@ -1,18 +1,24 @@
 import { Link } from "react-router-dom";
 import HomeMain from "./HomeMain";
 import UserMainHome from "./UserMainHome";
-import { APP_TITLE , TYPE_NAV } from "../Util/UtilTexts";
+import { APP_TITLE , TYPE_NAV , TYPE_MAIN} from "../Util/UtilTexts";
 import Navigation from "./Navigation/Navigation";
 
+/**
+ * Will hold basic Main display.
+ * 
+ * @param {Object} param - The component props. 
+ * @param {String} param.wichMain - main component to display.
+ * @returns {JSX.Element} - a main component selected.
+ */
 function MainContainer({ wichMain }) {
-    console.log("entrando en el MainContainer");
     let main;
 
     switch (wichMain) {
-        case 'home':
+        case TYPE_MAIN[0]:
             main = <HomeMain />
             break;
-        case 'userMainhome':
+        case TYPE_MAIN[1]:
             main = <UserMainHome />
             break;
     }

@@ -12,7 +12,6 @@ import Loading from "../Loading";
  * @returns {JSX.Element} 
  */
 export default function noRequireAuth(){
-    console.log("entrando en noRequireAuth")
     const {auth, setAuth} = useAuth();
     const [loading, setLoading] = useState(true);
     const setNotification = useNotification();

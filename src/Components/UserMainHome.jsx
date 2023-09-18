@@ -13,6 +13,8 @@ function JustReturnModelContentExample() {
 }
 
 /**
+ * Main component for user home page. where should be its publications,followers ,etc.
+ * 
  * @returns {JSX.Element} - show every user main page.
  */
 function UserMainHome() {

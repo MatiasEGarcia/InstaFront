@@ -1,7 +1,7 @@
 import Access from "../Components/Access";
 import ChatContainer from "../Components/ChatContainer";
 import MainContainer from "../Components/MainContainer";
-import { SIGN_IN, SIGN_UP } from "./UtilTexts"
+import { SIGN_IN, SIGN_UP, TYPE_MAIN } from "./UtilTexts"
 
 
 export const publicNav = [
@@ -10,8 +10,8 @@ export const publicNav = [
 ]
 
 export const privateNav = [
-    { path: "/home", name: "home", element: <MainContainer wichMain="home" /> },
-    { path: "/userHome", name: "userHome", element: <MainContainer wichMain="userMainHome" /> },
+    { path: "/home", name: "home", element: <MainContainer wichMain={TYPE_MAIN[0]} /> },
+    { path: "/userHome", name: "userHome", element: <MainContainer wichMain={TYPE_MAIN[1]} /> },
     { path: "/chat", name: "chat", element: <ChatContainer /> }
 ]
 

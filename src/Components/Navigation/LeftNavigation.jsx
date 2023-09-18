@@ -7,7 +7,14 @@ import { APP_TITLE, NAV_OPTIONS } from "../../Util/UtilTexts";
 
 
 /**
- * 
+ * @param {Object} param - The component props.
+ * @param {String} param.username - username value for input in search popover.
+ * @param {Function} param.setUsername - function to change the value in username.
+ * @param {Array} param.usersFound - array with users found in search popover.
+ * @param {Function} param.logout - logout function for configuration popover.
+ * @param {String} param.showPopover - wich popover should be active.
+ * @param {Function} param.setShowPopover - function to change wich popover should be active.
+ * @param {Function} param.hidePopover - function to hide the active popover.
  * @returns {JSX.Element} - The rendered left basic nav.
  */
 function LeftNavigation({

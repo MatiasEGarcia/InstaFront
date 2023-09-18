@@ -6,6 +6,7 @@ import { RefreshTokenException } from "../Errors/Errors";
 
 const AuthContext = createContext();
 
+
 export function AuthProvider({ children }) {
     const [auth, setAuth] = useState({});
     const setNotification = useNotification();
