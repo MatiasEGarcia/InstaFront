@@ -25,9 +25,9 @@ export default function Navigation({ typeNavigation }) {
         * After a second it runs this, 
         * but if the mouse re-entered the popover, then it won't close, it's to give the user time to get from the icon to the popover.
         */
-       /* setTimeout(() => {
+       setTimeout(() => {
             setShowPopover('');
-        }, 500);*/
+        }, 500);
     }
 
     function setUserVisibility(){

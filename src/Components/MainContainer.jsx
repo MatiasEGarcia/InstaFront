@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import HomeMain from "./HomeMain";
 import UserMainHome from "./UserMainHome";
-import { APP_TITLE , TYPE_NAV , TYPE_MAIN} from "../Util/UtilTexts";
+import { APP_TITLE, TYPE_NAV, TYPE_MAIN } from "../Util/UtilTexts";
 import Navigation from "./Navigation/Navigation";
-
+import UserDetailsMain from "./UserDetailsMain";
 /**
  * Will hold basic Main display.
  * 
@@ -21,6 +21,9 @@ function MainContainer({ wichMain }) {
         case TYPE_MAIN[1]:
             main = <UserMainHome />
             break;
+        case TYPE_MAIN[2]:
+            main = <UserDetailsMain />
+            break;
     }
 
 
@@ -32,9 +35,9 @@ function MainContainer({ wichMain }) {
                 </Link>
             </div>
             <div className="row vh-100 position-relative">
-                <Navigation typeNavigation={TYPE_NAV[0]}/>
+                <Navigation typeNavigation={TYPE_NAV[0]} />
                 {main}
-                <Navigation typeNavigation={TYPE_NAV[1]}/>
+                <Navigation typeNavigation={TYPE_NAV[1]} />
             </div>
         </div>
     )

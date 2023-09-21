@@ -18,7 +18,7 @@ export const APP_TITLE = 'FrontReact';
 export const NAV_OPTIONS = ['Search','Notifications', 'Chats', 'Navigate', 'Create' , 'Settings'];
 //types of navigation for the app
 export const TYPE_NAV = ['leftNavigation', 'stickyBottomIconNavigation'];
-export const TYPE_MAIN = ['home', 'userMainHome'];
+export const TYPE_MAIN = ['home', 'userMainHome', 'userDetailsMain'];
 
 export const SIGN_IN = 'signIn';
 export const SIGN_UP = 'signUp';

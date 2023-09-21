@@ -1,4 +1,4 @@
-import Loading from "../Loading";
+import { Link } from "react-router-dom";
 
 
 /**
@@ -44,12 +44,9 @@ function ConfigurationPopover({ hidePopover, container, logoutAction, userVisibi
                         </div>
                     </div>
                 </div>
-                <button className="btn btn-light">
-                    <p className="m-0">Edit password?</p>
-                </button>
-                <button className="btn btn-light">
-                    <p className="m-0">Profile details</p> {/*THIS WILL GO TO A MAIN PAGE TO EDIT USERNAME AND USER DETAILS LIKE MAIL, NAME AND SURNAME*/}
-                </button>
+                <Link to="/userDetails" className="btn btn-light">
+                    <p className="m-0">Set Profile details</p> {/*THIS WILL GO TO A MAIN PAGE TO EDIT USERNAME AND USER DETAILS LIKE MAIL, NAME AND SURNAME*/}
+                </Link>
             </div>
             <div className="h-15 text-center">
                 <button className="btn btn-danger w-50" onClick={() => logoutAction()}>

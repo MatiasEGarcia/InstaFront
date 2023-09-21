@@ -48,7 +48,60 @@ export async function logout() {
     }
 }
 
-export async function changeUserVisibility(){
+export async function uploadProfileImage(img) {
+    if (!img instanceof File) {
+        throw new Error('img is not a file');
+    }
+
+    const formData = new FormData();
+    formData.append('img', img);
+    let isTokenRefreshed = false;
+    let res;
+    const options = {
+        method: 'POST',
+        headers: { 
+             /*Why don't I add the Content-type header? I need the browser to create it automatically,
+              and the add the boundary too,  If I add the Content-type manually,the boundary will 
+              not be set and the request won't work */
+             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: formData,
+    }
+
+    try {
+        res = await fetch(`${USERS_ENDPOINT}/image`, options);
+    } catch (error) {
+        console.error(`Error tryin to connect to server -> ${error}`);
+        throw new Error(MESS_ERROR_SERVER_CONNECTION);
+    }
+
+    if (res.status >= 200 && res.status <= 299) {
+        const data = await res.json();
+        return data;
+    } else if (res.status === 401) {//means that that the auth token is invalid and user needs to auth again with refreshToken.
+        console.warn(MESS_AUTH_TOKEN_EXPIRED);
+        if (!isTokenRefreshed) {//to avoid circle loop
+            isTokenRefreshed = true;
+            await refreshToken();
+            // Call the function again, now that the token has been refreshed
+            return uploadProfileImage(img);
+        } else {
+            throw new RefreshTokenException(MESS_TOKENS_INVALID);
+        }
+    } else {
+        const errorData = await res.json();
+        console.warn(res.status);
+        throw new Error(errorData.message);
+    }
+}
+
+/**
+ * Function to change user visiblity(from private to public and vice versa).
+ * 
+ * @returns {Promise} A promise that resolves with the response data(the user basic info updated).
+ * @throws {Error} - If theres was some error in the connection or request.
+ */
+export async function changeUserVisibility() {
     let isTokenRefreshed = false;
     let res;
     const options = {
@@ -60,7 +113,7 @@ export async function changeUserVisibility(){
     }
 
     try {
-        res = await fetch(`${USERS_ENDPOINT}/visible`,options);
+        res = await fetch(`${USERS_ENDPOINT}/visible`, options);
     } catch (error) {
         console.error(`Error trying to connect to server -> ${error}`);
         throw new Error(MESS_ERROR_SERVER_CONNECTION);
