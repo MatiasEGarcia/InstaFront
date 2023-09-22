@@ -73,10 +73,9 @@ function Access({ typeOfAccess }) {
             username: evt.target.username.value,
             password: evt.target.password.value,
         }).then((data) => {
-            console.log(data)
             setNotification({
                 sev:NOTIFICATION_SEVERITIES[0],
-                msg:`Welcome ${data.username}`
+                msg:`Welcome ${data.body.username}`
             });
             navigate('/home');
         }).catch((error) => {

@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
     function logout() {
         logoutFromService().then((data) => {
             setAuth({});
+            console.log(data.body.message);
         }).catch((error) => {
             if(error instanceof RefreshTokenException){
                 //success because the tokens are not valid, which is what 

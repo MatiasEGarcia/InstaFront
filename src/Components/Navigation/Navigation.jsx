@@ -32,7 +32,7 @@ export default function Navigation({ typeNavigation }) {
 
     function setUserVisibility(){
         changeUserVisibility().then((data) => {
-            setAuth({...auth,user:data});
+            setAuth({...auth,user:data.body});
             setNotification({
                 sev: NOTIFICATION_SEVERITIES[0],//success
                 msg: "visibility changed",
@@ -52,12 +52,14 @@ export default function Navigation({ typeNavigation }) {
                 value: username,
                 operation: LIKE,
             }).then((data) => {
-                if (data.list !== undefined) {
-                    setUsersFound(data.list);
+                if (data.body?.list !== undefined) {
+                    setUsersFound(data.body.list);
+                }else{
+                    console.log(data.headers.get('moreInfo'))//moreInfo: name of the header with the more info
                 }
             }).catch((error) => {
                 setNotification({
-                    sev: NOTIFICATION_SEVERITIES[1],
+                    sev: NOTIFICATION_SEVERITIES[1],//error
                     msg: error.message,
                 })
             })

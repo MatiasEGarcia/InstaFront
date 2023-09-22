@@ -3,31 +3,30 @@ import { MESS_TOKENS_INVALID, MESS_ERROR_SERVER_CONNECTION, MESS_AUTH_TOKEN_EXPI
 
 /**
  * Async Fetch function to do a request to the server.
- * 
- * @param {Object} param - The function param.
  * @param {String} param.endpoint - endpoint to the resource, can contain params.
  * @param {String} param.options - fetch options.
- * @returns {Promise<Object>} - if the response status === 204 returns response headers, if not response data.
- * @throws {Error} - if authentication tokens are invalid or if there was some error in the connection or request.
+ * @returns {Promise<Object>} data object with the body or headers of the response.
+ * @throws {Error} if authentication tokens are invalid or if there was some error in the connection or request.
  */
 export default async function fetchApi({endpoint, options}){
 	let isTokenRefreshed = false;
-    let res;
+    let fetchRes;//request fetch response
+    let data = {};//function return object
 
 	try {
-        res = await fetch(endpoint, options);
+        fetchRes = await fetch(endpoint, options);
     } catch (error) {
         console.error(`Error trying to connect to server -> ${error}`);
         throw new Error(`${MESS_ERROR_SERVER_CONNECTION}`)
     }
 
-	if (res.status === 204) { //if is 204, no resources was found
-        const headers = res.headers; //in the headers there is one with info, is called 'moreInfo'
-        return headers;
-    } else if (res.status >= 200 && res.status <= 299) {
-        const data = await res.json();
+	if (fetchRes.status === 204) { //if is 204, no resources was found
+        data.headers = fetchRes.headers; //in the headers there is one with info, is called 'moreInfo'
         return data;
-    } else if (res.status === 401) {//means that that the auth token is invalid and user needs to auth again with refreshToken.
+    } else if (fetchRes.status >= 200 && fetchRes.status <= 299) {
+        data.body = await fetchRes.json();
+        return data;
+    } else if (fetchRes.status === 401) {//means that that the auth token is invalid and user needs to auth again with refreshToken.
         console.warn(MESS_AUTH_TOKEN_EXPIRED);
         if (!isTokenRefreshed) {//to avoid circle loop
             isTokenRefreshed = true;
@@ -38,8 +37,8 @@ export default async function fetchApi({endpoint, options}){
             throw new Error(MESS_TOKENS_INVALID);
         }
     } else {
-        const errorData = await res.json();
-        console.warn(res.status);
+        const errorData = await fetchRes.json();
+        console.warn(fetchRes.status);
         throw new Error(errorData.message);
     }
 }

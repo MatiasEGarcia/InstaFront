@@ -58,7 +58,7 @@ export default function UserDetailsMain() {
 
     function saveNewProfileImage(evt) {
         uploadProfileImage(evt.target.files[0]).then((data) => {
-            setAuth({ ...auth, user: { ...auth.user, image: data.image64 } });
+            setAuth({ ...auth, user: { ...auth.user, image: data.body.image64 } });
             setNotification({
                 sev: NOTIFICATION_SEVERITIES[0], //success
                 msg: 'user profile image updated'

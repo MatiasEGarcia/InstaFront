@@ -24,7 +24,7 @@ export default function useCheckUserEffect({
     useEffect(() => {
         if (!auth?.user && localStorage.getItem("authToken")) {
             getBasicUserInfo().then((data) => {
-                setAuth({ ...auth, user: data });
+                setAuth({ ...auth, user: data.body });
             }).catch((error) => {
                 setNotification('error', error.message);
             }).finally(() => {

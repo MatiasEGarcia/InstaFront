@@ -5,7 +5,7 @@ import fetchApi from "./FetchServices";
 /**
  * Async function to Log out the user by sending a request to the server with
  * the authentication token and refresh token.
- * @returns {Promise<Object>} A promise that resolves with the response data if the logout is successful.
+ * @returns {Promise<Object>} data object with the body of the response.
  */
 export async function logout() {
     let data;
@@ -29,8 +29,8 @@ export async function logout() {
 /**
  * Async function to upload or change user profile image.
  * 
- * @param {File} img - new user profile image.
- * @returns {Promise<Object>} - object Data from the response if is all ok(an object with the new image64).
+ * @param {File} img new user profile image.
+ * @returns {Promise<Object>} data object with the body of the response
  */
 export async function uploadProfileImage(img) {
     if (!img instanceof File) {
@@ -60,7 +60,7 @@ export async function uploadProfileImage(img) {
 /**
  * Function to change user visiblity(from private to public and vice versa).
  * 
- * @returns {Promise<Object>} - User data already updated.
+ * @returns {Promise<Object>} data object with the body of the response.
  */
 export async function changeUserVisibility() {
     let data;
@@ -80,7 +80,7 @@ export async function changeUserVisibility() {
 
 /**
  * Just search user profile image,username and if is visible.
-  * @returns {Promise<Object>} Data object with user basic info.
+  * @returns {Promise<Object>} data object with the body of the response.
  */
 export async function getBasicUserInfo() {
     let data;
@@ -100,7 +100,7 @@ export async function getBasicUserInfo() {
 
 /**
  * Async function to get Personal details of the user.
- * @returns {Promise<Object} - Data with user personal details
+ * @returns {Promise<Object} data object with the body of the response or headers if there is not personal details.
  */
 export async function getPersonalDetails(){
     let data;
@@ -119,12 +119,12 @@ export async function getPersonalDetails(){
 
 /**
  * Async function to save Personal details of the user.
- * @param {Object} param0 - The function param.
- * @param {String} param0.name - personal detail name.
- * @param {String} param0.lastname - personal detail lastname.
- * @param {String} param0.age - personal detail age.
- * @param {String} param0.email - personal detail email.
- * @returns {Promise<Object>} - Object with saved personal data
+ * @param {Object} param0 The function param.
+ * @param {String} param0.name personal detail name.
+ * @param {String} param0.lastname personal detail lastname.
+ * @param {String} param0.age personal detail age.
+ * @param {String} param0.email personal detail email.
+ * @returns {Promise<Object>} data object with the body of the response.
  */
 export async function savePersonalDetails({name, lastname, age , email}){
     let data;
@@ -152,13 +152,11 @@ export async function savePersonalDetails({name, lastname, age , email}){
 
 /**
  * Async function to search users by only one condition.
- * 
- * @param {Object} param0 - The function param.
- * @param {String} param0.column - column in which to apply conditions.
- * @param {String} param0.value - value to compare
- * @param {String} param0.page - page number in case of pagination.
- * @param {String} param0.sortDir - sort direction(ASC, DESC).
- * @param {String} param0.operation - Type of operation(equal, like,etc)
+ * @param {String} param0.column column in which to apply conditions.
+ * @param {String} param0.value value to compare
+ * @param {String} param0.page page number in case of pagination.
+ * @param {String} param0.sortDir sort direction(ASC, DESC).
+ * @param {String} param0.operation Type of operation(equal, like,etc)
  * @returns {Promise<Object>} Data object with users.
  */
 export async function searchUsersByOneCondition({

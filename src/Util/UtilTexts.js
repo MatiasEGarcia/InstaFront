@@ -12,7 +12,7 @@ export const USERNAME_LABEL = 'Username';
 export const PASSWORD_LABEL = 'Password';
 
 
-export const NOTIFICATION_SEVERITIES=['Success', 'Error'];
+export const NOTIFICATION_SEVERITIES=['Success', 'Error', 'Info'];
 
 export const APP_TITLE = 'FrontReact';
 export const NAV_OPTIONS = ['Search','Notifications', 'Chats', 'Navigate', 'Create' , 'Settings'];

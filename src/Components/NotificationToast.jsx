@@ -15,7 +15,10 @@ function NotificationToast({ message, severity }) {
             bgSeverityColor = 'bg-success';
             break;
         case NOTIFICATION_SEVERITIES[1]:
-            bgSeverityColor = 'bg-danger'
+            bgSeverityColor = 'bg-danger';
+            break;
+        case NOTIFICATION_SEVERITIES[2]:
+            bgSeverityColor = 'bg-info-subtle';
             break;
     }
 
