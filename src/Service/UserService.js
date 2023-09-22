@@ -1,7 +1,5 @@
-import { RefreshTokenException } from "../Errors/Errors";
-import { DIR_ASC_DIRECTION, MESS_AUTH_TOKEN_EXPIRED, MESS_ERROR_SERVER_CONNECTION, MESS_TOKENS_INVALID } from "../Util/UtilTexts";
+import { DIR_ASC_DIRECTION } from "../Util/UtilTexts";
 import { USERS_ENDPOINT } from "../Util/endpoints";
-import { refreshToken } from "./AuthService";
 import fetchApi from "./FetchServices";
 
 /**
@@ -101,6 +99,58 @@ export async function getBasicUserInfo() {
 }
 
 /**
+ * Async function to get Personal details of the user.
+ * @returns {Promise<Object} - Data with user personal details
+ */
+export async function getPersonalDetails(){
+    let data;
+    const options = {
+        method: 'GET',
+        headers : {
+            'Authoirzation': `Bearer ${localStorage.getItem('authToken')}`,
+        }
+    }
+    data = await fetchApi({
+        endpoint : `${USERS_ENDPOINT}/personalDetails`,
+        options
+    })
+    return data;
+}
+
+/**
+ * Async function to save Personal details of the user.
+ * @param {Object} param0 - The function param.
+ * @param {String} param0.name - personal detail name.
+ * @param {String} param0.lastname - personal detail lastname.
+ * @param {String} param0.age - personal detail age.
+ * @param {String} param0.email - personal detail email.
+ * @returns {Promise<Object>} - Object with saved personal data
+ */
+export async function savePersonalDetails({name, lastname, age , email}){
+    let data;
+    const bodyRequest = {
+        name, 
+        lastname, 
+        age, 
+        email
+    }
+    const options = {
+        method: 'POST',
+        headers : {
+            'Content-Type': 'application/json',
+            'Authoirzation': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify(bodyRequest),
+    }
+    data = await fetchApi({
+        endpoint : `${USERS_ENDPOINT}/personalDetails`,
+        options
+    })
+    return data;
+}
+
+
+/**
  * Async function to search users by only one condition.
  * 
  * @param {Object} param0 - The function param.
@@ -144,5 +194,3 @@ export async function searchUsersByOneCondition({
    
 
 }
-
-
