@@ -7,7 +7,7 @@ import { getBasicUserInfo } from "./UserService";
  * Function to set authentication token for requests by the user.
  * @param {string} token
  */
-function setToken(token){
+function setToken(token) {
     localStorage.setItem('authToken', token);
 }
 
@@ -15,34 +15,34 @@ function setToken(token){
  * Function to set authentication refresh token for requests by the user when token is expired.
  * @param {string} refreshToken 
  */
-function setRefreshToken(refreshToken){
-    localStorage.setItem('authRefreshToken',refreshToken);
+function setRefreshToken(refreshToken) {
+    localStorage.setItem('authRefreshToken', refreshToken);
 }
 
 /**
  * Remove authToken and authRefreshToken from localStorage, when there is a logout or when tokes expired.
  */
-function removeLocalStorageTokens(){
+function removeLocalStorageTokens() {
     localStorage.removeItem('authToken');
     localStorage.removeItem('authRefreshToken');
 }
 
 /**
- * Performs user access to the server based on the specified action, username, and password.
+ * Async function to Perform user access to the server based on the specified action, username, and password.
  * @param {Object} options - The options for user access.
  * @param {string} options.action - The action to perform (either 'signUp' or 'signIn').
  * @param {string} options.username - The username for the user.
  * @param {string} options.password - The password for the user.
- * @returns {Promise} - A promise that resolves to the basic user information.
+ * @returns {Promise<Object>} - A promise that resolves the basic user information.
  * @throws {Error} - If the specified action is not supported or if there was some error with the server. 
  */
-export async function userAccess({action, username, password}){
-    switch(action){
+export async function userAccess({ action, username, password }) {
+    switch (action) {
         case SIGN_UP:
-            await register({username,password});
+            await register({ username, password });
             break;
         case SIGN_IN:
-            await authenticate({username, password});
+            await authenticate({ username, password });
             break;
         default:
             throw new Error(ACTION_NO_EXIST);
@@ -51,115 +51,105 @@ export async function userAccess({action, username, password}){
 }
 
 /**
- * Async function to register a user by a Post request to the server.
+ * Async function to register a user to the server
  * @param {Object} userInfo - user information.
  * @param {string} userInfo.username - username of the user. 
  * @param {string} userInfo.password - password of the user.
- * @returns {Promise} - A promise that resolves when the user is registered.
- * @throws {Error} - If there was an error during registration.
+ * @returns {Promise<void>}
  */
-export async function register({username, password}){
-    let res;
+export async function register({ username, password }) {
+    
     const options = {
-        method:'POST',
-        headers:{
+        method: 'POST',
+        headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({username, password}),
+        body: JSON.stringify({ username, password }),
     }
 
-    try {
-        res = await fetch(`${AUTH_ENDPOINT}/register`,options);
-    } catch (error) {
-        console.error(`Error trying to connect to server -> ${error}`);
-        throw new Error(MESS_ERROR_SERVER_CONNECTION);
-    }
-
-    if(res.status >= 200 && res.status <= 299){
-        const data = await res.json();
-        setToken(data.token);
-        setRefreshToken(data.refreshToken);
-        return;
-    }else{
-        const errorData = await res.json();
-        console.warn(res.status);
-        throw new Error(`There was a error: ${errorData.message}`);
-    }
+    await authFetchApi({
+        endpoint: `${AUTH_ENDPOINT}/register`,
+        options
+    })
 }
 
 /**
- * If the user exists already, then can authenticate in the server with this function.
+ * Async function to authenticate the user with the server
  * @param {Object} props - The component props.
  * @param {string} props.username - username of the user that wants authenticate.
  * @param {string} props.password - password of the user that wants authenticate.
- * @returns {Promise} - A promise that resolves when the user is authenticated.
- * @throws {Error} - If there was an error during authentication.
+ * @returns {Promise<void>} 
  */
-export async function authenticate({username, password}){
-    let res;
+export async function authenticate({ username, password }) {
     const options = {
-        method:'POST',
-        headers:{
+        method: 'POST',
+        headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({username, password}),
+        body: JSON.stringify({ username, password }),
     }
-
-    try {
-        res = await fetch(`${AUTH_ENDPOINT}/authenticate`,options);
-    } catch (error) {
-        console.error( `Error trying to connect to server -> ${error}`);
-        throw new Error(MESS_ERROR_SERVER_CONNECTION);
-    }
-
-    if(res.status >= 200 && res.status <= 299){
-        const data = await res.json();
-        setToken(data.token);
-        setRefreshToken(data.refreshToken);
-    }else{
-        const errorData = await res.json();
-        console.warn(res.status);
-        throw new Error(`There was a error: ${errorData.message}`); 
-    }
+    await authFetchApi({
+        endpoint: `${AUTH_ENDPOINT}/authenticate`,
+        options
+    })
 }
 
 /**
- * Refreshes the authentication token using the refresh token.
- * @returns {Promise<void>} A promise that resolves when the token is refreshed.
- * @throws {Error} If there is an error connecting to the server.
- * @throws {RefreshTokenException} If the tokens are invalid and the user needs to re-authenticate.
+ * Async function to refresh the authentication token using the refresh token.
+ *  @returns {Promise<void>}
  */
-export async function refreshToken(){
-    let res;
+export async function refreshToken() {
     const token = localStorage.getItem('authToken');
     const refreshToken = localStorage.getItem('authRefreshToken');
 
     const options = {
-        method:'POST',
-        headers:{
+        method: 'POST',
+        headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({token, refreshToken}),
+        body: JSON.stringify({ token, refreshToken }),
     }
+    await authFetchApi({
+        endpoint: `${AUTH_ENDPOINT}/refreshToken`,
+        options
+    })
+}
+
+
+//I dont move this function to FetchService because is special for the funcions in this place
+/**
+ * Fetch function to do a authentications request to the server.
+ * If the request was good then will update authentications tokens.
+ * In the case of a refresh of the tokens, if they were invalid the will delete tokens from the memory
+ * 
+ * @param {Object} param - The function param.
+ * @param {String} param.endpoint - endpoint to the resource, can contain params.
+ * @param {String} param.options - fetch options.
+ * @returns {Promise<void>} 
+ * @throws {Error} - If there was some error in the connection or in the request
+ * @throws {RefreshTokenException} - If the response was with 401 status, meaning that the refresh token was invalid
+ */
+export async function authFetchApi({ endpoint, options }) {
+    let res;
 
     try {
-        res = await fetch(`${AUTH_ENDPOINT}/refreshToken`,options)
+        res = await fetch(endpoint, options);
     } catch (error) {
         console.error(`Error trying to connect to server -> ${error}`);
         throw new Error(MESS_ERROR_SERVER_CONNECTION);
     }
 
-    if(res.status >= 200 && res.status <= 299){
+    if (res.status >= 200 && res.status <= 299) {
         const data = await res.json();
         setToken(data.token);
         setRefreshToken(data.refreshToken);
         return;
-    }else if(res.status === 401){//this means that the tokens were invalid and user needs to auth again
+    } else if (res.status === 401) {//this means that the tokens in the case of refresh were invalid and user needs to auth again
         removeLocalStorageTokens();
         const errorData = await res.json();
         console.warn(res.status);
         throw new RefreshTokenException(errorData.message);
-    }else {
+    } else {
         const errorData = await res.json();
         console.warn(res.status);
         throw new Error(errorData.message);
