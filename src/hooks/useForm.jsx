@@ -27,6 +27,17 @@ export const useForm = (initialForm, validateForm) => {
     }
 
     /**
+     * Funtion to update multiple form inputs values.
+     * @param {Object} object - object that contains each key with values, each key should be the same than in initialForm
+     */
+    function handleMultipleChange(object){
+        setForm({
+            ...form,
+            ...object
+        })
+    }
+
+    /**
      * Function to set wich input in the form was already touched, to set errors in the form and handle any change in the inputs.
      * @param {Event} evt - event that will came from an input.
      */
@@ -59,6 +70,7 @@ export const useForm = (initialForm, validateForm) => {
             errors,
             handleChange,
             handleBlur,
-            handleSubmit
+            handleSubmit,
+            handleMultipleChange
         }
 }

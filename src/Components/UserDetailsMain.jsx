@@ -1,11 +1,12 @@
 import useAuth from "../hooks/useAuth";
-import { uploadProfileImage } from "../Service/UserService";
+import { getPersonalDetails, savePersonalDetails, uploadProfileImage } from "../Service/UserService";
 import { PencilSquare } from "react-bootstrap-icons";
 import { useNotification } from "../hooks/useNotification";
 import { NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
 import UserImageProfile from "./UserImageProfile";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "../hooks/useForm";
+import Loading from "./Loading";
 
 /**
  * Initial valies in user details input form.
@@ -20,16 +21,24 @@ const initialForm = {
 const validationsForm = (form) => {
     let errors = {};
 
-    if (!/^[A-Za-z]{1,20}$/.test(form.name)) {
+    if (!form.name.trim()) {
+        errors.name = "Please , add a name";
+    } else if (!/^[A-Za-z]{1,20}$/.test(form.name)) {
         errors.name = "Name can't contain spaces, special characters or be more than 20 characters";
     }
-    if (!/^[A-Za-z]{1,20}$/.test(form.lastname)) {
+    if (!form.lastname.trim()) {
+        errors.lastname = "Please , add a lastname";
+    } else if (!/^[A-Za-z]{1,20}$/.test(form.lastname)) {
         errors.lastname = "Lastname can't contain spaces, special characters or be more than 20 characters";
     }
-    if (!/^(1[8-9]|[2-9][0-9])$/.test(form.age)) {
+    if (!form.age.trim()) {
+        errors.age = "Please , add a age";
+    } else if (!/^(1[8-9]|[2-9][0-9])$/.test(form.age)) {
         errors.age = "Age should be between 18 and 99";
     }
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email)) {
+    if (!form.email.trim()) {
+        errors.email = "Please , add a email";
+    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email)) {
         errors.email = "Should be a valid email";
     }
     return errors;
@@ -38,6 +47,7 @@ const validationsForm = (form) => {
 
 export default function UserDetailsMain() {
     const [displayImageEditIcon, setdisplayImageEditIcon] = useState('d-none');//to show or hide PencilSquare
+    const [loading, setLoading] = useState(false);
     const fileInputRef = useRef(null);
     const { auth, setAuth } = useAuth();
     const setNotification = useNotification();
@@ -47,9 +57,27 @@ export default function UserDetailsMain() {
         errors,
         handleChange,
         handleBlur,
-        handleSubmit
+        handleSubmit,
+        handleMultipleChange
     } = useForm(initialForm, validationsForm);
 
+    useEffect(() => {
+        setLoading(true);
+        getPersonalDetails().then((data) => {
+            if (data.body) {
+                handleMultipleChange(data.body);
+            }else if(data.headers){
+                console.log(data.headers.get('moreInfo'));
+            }
+        }).catch((error) => {
+            setNotification({
+                sev: NOTIFICATION_SEVERITIES[0],//error
+                msg: error.message
+            })
+        }).finally(() => {
+            setLoading(false);
+        })
+    }, [])
 
 
     function handleProfileButtonClick() {
@@ -71,8 +99,32 @@ export default function UserDetailsMain() {
         });
     }
 
-    function setUserDetails() {
-        console.log("ENTRO");
+    function setUserDetails(evt) {
+        setLoading(true);
+        savePersonalDetails({
+            name: evt.target.name.value,
+            lastname: evt.target.lastname.value,
+            age: evt.target.age.value,
+            email: evt.target.email.value
+        }).then((data) => {//we recive a data, but I don't need it now.
+            setNotification({
+                sev: NOTIFICATION_SEVERITIES[0], //SUCCESS
+                msg: `${auth.user.username} update it's personal details succefuly`
+            })
+        }).catch((error) => {
+            setNotification({
+                sev: NOTIFICATION_SEVERITIES[1], //ERROR
+                msg: error.message
+            })
+        }).finally(() => {
+            setLoading(false);
+        })
+    }
+
+    if (loading) {
+        return (
+            <Loading />
+        )
     }
 
     return (
@@ -166,11 +218,8 @@ export default function UserDetailsMain() {
                             {errors.email}
                         </small>
                     </div>
-                    <div className="col-12 text-center text-primary">
-                        <small>None of the fields are required</small>
-                    </div>
                 </div>
-                <div className="row justify-content-center">
+                <div className="mt-2 row justify-content-center">
                     <button type="submit" className="btn btn-success w-50">
                         Finish
                     </button>

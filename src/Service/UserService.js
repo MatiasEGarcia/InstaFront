@@ -15,7 +15,6 @@ export async function logout() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ token, refreshToken }),
     }
@@ -45,8 +44,7 @@ export async function uploadProfileImage(img) {
             /*Why don't I add the Content-type header? I need the browser to create it automatically,
              and the add the boundary too,  If I add the Content-type manually,the boundary will 
              not be set and the request won't work */
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        },
+        },//I need this even empty for fetchApi function
         body: formData,
     }
 
@@ -68,7 +66,6 @@ export async function changeUserVisibility() {
         method: 'PUT',
         headers: {
             'Content-type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
     }
     data = await fetchApi({
@@ -88,7 +85,6 @@ export async function getBasicUserInfo() {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
     }
     data = await fetchApi({
@@ -106,9 +102,7 @@ export async function getPersonalDetails(){
     let data;
     const options = {
         method: 'GET',
-        headers : {
-            'Authoirzation': `Bearer ${localStorage.getItem('authToken')}`,
-        }
+        headers : {}//I need this even empty for fetchApi function
     }
     data = await fetchApi({
         endpoint : `${USERS_ENDPOINT}/personalDetails`,
@@ -138,7 +132,6 @@ export async function savePersonalDetails({name, lastname, age , email}){
         method: 'POST',
         headers : {
             'Content-Type': 'application/json',
-            'Authoirzation': `Bearer ${localStorage.getItem('authToken')}`,
         },
         body: JSON.stringify(bodyRequest),
     }
@@ -179,7 +172,6 @@ export async function searchUsersByOneCondition({
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
         body: JSON.stringify(bodyRequest),
     }

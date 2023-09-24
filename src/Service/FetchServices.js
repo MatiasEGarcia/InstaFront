@@ -13,6 +13,11 @@ export default async function fetchApi({endpoint, options}){
     let fetchRes;//request fetch response
     let data = {};//function return object
 
+    //if there is some refresh token I need this code here, otherwise, 
+    //if I let as a task to add this header to the function that calls this function 
+    //we won't get the authToken updated and I'll get a loop.
+    options.headers['Authorization'] = `Bearer ${localStorage.getItem('authToken')}`;
+
 	try {
         fetchRes = await fetch(endpoint, options);
     } catch (error) {
@@ -32,7 +37,7 @@ export default async function fetchApi({endpoint, options}){
             isTokenRefreshed = true;
             await refreshToken();
             // Call the function again, now that the token has been refreshed
-            return fetchApi({endpoint, options});
+            return await fetchApi({endpoint, options});
         } else {
             throw new Error(MESS_TOKENS_INVALID);
         }
