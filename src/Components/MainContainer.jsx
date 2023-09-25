@@ -4,6 +4,7 @@ import UserMainHome from "./UserMainHome";
 import { APP_TITLE, TYPE_NAV, TYPE_MAIN } from "../Util/UtilTexts";
 import Navigation from "./Navigation/Navigation";
 import UserDetailsMain from "./UserDetailsMain";
+import CreatePublicationMain from "./CreatePublicationMain";
 /**
  * Will hold basic Main display.
  * 
@@ -23,6 +24,9 @@ function MainContainer({ wichMain }) {
             break;
         case TYPE_MAIN[2]:
             main = <UserDetailsMain />
+            break;
+        case TYPE_MAIN[3]:
+            main = <CreatePublicationMain/>
             break;
     }
 

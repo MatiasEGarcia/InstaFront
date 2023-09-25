@@ -77,10 +77,10 @@ function LeftNavigation({
                     </button>
                 </li>
                 <li className="nav-item">
-                    <button type="button" className="btn btn-light w-100 text-start fs-5">
+                    <Link to="/createPublication" className="btn btn-light w-100 text-start fs-5">
                         <PlusCircle size={30} />
                         <span className="ms-2">{NAV_OPTIONS[4]}</span>
-                    </button>
+                    </Link>
                 </li>
                 <li className="nav-item position-relative">
                     <button type="button" className="btn btn-light w-100 text-start fs-5" onClick={() => setShowPopover('config')}>

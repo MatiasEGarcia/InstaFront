@@ -69,9 +69,9 @@ function StickyBottomIconNavigation({
                     </button>
                 </li>
                 <li className="nav-item">
-                    <button type="button" className="btn btn-light w-100 text-start fs-1 px-3">
+                    <Link to="/createPublication" className="btn btn-light w-100 text-start fs-1 px-3">
                         <PlusCircle />
-                    </button>
+                    </Link>
                 </li>
                 <li className="nav-item position-relative">
                     <button type="button" className={`btn btn-light w-100 text-start fs-1 px-3 ${showPopover === 'config' && 'bg-secondary'}`}
