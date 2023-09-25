@@ -4,6 +4,7 @@ import { useNotification } from "../../hooks/useNotification";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import useCheckUserEffect from "../../hooks/useCheckUserEffect";
 import Loading from "../Loading";
+import { LOADING_OPTIONS } from "../../Util/UtilTexts";
 
 /**
  * will check if a user is authenticated. If is then will send it to /home and avoid all the components
@@ -27,7 +28,7 @@ export default function noRequireAuth(){
 
     if(loading){
         return(
-            <Loading/>
+            <Loading spaceToTake={LOADING_OPTIONS[0]}/>
         )
     }
 

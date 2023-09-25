@@ -1,5 +1,5 @@
 import { PersonFillAdd, PersonUp } from "react-bootstrap-icons";
-import { NOTIFICATION_SEVERITIES, PASSWORD_LABEL, SIGN_IN, USERNAME_LABEL } from "../Util/UtilTexts";
+import { LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PASSWORD_LABEL, SIGN_IN, USERNAME_LABEL } from "../Util/UtilTexts";
 import { useForm } from "../hooks/useForm";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -91,7 +91,7 @@ function Access({ typeOfAccess }) {
 
     if(loading){
         return(
-            <Loading/>
+            <Loading spaceToTake={LOADING_OPTIONS[0]}/>
         )
     }
 

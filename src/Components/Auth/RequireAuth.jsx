@@ -5,6 +5,7 @@ import { useLocation, Outlet } from "react-router-dom";
 import Loading from "../Loading";
 import { Navigate } from "react-router-dom";
 import useCheckUserEffect from "../../hooks/useCheckUserEffect";
+import { LOADING_OPTIONS } from "../../Util/UtilTexts";
 
 /**
  * This component will see if a user is authenticated,  
@@ -27,7 +28,7 @@ export default function RequireAuth(){
 
     if (loading) {
         return (
-            <Loading />
+            <Loading spaceToTake={LOADING_OPTIONS[0]}/>
         )
     }
 
