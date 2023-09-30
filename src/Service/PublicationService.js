@@ -1,3 +1,4 @@
+import { DIR_ASC_DIRECTION } from "../Util/UtilTexts";
 import { PUBLICATION_ENDPOINT } from "../Util/endpoints";
 import fetchApi from "./FetchServices";
 
@@ -26,5 +27,31 @@ export async function save({img, description}){
         endpoint:`${PUBLICATION_ENDPOINT}/save`,
         options
     })
+    return data;
+}
+
+export async function getAllByAuthUser({
+    page, pageSize,sortField , sortDir 
+}){
+    let data;
+    const params = new URLSearchParams({
+        page: page || '0',
+        pageSize: pageSize || '20',
+        sortField: sortField || 'pubImaId',
+        sortDir: sortDir || DIR_ASC_DIRECTION
+    });
+
+    const options={
+        method: 'GET',
+        headers:{
+            'Timezone': 'America/Argentina/Buenos_Aires'
+        }
+    }
+
+    data = await fetchApi({
+        endpoint: `${PUBLICATION_ENDPOINT}?`+ params.toString(),
+        options
+    })
+
     return data;
 }
