@@ -24,6 +24,15 @@ function JustReturnModelContentExample() {
  */
 function UserMainHome() {
     const [userPublications, setUserPublications] = useState([]);
+    const [pagDetailsFlag, setPagDetailsFlag] = useState(false);//??, is for the useEffect that is listening pagDetails, becuase changes pagDetails content too, and with this I avoid a loop.
+    const [pagDetails, setPagDetails] = useState({
+        pageNo: 0,//first page is 0
+        pageSize: 10,
+        totalPages: undefined,
+        totalElements: undefined,
+        sortField: undefined,
+        sortDir: undefined
+    });
     const [loading, setLoading] = useState(false);
     const { modalState,
         setModalState,
@@ -31,11 +40,18 @@ function UserMainHome() {
         showModal } = useModal(JustReturnModelContentExample);
     const setNotification = useNotification();
 
+    /**
+     * useEffect to load all the current user Publications at the beggining.
+     */
     useEffect(() => {
         setLoading(true);
-        getAllByAuthUser({}).then((data) => {
+        getAllByAuthUser(pagDetails).then((data) => {
             if (data.body.list) {
                 setUserPublications(data.body.list);
+                setPagDetails({
+                    ...pagDetails,
+                    ...data.body.pageInfoDto,
+                })
             } else {
                 console.log(data.headers['moreInfo']);
             }
@@ -47,8 +63,75 @@ function UserMainHome() {
         }).finally(() => {
             setLoading(false);
         });
-    }, [])
+    }, []);
 
+    /**
+     * 
+     * @param {} param0 
+     */
+    function changePage(newPageNo) {
+        setPagDetails({
+            ...pagDetails,
+            ['pageNo']: newPageNo
+        });
+        setPagDetailsFlag(true);
+    }
+
+    /**
+     * useEffect to search user publications when there is a change in pagDetails content.
+     */
+    useEffect(() => {
+        if (pagDetailsFlag) {
+            setLoading(true);
+            getAllByAuthUser(pagDetails).then((data) => {
+                if (data.body.list) {
+                    setUserPublications(data.body.list);
+                    setPagDetails({
+                        ...pagDetails,
+                        ...data.body.pageInfoDto,
+                    })
+                } else {
+                    console.log(data.headers['moreInfo']);
+                }
+            }).catch((error) => {
+                setNotification({
+                    sev: NOTIFICATION_SEVERITIES[1],//ERROR
+                    msg: error.message
+                });
+            }).finally(() => {
+                setLoading(false);
+                setPagDetailsFlag(false);
+            });
+        }
+    }, [pagDetails]);
+
+
+    function returnLiPageElements() {
+        const liPages = [];
+        //I just want 5 prevPageOptions plus the current page, if not, just the possibles
+        for (let i = 0, pageNoFor = pagDetails.pageNo; i < 5 && pageNoFor >= 0; i++, pageNoFor--) {
+            liPages.unshift(
+                <li className={`page-item ${pageNoFor === pagDetails.pageNo ? 'active disabled' : ''}`} key={pageNoFor}
+                onClick={() => changePage(pageNoFor)} >
+                    <a className="page-link" href="#">
+                        {pageNoFor + 1} {/*+ 1 because backend return first page as 0, but the user need to see 1 as first */}
+                    </a>
+                </li>
+            );
+        }
+
+        //I just want 5 proxPageOptions without the current page ,that's why pageNo+1, the current page is showed in the prev for
+        for (let i = 0, pageNoFor = pagDetails.pageNo + 1; i < 5 && pageNoFor < pagDetails.totalPages; i++, pageNoFor++) {
+            liPages.push(
+                <li className="page-item" key={pageNoFor} onClick={() => changePage(pageNoFor)} >
+                    <a className="page-link" href="#">
+                        {pageNoFor + 1}
+                    </a>
+                </li>
+            );
+        }
+        return liPages;
+    }
 
     return (
         <main className="col-12 col-md-8 col-xl-10">
@@ -88,6 +171,23 @@ function UserMainHome() {
                         })}
 
             </div>
+            {pagDetails.totalPages && pagDetails.totalPages > 1 &&
+                <nav aria-label="Page navigation">
+                    <ul className="pagination justify-content-center mt-2">
+                        <li className={`${pagDetails.pageNo === 0 ? 'page-item disabled' : 'page-item'}`}>
+                            <button className="page-link" aria-label="Previous" onClick={() => changePage(pagDetails.pageNo - 1)} >
+                                <span aria-hidden="true">&laquo;</span>
+                            </button>
+                        </li>
+                        {returnLiPageElements()}
+                        <li className={`${pagDetails.pageNo === pagDetails.totalPages ? 'page-item disabled' : 'page-item'}`}>
+                            <button className="page-link" aria-label="Next" onClick={() => changePage(pagDetails.pageNo + 1)} >
+                                <span aria-hidden="true">&raquo;</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            }
             <Modal modalState={modalState} setModalState={setModalState}>
                 <PublicationModal setModalState={setModalState} contentModal={contentModal} />
             </Modal>

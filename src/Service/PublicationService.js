@@ -31,11 +31,11 @@ export async function save({img, description}){
 }
 
 export async function getAllByAuthUser({
-    page, pageSize,sortField , sortDir 
+    pageNo , pageSize,sortField , sortDir 
 }){
     let data;
     const params = new URLSearchParams({
-        page: page || '0',
+        page: pageNo || '0',
         pageSize: pageSize || '20',
         sortField: sortField || 'pubImaId',
         sortDir: sortDir || DIR_ASC_DIRECTION
