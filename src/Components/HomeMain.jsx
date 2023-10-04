@@ -34,7 +34,8 @@ function HomeMain() {
             <div className="row">
                 <div className="col-12 col-lg-8 
                                 d-flex flex-column align-items-center gap-5
-                                mt-5">
+                                mt-5">{/*PARA MOSTRAR EN HILO, SIMPLEMENTE CREO UN ARRAY Y CUANDO PIDA OTRA PAGINA AGREGO LAS NUEVAS PUBLICAICONES
+                                A LOS VIEJOS Y MUESTRO AMBOS sin un loading porque no quedaria muy bien*/}
                     <PublicationCard showModal={showModal} width="w-75 w-sm-75 w-xl-50" />
                     <PublicationCard showModal={showModal} width="w-75 w-sm-75 w-lg-50" />
                     <PublicationCard showModal={showModal} width="w-75 w-sm-75 w-lg-50" />

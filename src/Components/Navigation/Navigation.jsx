@@ -6,6 +6,7 @@ import useAuth from "../../hooks/useAuth";
 import { searchUsersByOneCondition } from "../../Service/UserService";
 import { useNotification } from "../../hooks/useNotification";
 import { changeUserVisibility } from "../../Service/UserService";
+import { follow } from "../../Service/FollowService";
 
 /**
  * 
@@ -25,14 +26,14 @@ export default function Navigation({ typeNavigation }) {
         * After a second it runs this, 
         * but if the mouse re-entered the popover, then it won't close, it's to give the user time to get from the icon to the popover.
         */
-       setTimeout(() => {
+        setTimeout(() => {
             setShowPopover('');
         }, 500);
     }
 
-    function setUserVisibility(){
+    function setUserVisibility() {
         changeUserVisibility().then((data) => {
-            setAuth({...auth,user:data.body});
+            setAuth({ ...auth, user: data.body });
             setNotification({
                 sev: NOTIFICATION_SEVERITIES[0],//success
                 msg: "visibility changed",
@@ -54,7 +55,7 @@ export default function Navigation({ typeNavigation }) {
             }).then((data) => {
                 if (data.body?.list !== undefined) {
                     setUsersFound(data.body.list);
-                }else{
+                } else {
                     console.log(data.headers.get('moreInfo'))//moreInfo: name of the header with the more info
                 }
             }).catch((error) => {
@@ -63,11 +64,25 @@ export default function Navigation({ typeNavigation }) {
                     msg: error.message,
                 })
             })
-        }else{
+        } else {
             //to reset usersFoundList
             setUsersFound([]);
         }
     }, [username]);
+
+    function saveFollow(followedId) {
+        follow(followedId).then((data) => {
+            setNotification({
+                sev: NOTIFICATION_SEVERITIES[0], //success
+                msg: `follow saved, current status is ${data.body.followStatus}`
+            });
+        }).catch((error => {
+            setNotification({
+                sev: NOTIFICATION_SEVERITIES[1], //error
+                msg: error.message
+            });
+        })).finally()
+    }
 
 
     switch (typeNavigation) {
@@ -81,7 +96,8 @@ export default function Navigation({ typeNavigation }) {
                 setShowPopover={setShowPopover}
                 hidePopover={hidePopover}
                 userVisibiliy={auth.user.visible}
-                setUserVisibility={setUserVisibility} />
+                setUserVisibility={setUserVisibility}
+                saveFollow={saveFollow} />
         case TYPE_NAV[1]:
             return <StickyBottomIconNavigation
                 username={username}
@@ -92,7 +108,8 @@ export default function Navigation({ typeNavigation }) {
                 setShowPopover={setShowPopover}
                 hidePopover={hidePopover}
                 userVisibiliy={auth.user.visible}
-                setUserVisibility={setUserVisibility} />
+                setUserVisibility={setUserVisibility}
+                setFollow={saveFollow} />
         default:
             throw new Error(ACTION_NO_EXIST);
     }

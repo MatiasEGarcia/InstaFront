@@ -30,6 +30,14 @@ export async function save({img, description}){
     return data;
 }
 
+/**
+ * Async function to get publications by the current user.
+ * @param {Number} param.pageNo number of the page in pagination.
+ * @param {Number} param.pageSize number of elements for page in pagination.
+ * @param {String} param.sortField field to sort.
+ * @param {String} param.sortDir direction to sort.
+ * @returns {Promise<Object>} data object with the body of the response.
+ */
 export async function getAllByAuthUser({
     pageNo , pageSize,sortField , sortDir 
 }){

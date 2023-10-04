@@ -10,7 +10,7 @@ export const NOTI_MESSAGE_LOGOUT_SUCCESSFULLY = 'User logout successfully!';
 //FORMS
 export const USERNAME_LABEL = 'Username';
 export const PASSWORD_LABEL = 'Password';
-//LOADING OPTIONS
+
 export const LOADING_OPTIONS = ['allWindow', 'justAvailable'];
 
 export const NOTIFICATION_SEVERITIES=['Success', 'Error', 'Info'];

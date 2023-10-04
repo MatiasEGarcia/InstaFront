@@ -25,7 +25,8 @@ function StickyBottomIconNavigation({
     setShowPopover,
     hidePopover,
     userVisibiliy,
-    setUserVisibility
+    setUserVisibility,
+    saveFollow
 }) {
 
 
@@ -43,7 +44,8 @@ function StickyBottomIconNavigation({
                             container="custom-icon-popover-container"
                             username={username}
                             setUsername={setUsername}
-                            usersFound={usersFound} />
+                            usersFound={usersFound}
+                            saveFollow = {saveFollow} />
                     }
                 </li>
                 <li className="nav-item position-relative">

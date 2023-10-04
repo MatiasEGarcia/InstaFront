@@ -1,4 +1,5 @@
 import UserImageProfile from "../UserImageProfile";
+import { follow } from "../../Service/FollowService";
 
 
 /**
@@ -11,7 +12,7 @@ import UserImageProfile from "../UserImageProfile";
  * @param {Array} param.usersFound - array with users found.
  * @returns {JSX.Element} - search popover.
  */
-function SearchPopover({ hidePopover, username, setUsername, container, usersFound }) {
+function SearchPopover({ hidePopover, username, setUsername, container, usersFound, saveFollow}) {
     return (
         <div className={`${container} border rounded p-3 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
             <div className="mb-3">
@@ -35,7 +36,7 @@ function SearchPopover({ hidePopover, username, setUsername, container, usersFou
                                     <UserImageProfile imgWith="60px" imgHeight="60px" img={user.image}/>
                                     <span className="ps-2 fs-5">{user.username}</span>
                                 </div>
-                                <span className="btn btn-sm btn-link">
+                                <span className="btn btn-sm btn-link" onClick={() => saveFollow(user.userId)}>
                                     Follow
                                 </span>
                             </button>
