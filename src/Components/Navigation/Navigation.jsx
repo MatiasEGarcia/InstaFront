@@ -70,19 +70,6 @@ export default function Navigation({ typeNavigation }) {
         }
     }, [username]);
 
-    function saveFollow(followedId) {
-        follow(followedId).then((data) => {
-            setNotification({
-                sev: NOTIFICATION_SEVERITIES[0], //success
-                msg: `follow saved, current status is ${data.body.followStatus}`
-            });
-        }).catch((error => {
-            setNotification({
-                sev: NOTIFICATION_SEVERITIES[1], //error
-                msg: error.message
-            });
-        })).finally()
-    }
 
 
     switch (typeNavigation) {
@@ -96,8 +83,7 @@ export default function Navigation({ typeNavigation }) {
                 setShowPopover={setShowPopover}
                 hidePopover={hidePopover}
                 userVisibiliy={auth.user.visible}
-                setUserVisibility={setUserVisibility}
-                saveFollow={saveFollow} />
+                setUserVisibility={setUserVisibility}/>
         case TYPE_NAV[1]:
             return <StickyBottomIconNavigation
                 username={username}
@@ -108,8 +94,7 @@ export default function Navigation({ typeNavigation }) {
                 setShowPopover={setShowPopover}
                 hidePopover={hidePopover}
                 userVisibiliy={auth.user.visible}
-                setUserVisibility={setUserVisibility}
-                setFollow={saveFollow} />
+                setUserVisibility={setUserVisibility}/>
         default:
             throw new Error(ACTION_NO_EXIST);
     }

@@ -1,5 +1,5 @@
 import UserImageProfile from "../UserImageProfile";
-import { follow } from "../../Service/FollowService";
+import { Link } from "react-router-dom";
 
 
 /**
@@ -36,9 +36,9 @@ function SearchPopover({ hidePopover, username, setUsername, container, usersFou
                                     <UserImageProfile imgWith="60px" imgHeight="60px" img={user.image}/>
                                     <span className="ps-2 fs-5">{user.username}</span>
                                 </div>
-                                <span className="btn btn-sm btn-link" onClick={() => saveFollow(user.userId)}>
-                                    Follow
-                                </span>
+                                <Link to={`/userHome/${user.userId}`} className="btn btn-sm btn-link">
+                                    Visit
+                                </Link>
                             </button>
                         )
                     })

@@ -39,7 +39,7 @@ export async function save({img, description}){
  * @returns {Promise<Object>} data object with the body of the response.
  */
 export async function getAllByAuthUser({
-    pageNo , pageSize,sortField , sortDir 
+    pageNo , pageSize,sortField , sortDir, ownerId 
 }){
     let data;
     const params = new URLSearchParams({
@@ -57,7 +57,7 @@ export async function getAllByAuthUser({
     }
 
     data = await fetchApi({
-        endpoint: `${PUBLICATION_ENDPOINT}?`+ params.toString(),
+        endpoint: `${PUBLICATION_ENDPOINT}/byOwnerId/${ownerId}?`+ params.toString(),
         options
     })
 

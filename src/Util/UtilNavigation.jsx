@@ -11,7 +11,7 @@ export const publicNav = [
 
 export const privateNav = [
     { path: "/home", name: "home", element: <MainContainer wichMain={TYPE_MAIN[0]} /> },
-    { path: "/userHome", name: "userHome", element: <MainContainer wichMain={TYPE_MAIN[1]} /> },
+    { path: "/userHome/:userId", name: "userHome", element: <MainContainer wichMain={TYPE_MAIN[1]} /> },
     { path: "/userDetails", name: "userDetails", element: <MainContainer wichMain={TYPE_MAIN[2]} /> },
     { path: "/createPublication", name: "createPublication", element: <MainContainer wichMain={TYPE_MAIN[3]} /> },
     { path: "/chat", name: "chat", element: <ChatContainer /> }

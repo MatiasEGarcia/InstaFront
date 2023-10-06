@@ -7,6 +7,16 @@ import { getAllByAuthUser } from "../Service/PublicationService";
 import { useNotification } from "../hooks/useNotification";
 import { LOADING_OPTIONS, NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
 import Loading from "./Loading";
+import { useParams } from "react-router-dom";
+
+const basePagDetails = {
+    pageNo: 0,//first page is 0
+    pageSize: 10,
+    totalPages: undefined,
+    totalElements: undefined,
+    sortField: undefined,
+    sortDir: undefined
+}
 
 //cuando me comunique con el server esto lo borro
 function JustReturnModelContentExample() {
@@ -25,35 +35,32 @@ function JustReturnModelContentExample() {
 function UserMainHome() {
     const [userPublications, setUserPublications] = useState([]);
     const [pagDetailsFlag, setPagDetailsFlag] = useState(false);//??, is for the useEffect that is listening pagDetails, becuase changes pagDetails content too, and with this I avoid a loop.
-    const [pagDetails, setPagDetails] = useState({
-        pageNo: 0,//first page is 0
-        pageSize: 10,
-        totalPages: undefined,
-        totalElements: undefined,
-        sortField: undefined,
-        sortDir: undefined
-    });
+    const [pagDetails, setPagDetails] = useState(basePagDetails);
     const [loading, setLoading] = useState(false);
     const { modalState,
         setModalState,
         contentModal,
         showModal } = useModal(JustReturnModelContentExample);
     const setNotification = useNotification();
+    const { userId } = useParams();
 
     /**
      * useEffect to load all the current user Publications at the beggining.
      */
     useEffect(() => {
         setLoading(true);
-        getAllByAuthUser(pagDetails).then((data) => {
-            if (data.body.list) {
+        getAllByAuthUser({ ...pagDetails, ownerId: userId }).then((data) => {
+            if (data.body?.list) {
                 setUserPublications(data.body.list);
                 setPagDetails({
                     ...pagDetails,
                     ...data.body.pageInfoDto,
                 })
-            } else {
-                console.log(data.headers['moreInfo']);
+            } else if (data.headers) {
+                setNotification({
+                    sev: NOTIFICATION_SEVERITIES[2],
+                    msg: data.headers.get('moreInfo')
+                });
             }
         }).catch((error) => {
             setNotification({
@@ -83,15 +90,18 @@ function UserMainHome() {
     useEffect(() => {
         if (pagDetailsFlag) {
             setLoading(true);
-            getAllByAuthUser(pagDetails).then((data) => {
-                if (data.body.list) {
+            getAllByAuthUser({ ...pagDetails, ownerId: userId }).then((data) => {
+                if (data.body?.list) {
                     setUserPublications(data.body.list);
                     setPagDetails({
                         ...pagDetails,
                         ...data.body.pageInfoDto,
                     })
-                } else {
-                    console.log(data.headers['moreInfo']);
+                } else if (data.headers) {
+                    setNotification({
+                        sev: NOTIFICATION_SEVERITIES[2],//INFO
+                        msg: data.headers.get('moreInfo')
+                    });
                 }
             }).catch((error) => {
                 setNotification({
@@ -105,6 +115,35 @@ function UserMainHome() {
         }
     }, [pagDetails]);
 
+    /**
+     * useEffect to change user when userId(from useParams) changes
+     */
+    useEffect(() => {
+        setLoading(true);
+        //I need to reset pagDetails so I use basePagDetails
+        getAllByAuthUser({ ...basePagDetails, ownerId: userId }).then((data) => {
+            if (data.body?.list) {
+                setUserPublications(data.body.list);
+                setPagDetails({
+                    ...basePagDetails,
+                    ...data.body.pageInfoDto,
+                })
+            } else if (data.headers) {
+                setNotification({
+                    sev: NOTIFICATION_SEVERITIES[2],//INFO
+                    msg: data.headers.get('moreInfo')
+                });
+            }
+        }).catch((error) => {
+            setNotification({
+                sev: NOTIFICATION_SEVERITIES[1],//ERROR
+                msg: error.message
+            });
+        }).finally(() => {
+            setLoading(false);
+            setPagDetailsFlag(false);
+        });
+    }, [userId]);
 
     function returnLiPageElements() {
         const liPages = [];
@@ -112,7 +151,7 @@ function UserMainHome() {
         for (let i = 0, pageNoFor = pagDetails.pageNo; i < 5 && pageNoFor >= 0; i++, pageNoFor--) {
             liPages.unshift(
                 <li className={`page-item ${pageNoFor === pagDetails.pageNo ? 'active disabled' : ''}`} key={pageNoFor}
-                onClick={() => changePage(pageNoFor)} >
+                    onClick={() => changePage(pageNoFor)} >
                     <a className="page-link" href="#">
                         {pageNoFor + 1} {/*+ 1 because backend return first page as 0, but the user need to see 1 as first */}
                     </a>
@@ -160,7 +199,7 @@ function UserMainHome() {
                 {loading
                     ? <Loading spaceToTake={LOADING_OPTIONS[1]} />
                     : userPublications.length === 0
-                        ? <h2>There is not publications yet</h2>
+                        ? <h2 className="text-center">-</h2>
                         : userPublications.map((publication) => {
                             return (
                                 <PublicationCard key={publication.id}

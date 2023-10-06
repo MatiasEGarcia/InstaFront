@@ -26,8 +26,7 @@ function LeftNavigation({
     setShowPopover,
     hidePopover,
     userVisibiliy,
-    setUserVisibility,
-    saveFollow
+    setUserVisibility
 }) {
 
 
@@ -50,8 +49,7 @@ function LeftNavigation({
                             container="custom-popover-container"
                             username={username}
                             setUsername={setUsername}
-                            usersFound={usersFound} 
-                            saveFollow = {saveFollow}/>
+                            usersFound={usersFound}/>
                     }
                 </li>
                 <li className="nav-item position-relative">
