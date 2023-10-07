@@ -1,17 +1,18 @@
 import PublicationCard from "./PublicationCard";
+import Pagination from "./Pagination";
 import Modal from "./Modal";
 import { useModal } from "../hooks/useModal";
 import PublicationModal from "./PublicationModal";
 import { useEffect, useState } from "react";
 import { getAllByAuthUser } from "../Service/PublicationService";
 import { useNotification } from "../hooks/useNotification";
-import { LOADING_OPTIONS, NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
+import { LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../Util/UtilTexts";
 import Loading from "./Loading";
 import { useParams } from "react-router-dom";
 
 const basePagDetails = {
     pageNo: 0,//first page is 0
-    pageSize: 10,
+    pageSize: 2,
     totalPages: undefined,
     totalElements: undefined,
     sortField: undefined,
@@ -145,32 +146,6 @@ function UserMainHome() {
         });
     }, [userId]);
 
-    function returnLiPageElements() {
-        const liPages = [];
-        //I just want 5 prevPageOptions plus the current page, if not, just the possibles
-        for (let i = 0, pageNoFor = pagDetails.pageNo; i < 5 && pageNoFor >= 0; i++, pageNoFor--) {
-            liPages.unshift(
-                <li className={`page-item ${pageNoFor === pagDetails.pageNo ? 'active disabled' : ''}`} key={pageNoFor}
-                    onClick={() => changePage(pageNoFor)} >
-                    <a className="page-link" href="#">
-                        {pageNoFor + 1} {/*+ 1 because backend return first page as 0, but the user need to see 1 as first */}
-                    </a>
-                </li>
-            );
-        }
-
-        //I just want 5 proxPageOptions without the current page ,that's why pageNo+1, the current page is showed in the prev for
-        for (let i = 0, pageNoFor = pagDetails.pageNo + 1; i < 5 && pageNoFor < pagDetails.totalPages; i++, pageNoFor++) {
-            liPages.push(
-                <li className="page-item" key={pageNoFor} onClick={() => changePage(pageNoFor)} >
-                    <a className="page-link" href="#">
-                        {pageNoFor + 1}
-                    </a>
-                </li>
-            );
-        }
-        return liPages;
-    }
 
     return (
         <main className="col-12 col-md-8 col-xl-10">
@@ -198,35 +173,17 @@ function UserMainHome() {
             <div className="row p-3 border d-flex justify-content-center gap-5">
                 {loading
                     ? <Loading spaceToTake={LOADING_OPTIONS[1]} />
-                    : userPublications.length === 0
-                        ? <h2 className="text-center">-</h2>
-                        : userPublications.map((publication) => {
-                            return (
-                                <PublicationCard key={publication.id}
-                                    publication={publication}
-                                    showModal={showModal}
-                                    width="w-80 w-sm-75 w-xl-30" />
-                            )
-                        })}
+                    : <Pagination 
+                            itemsList = {userPublications}
+                            pagType={PAG_TYPES[0]} //nav pagination
+                            changePage={changePage}
+                            pagDetails={pagDetails}
+                            ComponentToDisplayItem = {(props) => <PublicationCard showModal={showModal} 
+                            width="w-80 w-sm-75 w-xl-30" {...props}/>}
+                      />
+                } 
 
             </div>
-            {pagDetails.totalPages && pagDetails.totalPages > 1 &&
-                <nav aria-label="Page navigation">
-                    <ul className="pagination justify-content-center mt-2">
-                        <li className={`${pagDetails.pageNo === 0 ? 'page-item disabled' : 'page-item'}`}>
-                            <button className="page-link" aria-label="Previous" onClick={() => changePage(pagDetails.pageNo - 1)} >
-                                <span aria-hidden="true">&laquo;</span>
-                            </button>
-                        </li>
-                        {returnLiPageElements()}
-                        <li className={`${pagDetails.pageNo === pagDetails.totalPages ? 'page-item disabled' : 'page-item'}`}>
-                            <button className="page-link" aria-label="Next" onClick={() => changePage(pagDetails.pageNo + 1)} >
-                                <span aria-hidden="true">&raquo;</span>
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-            }
             <Modal modalState={modalState} setModalState={setModalState}>
                 <PublicationModal setModalState={setModalState} contentModal={contentModal} />
             </Modal>

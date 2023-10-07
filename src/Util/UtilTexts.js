@@ -17,6 +17,9 @@ export const NOTIFICATION_SEVERITIES=['Success', 'Error', 'Info'];
 
 export const APP_TITLE = 'FrontReact';
 export const NAV_OPTIONS = ['Search','Notifications', 'Chats', 'Navigate', 'Create' , 'Settings'];
+
+export const PAG_TYPES = ['navPagination', 'scrollDownPagination'];
+
 //types of navigation for the app
 export const TYPE_NAV = ['leftNavigation', 'stickyBottomIconNavigation'];
 export const TYPE_MAIN = ['home', 'userMainHome', 'userDetailsMain','createPublicationMain'];

@@ -6,11 +6,11 @@ import UserImageProfile from "./UserImageProfile";
  * @param {Object} props - The component props.
  * @param {Function} props.showModal - will open a modal that have the publication info + comentaries.
  * @param {String} props.width - publication card width.
- * @param {Object} props.publication - publication content.
+ * @param {Object} props.item - publication content.
  * @returns {JSX.Element} - The rendered Publication component.
  */
-function PublicationCard({ showModal, width, publication }) {
-    const utcLocalCreateAt = new Date(publication.createdAt);
+function PublicationCard({ showModal, width, item }) {
+    const utcLocalCreateAt = new Date(item.createdAt);
     const options = {
         month: "numeric",
         day: "numeric",
@@ -22,8 +22,8 @@ function PublicationCard({ showModal, width, publication }) {
         <div className={`card ${width}`}>
             <div className="card-header d-flex justify-content-between">
                 <div>
-                    <UserImageProfile imgWith="60px" imgHeight="60px" img={publication.userOwner.image} />
-                    <span className="ps-2 fs-5">{publication.userOwner.username}</span>
+                    <UserImageProfile imgWith="60px" imgHeight="60px" img={item.userOwner.image} />
+                    <span className="ps-2 fs-5">{item.userOwner.username}</span>
                 </div>
 
                 <div>
@@ -32,7 +32,7 @@ function PublicationCard({ showModal, width, publication }) {
             </div>
             <img
                 style={{ maxHeight: '200px' }}
-                src={`data:image/jpeg;charset=utf-8;base64,${publication.image}`}
+                src={`data:image/jpeg;charset=utf-8;base64,${item.image}`}
                 className="card-img-top"
                 alt="publication image" />
             <div className="card-body">
@@ -43,7 +43,7 @@ function PublicationCard({ showModal, width, publication }) {
                     </button>
                 </div>
                 <div>
-                    <p>{publication.description}</p>
+                    <p>{item.description}</p>
                 </div>
             </div>
             <div className="card-footer">
