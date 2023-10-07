@@ -1,23 +1,13 @@
-import PublicationCard from "./PublicationCard";
-import Pagination from "./Pagination";
 import Modal from "./Modal";
 import { useModal } from "../hooks/useModal";
 import PublicationModal from "./PublicationModal";
 import { useEffect, useState } from "react";
 import { getAllByAuthUser } from "../Service/PublicationService";
 import { useNotification } from "../hooks/useNotification";
-import { LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../Util/UtilTexts";
-import Loading from "./Loading";
+import { NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
 import { useParams } from "react-router-dom";
+import UsersHomePublications from "./UserHomePublications";
 
-const basePagDetails = {
-    pageNo: 0,//first page is 0
-    pageSize: 2,
-    totalPages: undefined,
-    totalElements: undefined,
-    sortField: undefined,
-    sortDir: undefined
-}
 
 //cuando me comunique con el server esto lo borro
 function JustReturnModelContentExample() {
@@ -34,9 +24,6 @@ function JustReturnModelContentExample() {
  * @returns {JSX.Element} - show every user main page.
  */
 function UserMainHome() {
-    const [userPublications, setUserPublications] = useState([]);
-    const [pagDetailsFlag, setPagDetailsFlag] = useState(false);//??, is for the useEffect that is listening pagDetails, becuase changes pagDetails content too, and with this I avoid a loop.
-    const [pagDetails, setPagDetails] = useState(basePagDetails);
     const [loading, setLoading] = useState(false);
     const { modalState,
         setModalState,
@@ -44,107 +31,6 @@ function UserMainHome() {
         showModal } = useModal(JustReturnModelContentExample);
     const setNotification = useNotification();
     const { userId } = useParams();
-
-    /**
-     * useEffect to load all the current user Publications at the beggining.
-     */
-    useEffect(() => {
-        setLoading(true);
-        getAllByAuthUser({ ...pagDetails, ownerId: userId }).then((data) => {
-            if (data.body?.list) {
-                setUserPublications(data.body.list);
-                setPagDetails({
-                    ...pagDetails,
-                    ...data.body.pageInfoDto,
-                })
-            } else if (data.headers) {
-                setNotification({
-                    sev: NOTIFICATION_SEVERITIES[2],
-                    msg: data.headers.get('moreInfo')
-                });
-            }
-        }).catch((error) => {
-            setNotification({
-                sev: NOTIFICATION_SEVERITIES[1],//ERROR
-                msg: error.message
-            });
-        }).finally(() => {
-            setLoading(false);
-        });
-    }, []);
-
-    /**
-     * 
-     * @param {} param0 
-     */
-    function changePage(newPageNo) {
-        setPagDetails({
-            ...pagDetails,
-            ['pageNo']: newPageNo
-        });
-        setPagDetailsFlag(true);
-    }
-
-    /**
-     * useEffect to search user publications when there is a change in pagDetails content.
-     */
-    useEffect(() => {
-        if (pagDetailsFlag) {
-            setLoading(true);
-            getAllByAuthUser({ ...pagDetails, ownerId: userId }).then((data) => {
-                if (data.body?.list) {
-                    setUserPublications(data.body.list);
-                    setPagDetails({
-                        ...pagDetails,
-                        ...data.body.pageInfoDto,
-                    })
-                } else if (data.headers) {
-                    setNotification({
-                        sev: NOTIFICATION_SEVERITIES[2],//INFO
-                        msg: data.headers.get('moreInfo')
-                    });
-                }
-            }).catch((error) => {
-                setNotification({
-                    sev: NOTIFICATION_SEVERITIES[1],//ERROR
-                    msg: error.message
-                });
-            }).finally(() => {
-                setLoading(false);
-                setPagDetailsFlag(false);
-            });
-        }
-    }, [pagDetails]);
-
-    /**
-     * useEffect to change user when userId(from useParams) changes
-     */
-    useEffect(() => {
-        setLoading(true);
-        //I need to reset pagDetails so I use basePagDetails
-        getAllByAuthUser({ ...basePagDetails, ownerId: userId }).then((data) => {
-            if (data.body?.list) {
-                setUserPublications(data.body.list);
-                setPagDetails({
-                    ...basePagDetails,
-                    ...data.body.pageInfoDto,
-                })
-            } else if (data.headers) {
-                setNotification({
-                    sev: NOTIFICATION_SEVERITIES[2],//INFO
-                    msg: data.headers.get('moreInfo')
-                });
-            }
-        }).catch((error) => {
-            setNotification({
-                sev: NOTIFICATION_SEVERITIES[1],//ERROR
-                msg: error.message
-            });
-        }).finally(() => {
-            setLoading(false);
-            setPagDetailsFlag(false);
-        });
-    }, [userId]);
 
 
     return (
@@ -170,20 +56,7 @@ function UserMainHome() {
                     </div>
                 </div>
             </div>
-            <div className="row p-3 border d-flex justify-content-center gap-5">
-                {loading
-                    ? <Loading spaceToTake={LOADING_OPTIONS[1]} />
-                    : <Pagination 
-                            itemsList = {userPublications}
-                            pagType={PAG_TYPES[0]} //nav pagination
-                            changePage={changePage}
-                            pagDetails={pagDetails}
-                            ComponentToDisplayItem = {(props) => <PublicationCard showModal={showModal} 
-                            width="w-80 w-sm-75 w-xl-30" {...props}/>}
-                      />
-                } 
-
-            </div>
+            <UsersHomePublications showModal={showModal} userOwnerId={userId} />
             <Modal modalState={modalState} setModalState={setModalState}>
                 <PublicationModal setModalState={setModalState} contentModal={contentModal} />
             </Modal>
