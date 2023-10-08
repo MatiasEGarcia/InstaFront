@@ -4,9 +4,12 @@ import PublicationModal from "./PublicationModal";
 import { useEffect, useState } from "react";
 import { getAllByAuthUser } from "../Service/PublicationService";
 import { useNotification } from "../hooks/useNotification";
-import { NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
-import { useParams } from "react-router-dom";
+import { FOLLOWED_LABEL, FOLLOWED_STATUS, FOLLOWERS_LABEL, NOTIFICATION_SEVERITIES, PUBLICATIONS_LABEL, LOADING_OPTIONS } from "../Util/UtilTexts";
+import { useNavigate, useParams } from "react-router-dom";
 import UsersHomePublications from "./UserHomePublications";
+import { getGeneralUserInfo } from "../Service/UserService";
+import UserImageProfile from "./UserImageProfile";
+import Loading from "./Loading";
 
 
 //cuando me comunique con el server esto lo borro
@@ -24,35 +27,63 @@ function JustReturnModelContentExample() {
  * @returns {JSX.Element} - show every user main page.
  */
 function UserMainHome() {
-    const [loading, setLoading] = useState(false);
     const { modalState,
         setModalState,
         contentModal,
         showModal } = useModal(JustReturnModelContentExample);
     const setNotification = useNotification();
+    const navigate = useNavigate();
     const { userId } = useParams();
+    const [loading, setLoading] = useState(false);
+    const [user, setUser] = useState({});
+
+    useEffect(() => {
+        setLoading(true);
+        getGeneralUserInfo(userId).then((data) => {
+            setUser(data.body);
+        }).catch((error) => {
+            setNotification({
+                sev: NOTIFICATION_SEVERITIES[1],//ERROR
+                msg: error.message
+            });
+            navigate("/home");
+        }).finally(() => {
+            setLoading(false);
+        });
+    }, []);
+
+    if (loading) {
+        return (
+            <main className="col-12 col-md-8 col-xl-10">
+                <Loading spaceToTake={LOADING_OPTIONS[1]} />
+            </main>
+        )
+    }
 
 
     return (
         <main className="col-12 col-md-8 col-xl-10">
             <div className="row p-3">
                 <div className="col-12 col-md-5 text-center text-md-end">
-                    <img height="180px" width="180px" className="rounded-circle"
-                        src="/defaultImg/profile.jpg"
-                        alt="userImage" />
+                    <UserImageProfile img={user.user?.image}
+                        imgHeight="180px"
+                        imgWith="180px" />
                 </div>
                 <div className="col-12 col-md-7">
                     <div className="mt-3 w-100 w-lg-80 d-flex">
-                        <h3>Username</h3>
+                        <h3>{user.user?.username}</h3>
                         <div className="ms-3 d-flex  gap-2">
-                            <button className="btn btn-light">Follow</button>
+                            {user.social?.followStatus === FOLLOWED_STATUS[3] && <button className="btn btn-light">Follow</button>}
+                            {user.social?.followStatus === FOLLOWED_STATUS[0] && <button className="btn btn-light">Unfollow</button>}
+                            {user.social?.followStatus === FOLLOWED_STATUS[2] && <span className="btn btn-light">Follow request in proccess</span>}
+                            {user.social?.followStatus === FOLLOWED_STATUS[1] && <span className="btn btn-light">Follow request was rejected</span>}
                             <button className="btn btn-light">Send a message</button>
                         </div>
                     </div>
                     <div className="mt-3 w-100 w-lg-80 d-flex justify-content-between">
-                        <p>100 publicaciones</p>
-                        <p>50 seguidores</p>
-                        <p>60 seguidos</p>
+                        <p>{user.social?.numberPublications} {PUBLICATIONS_LABEL}</p>
+                        <p>{user.social?.numberFollowers} {FOLLOWERS_LABEL}</p>
+                        <p>{user.social?.numberFollowed} {FOLLOWED_LABEL}</p>
                     </div>
                 </div>
             </div>

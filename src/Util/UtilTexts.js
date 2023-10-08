@@ -11,6 +11,11 @@ export const NOTI_MESSAGE_LOGOUT_SUCCESSFULLY = 'User logout successfully!';
 export const USERNAME_LABEL = 'Username';
 export const PASSWORD_LABEL = 'Password';
 
+export const FOLLOWED_STATUS = ['ACCEPTED','REJECTED','IN_PROCESS','NOT_ASKED'];
+export const FOLLOWED_LABEL= 'Followed';
+export const FOLLOWERS_LABEL= 'Followers';
+export const PUBLICATIONS_LABEL = 'Publications';
+
 export const LOADING_OPTIONS = ['allWindow', 'justAvailable'];
 
 export const NOTIFICATION_SEVERITIES=['Success', 'Error', 'Info'];

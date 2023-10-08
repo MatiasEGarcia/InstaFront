@@ -76,7 +76,7 @@ export async function changeUserVisibility() {
 }
 
 /**
- * Just search user profile image,username and if is visible.
+ * Just search auth user profile image,username and if is visible.
   * @returns {Promise<Object>} data object with the body of the response.
  */
 export async function getBasicUserInfo() {
@@ -93,6 +93,27 @@ export async function getBasicUserInfo() {
     });
     return data;
 }
+
+/**
+ * 
+ * @param {String} id  id of the user wanted.
+ * @returns {Promise<Object>} data object with the body of the response.
+ */
+export async function getGeneralUserInfo(id){
+    let data;
+    const options={
+        method:'GET',
+        headers: {}
+    }
+
+    data = await fetchApi({
+        endpoint: `${USERS_ENDPOINT}/generalInfoById/${id}`,
+        options
+    });
+
+    return data;
+}
+
 
 /**
  * Async function to get Personal details of the user.
