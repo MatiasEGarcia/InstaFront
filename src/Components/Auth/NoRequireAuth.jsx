@@ -13,15 +13,16 @@ import { LOADING_OPTIONS } from "../../Util/UtilTexts";
  * @returns {JSX.Element} 
  */
 export default function noRequireAuth(){
-    const {auth, setAuth} = useAuth();
+    const {auth, setAuth, socketConnected} = useAuth();
     const [loading, setLoading] = useState(true);
-    const setNotification = useNotification();
+    const {setNotification} = useNotification();
     const location = useLocation();
 
 
     useCheckUserEffect({
         auth,
         setAuth,
+        socketConnected,
         setNotification,
         setLoading
     });

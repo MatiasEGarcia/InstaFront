@@ -26,7 +26,8 @@ function LeftNavigation({
     setShowPopover,
     hidePopover,
     userVisibiliy,
-    setUserVisibility
+    setUserVisibility,
+    notificationList
 }) {
 
 
@@ -59,7 +60,8 @@ function LeftNavigation({
                     </button>
                     {showPopover === 'notifications' &&
                         <NotificationsPopover hidePopover={hidePopover}
-                            container="custom-popover-container" />
+                            container="custom-popover-container"
+                            notificationList={notificationList} />
                     }
                 </li>
                 <li className="nav-item">

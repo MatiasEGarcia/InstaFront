@@ -1,7 +1,6 @@
 import { SIGN_UP, MESS_ERROR_SERVER_CONNECTION, SIGN_IN, ACTION_NO_EXIST } from "../Util/UtilTexts";
 import { AUTH_ENDPOINT } from "../Util/endpoints";
 import { RefreshTokenException } from "../Errors/Errors";
-import { getBasicUserInfo } from "./UserService";
 
 /**
  * Function to set authentication token for requests by the user.
@@ -20,11 +19,12 @@ function setRefreshToken(refreshToken) {
 }
 
 /**
- * Remove authToken and authRefreshToken from localStorage, when there is a logout or when tokes expired.
+ * Remove authToken, authRefreshToken and webSocketToken from localStorage, when there is a logout or when tokes expired.
  */
 function removeLocalStorageTokens() {
     localStorage.removeItem('authToken');
     localStorage.removeItem('authRefreshToken');
+    localStorage.removeItem('webSocketToken');
 }
 
 /**
@@ -33,7 +33,6 @@ function removeLocalStorageTokens() {
  * @param {string} options.action - The action to perform (either 'signUp' or 'signIn').
  * @param {string} options.username - The username for the user.
  * @param {string} options.password - The password for the user.
- * @returns {Promise<Object>} - A promise that resolves the basic user information.
  * @throws {Error} - If the specified action is not supported or if there was some error with the server. 
  */
 export async function userAccess({ action, username, password }) {
@@ -47,7 +46,6 @@ export async function userAccess({ action, username, password }) {
         default:
             throw new Error(ACTION_NO_EXIST);
     }
-    return await getBasicUserInfo();
 }
 
 /**

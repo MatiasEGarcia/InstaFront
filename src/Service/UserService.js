@@ -3,6 +3,15 @@ import { USERS_ENDPOINT } from "../Util/endpoints";
 import fetchApi from "./FetchServices";
 
 /**
+ * Function to save web socket token for connection in local storage 
+ * @param {String} webSocketAuthToken - web socket token
+ */
+function setWebSocketToken(webSocketAuthToken){
+    localStorage.setItem('webSocketToken', webSocketAuthToken);
+}
+
+
+/**
  * Async function to Log out the user by sending a request to the server with
  * the authentication token and refresh token.
  * @returns {Promise<Object>} data object with the body of the response.
@@ -79,7 +88,7 @@ export async function changeUserVisibility() {
  * Just search auth user profile image,username and if is visible.
   * @returns {Promise<Object>} data object with the body of the response.
  */
-export async function getBasicUserInfo() {
+async function getBasicUserInfo() {
     let data;
     const options = {
         method: 'GET',
@@ -99,10 +108,10 @@ export async function getBasicUserInfo() {
  * @param {String} id  id of the user wanted.
  * @returns {Promise<Object>} data object with the body of the response.
  */
-export async function getGeneralUserInfo(id){
+export async function getGeneralUserInfo(id) {
     let data;
-    const options={
-        method:'GET',
+    const options = {
+        method: 'GET',
         headers: {}
     }
 
@@ -119,14 +128,14 @@ export async function getGeneralUserInfo(id){
  * Async function to get Personal details of the user.
  * @returns {Promise<Object} data object with the body of the response or headers if there is not personal details.
  */
-export async function getPersonalDetails(){
+export async function getPersonalDetails() {
     let data;
     const options = {
         method: 'GET',
-        headers : {}//I need this even empty for fetchApi function
+        headers: {}//I need this even empty for fetchApi function
     }
     data = await fetchApi({
-        endpoint : `${USERS_ENDPOINT}/personalDetails`,
+        endpoint: `${USERS_ENDPOINT}/personalDetails`,
         options
     })
     return data;
@@ -141,23 +150,23 @@ export async function getPersonalDetails(){
  * @param {String} param0.email personal detail email.
  * @returns {Promise<Object>} data object with the body of the response.
  */
-export async function savePersonalDetails({name, lastname, age , email}){
+export async function savePersonalDetails({ name, lastname, age, email }) {
     let data;
     const bodyRequest = {
-        name, 
-        lastname, 
-        age, 
+        name,
+        lastname,
+        age,
         email
     }
     const options = {
         method: 'POST',
-        headers : {
+        headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(bodyRequest),
     }
     data = await fetchApi({
-        endpoint : `${USERS_ENDPOINT}/personalDetails`,
+        endpoint: `${USERS_ENDPOINT}/personalDetails`,
         options
     })
     return data;
@@ -169,6 +178,7 @@ export async function savePersonalDetails({name, lastname, age , email}){
  * @param {String} param0.column column in which to apply conditions.
  * @param {String} param0.value value to compare
  * @param {String} param0.page page number in case of pagination.
+ * @param {String} param0.pageSize page size in case of pagination.
  * @param {String} param0.sortDir sort direction(ASC, DESC).
  * @param {String} param0.operation Type of operation(equal, like,etc)
  * @returns {Promise<Object>} Data object with users.
@@ -196,12 +206,72 @@ export async function searchUsersByOneCondition({
         },
         body: JSON.stringify(bodyRequest),
     }
-    
+
     data = await fetchApi({
         endpoint: `${USERS_ENDPOINT}/searchAll/oneCondition?` + params.toString(),
         options
     })
     return data;
-   
 
+
+}
+
+/**
+ * Async function to get current user's notifications.
+ * @param {String} param0.page page number in case of pagination.
+ * @param {String} param0.pageSize page size.
+ * @param {String} param0.sortField atribute to sort.
+ * @param {String} param0.sortDir sort direction(ASC, DESC).
+ * @returns {Promise<Object} data object with the body of the response or headers if there is not notifications for the current user.
+ */
+export async function getPersonalNotifications({
+    page, pageSize, sortField, sortDir
+}) {
+    let data;
+    const params = new URLSearchParams({
+        page: page || '0',
+        pageSize: pageSize || '20',
+        sortField: sortField || 'notiId',
+        sortDir: sortDir || DIR_ASC_DIRECTION,
+    });
+    const options = {
+        method: 'GET',
+        headers: {}
+    }
+    data = await fetchApi({
+        endpoint: `${USERS_ENDPOINT}/notifications`,
+        options
+    })
+    return data;
+}
+
+/**
+ * Function to get web socket token and save it in local storage.
+ */
+async function getWebSocketToken() {
+    let data;
+    const options = {
+        method: 'GET',
+        headers: {}//I need this even empty for fetchApi function
+    }
+    data = await fetchApi({
+        endpoint: `${USERS_ENDPOINT}/webSocketToken`,
+        options
+    })
+    setWebSocketToken(data.body.webSocketAuthToken);
+}
+
+
+/**
+ * Function that if 'webSocket' is false then calls {@link getWebSocketToken} otherwise don't call it.
+ * After calls {@link getBasicUserInfo} (this will return auth user basic info).
+ * 
+ * @param {Boolean} webSocket - true if webSockets is already connected , false if not. 
+ * @returns {Promise<Object>} data object with the general user Info.
+ */
+export async function getGeneralInfo(webSocket) {
+    if (!webSocket) {
+        await getWebSocketToken();
+    }
+    return await getBasicUserInfo();
 }

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { getBasicUserInfo } from "../Service/UserService";
+import { NOTIFICATION_SEVERITIES, NOTIFICATION_TYPE } from "../Util/UtilTexts";
+import { getGeneralInfo } from "../Service/UserService";
 
 /**
  * Use effect that will be executed in the load of the component , [].
@@ -14,6 +15,7 @@ import { getBasicUserInfo } from "../Service/UserService";
 export default function useCheckUserEffect({
     auth,
     setAuth,
+    socketConnected,
     setNotification,
     setLoading
 }) {
@@ -23,10 +25,14 @@ export default function useCheckUserEffect({
      */
     useEffect(() => {
         if (!auth?.user && localStorage.getItem("authToken")) {
-            getBasicUserInfo().then((data) => {
+            getGeneralInfo(socketConnected).then((data) => {
                 setAuth({ ...auth, user: data.body });
             }).catch((error) => {
-                setNotification('error', error.message);
+                setNotification({
+                    sev:NOTIFICATION_SEVERITIES[1],
+                    msg:error.message,
+                    notificationType : NOTIFICATION_TYPE[5]
+                });
             }).finally(() => {
                 setLoading(false);
             });

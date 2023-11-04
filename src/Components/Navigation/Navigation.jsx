@@ -18,7 +18,7 @@ export default function Navigation({ typeNavigation }) {
     const [showPopover, setShowPopover] = useState('');//should containe name of the popover to show, if is empty then no one.
     const [username, setUsername] = useState('');
     const [usersFound, setUsersFound] = useState([]);
-    const setNotification = useNotification();
+    const {setNotification,notificationList} = useNotification();
     const { auth, setAuth, logout } = useAuth();
 
     function hidePopover() {
@@ -72,6 +72,7 @@ export default function Navigation({ typeNavigation }) {
 
 
 
+
     switch (typeNavigation) {
         case TYPE_NAV[0]:
             return <LeftNavigation
@@ -83,7 +84,8 @@ export default function Navigation({ typeNavigation }) {
                 setShowPopover={setShowPopover}
                 hidePopover={hidePopover}
                 userVisibiliy={auth.user.visible}
-                setUserVisibility={setUserVisibility}/>
+                setUserVisibility={setUserVisibility}
+                notificationList = {notificationList}/>
         case TYPE_NAV[1]:
             return <StickyBottomIconNavigation
                 username={username}
@@ -94,7 +96,8 @@ export default function Navigation({ typeNavigation }) {
                 setShowPopover={setShowPopover}
                 hidePopover={hidePopover}
                 userVisibiliy={auth.user.visible}
-                setUserVisibility={setUserVisibility}/>
+                setUserVisibility={setUserVisibility}
+                notificationList = {notificationList}/>
         default:
             throw new Error(ACTION_NO_EXIST);
     }

@@ -25,7 +25,8 @@ function StickyBottomIconNavigation({
     setShowPopover,
     hidePopover,
     userVisibiliy,
-    setUserVisibility
+    setUserVisibility,
+    notificationList
 }) {
 
 
@@ -53,7 +54,8 @@ function StickyBottomIconNavigation({
                     </button>
                     {showPopover === 'notifications' &&
                         <NotificationsPopover hidePopover={hidePopover}
-                            container="custom-icon-popover-container" />
+                            container="custom-icon-popover-container"
+                            notificationList={notificationList} />
                     }
                 </li>
                 <li className="nav-item">

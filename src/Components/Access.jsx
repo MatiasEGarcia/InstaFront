@@ -1,5 +1,5 @@
 import { PersonFillAdd, PersonUp } from "react-bootstrap-icons";
-import { LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PASSWORD_LABEL, SIGN_IN, USERNAME_LABEL } from "../Util/UtilTexts";
+import { LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PASSWORD_LABEL, SIGN_IN, USERNAME_LABEL , NOTIFICATION_TYPE} from "../Util/UtilTexts";
 import { useForm } from "../hooks/useForm";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -44,7 +44,7 @@ const validationsForm = (form) => {
 function Access({ typeOfAccess }) {
     const [loading, setLoading] = useState(false);
     const auth = useAuth();
-    const setNotification = useNotification();
+    const {setNotification} = useNotification();
     const { form,
         fieldsTouched,
         errors,
@@ -72,17 +72,18 @@ function Access({ typeOfAccess }) {
             action:typeOfAccess,
             username: evt.target.username.value,
             password: evt.target.password.value,
-        }).then((data) => {
+        }).then(() => {
             setNotification({
                 sev:NOTIFICATION_SEVERITIES[0],
-                msg:`Welcome ${data.body.username}`
+                msg:`Welcome to instaFrontReact`,
+                notificationType : NOTIFICATION_TYPE[6]
             });
             navigate('/home');
         }).catch((error) => {
-            console.log(error)
             setNotification({
                 sev: NOTIFICATION_SEVERITIES[1],
-                msg: error.message
+                msg: error.message,
+                notificationType : NOTIFICATION_TYPE[5]
             });
         }).finally(() => {
             setLoading(false);

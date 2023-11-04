@@ -2,9 +2,9 @@ import Modal from "./Modal";
 import { useModal } from "../hooks/useModal";
 import PublicationModal from "./PublicationModal";
 import { useEffect, useState } from "react";
-import { getAllByAuthUser } from "../Service/PublicationService";
 import { useNotification } from "../hooks/useNotification";
-import { FOLLOWED_LABEL, FOLLOWED_STATUS, FOLLOWERS_LABEL, NOTIFICATION_SEVERITIES, PUBLICATIONS_LABEL, LOADING_OPTIONS } from "../Util/UtilTexts";
+import { FOLLOWED_LABEL, FOLLOWED_STATUS, FOLLOWERS_LABEL, NOTIFICATION_SEVERITIES, PUBLICATIONS_LABEL, LOADING_OPTIONS,
+NOTIFICATION_TYPE } from "../Util/UtilTexts";
 import { useNavigate, useParams } from "react-router-dom";
 import UsersHomePublications from "./UserHomePublications";
 import { getGeneralUserInfo } from "../Service/UserService";
@@ -44,7 +44,8 @@ function UserMainHome() {
         }).catch((error) => {
             setNotification({
                 sev: NOTIFICATION_SEVERITIES[1],//ERROR
-                msg: error.message
+                msg: error.message,
+                notificationType: NOTIFICATION_TYPE[5],//ERROR//tengo que agreag la fechaa
             });
             navigate("/home");
         }).finally(() => {

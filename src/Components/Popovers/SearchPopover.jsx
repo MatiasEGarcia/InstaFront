@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
  */
 function SearchPopover({ hidePopover, username, setUsername, container, usersFound, saveFollow}) {
     return (
-        <div className={`${container} border rounded p-3 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
+        <div className={`${container} border rounded p-2 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
             <div className="mb-3">
                 <input type="text"
                     className="form-control"
