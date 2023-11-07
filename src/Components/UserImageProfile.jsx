@@ -1,6 +1,6 @@
 
 /**
- * Display user basic profile image.
+ * Display user basic profile image. if there was no image then gives one by default.
  * 
  * @param {Object} props - The component props.
  * @param {String} props.imgWith - image width

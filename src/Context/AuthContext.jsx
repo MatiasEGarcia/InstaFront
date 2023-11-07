@@ -10,7 +10,6 @@ const AuthContext = createContext();
 var stompClient = null;
 
 export function AuthProvider({ children }) {
-    console.log('ENTRANDO EN AUTHPROVIDER')
     const [auth, setAuth] = useState({});
     const { setNotification, setNotificationList } = useNotification();
     const [socketConnected, setSocketConnected] = useState(false);
@@ -35,7 +34,7 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         if (auth.user) {
-            getPersonalNotifications().then((data) => {
+            getPersonalNotifications({}).then((data) => {
                 if (data.body?.list) {
                     setNotificationList(data.body.list);
                 } else if (data.headers) {//in case that there are not notifi
@@ -80,13 +79,14 @@ export function AuthProvider({ children }) {
         }
 
         function handleServerNotification(payload) {
-            setNotification({
+            console.log("LLEGOOOOOOOOOOOOOOOO " + payload);
+            /*setNotification({
                 sev: NOTIFICATION_SEVERITIES[2], //info
                 msg: NOTIFICATION_MESSAGES.get(payload.type),
                 fromWho: payload.fromWho,
                 type: payload.type,
                 createdAt: new Date(payload.createdAt)
-            });
+            });*/
         }
 
     }, [auth]);

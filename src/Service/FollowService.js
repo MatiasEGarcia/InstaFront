@@ -29,7 +29,7 @@ export async function follow(followedId){
  * @param {String} followedId  id of user want to left to follow.
  * @returns {Promise<Object>} data object with the body of the response.
  */
-export async function deleteFollow(followedId){
+export async function unFollow(followedId){
     let data;
     const options = {
         method: 'POST',
@@ -42,4 +42,13 @@ export async function deleteFollow(followedId){
     })
 
     return data;
+}
+
+/**
+ * Async function to update follow status.
+ * @param {String} followedId  id of user want to left to follow.
+ * @returns {Promise<Object>} data object with the body of the response.
+ */
+export async function updateFollowStatus(newFollowStatus){
+
 }

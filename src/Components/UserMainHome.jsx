@@ -10,6 +10,7 @@ import UsersHomePublications from "./UserHomePublications";
 import { getGeneralUserInfo } from "../Service/UserService";
 import UserImageProfile from "./UserImageProfile";
 import Loading from "./Loading";
+import { follow,unFollow } from "../Service/FollowService";
 
 
 //cuando me comunique con el server esto lo borro
@@ -31,21 +32,21 @@ function UserMainHome() {
         setModalState,
         contentModal,
         showModal } = useModal(JustReturnModelContentExample);
-    const setNotification = useNotification();
+    const {setNotification} = useNotification();
     const navigate = useNavigate();
     const { userId } = useParams();
     const [loading, setLoading] = useState(false);
-    const [user, setUser] = useState({});
+    const [userVisited, setUserVisited] = useState({}); //user owner of this page
 
     useEffect(() => {
         setLoading(true);
         getGeneralUserInfo(userId).then((data) => {
-            setUser(data.body);
+            setUserVisited(data.body);
         }).catch((error) => {
             setNotification({
                 sev: NOTIFICATION_SEVERITIES[1],//ERROR
                 msg: error.message,
-                notificationType: NOTIFICATION_TYPE[5],//ERROR//tengo que agreag la fechaa
+                notificationType: NOTIFICATION_TYPE[5],//ERROR
             });
             navigate("/home");
         }).finally(() => {
@@ -61,30 +62,57 @@ function UserMainHome() {
         )
     }
 
+    function followHanlder(){
+        follow(userVisited.user.userId).then(data => {
+            setUserVisited({...userVisited,social : {...userVisited.social, followStatus : data.body.followStatus}});
+        }).catch(error => {
+            setNotification({
+                sev: NOTIFICATION_SEVERITIES[1],//ERROR
+                msg: error.message,
+                notificationType: NOTIFICATION_TYPE[5],//ERROR
+            });
+        });
+    }
+    function unfollowHandler(){
+        unFollow(userVisited.user.userId).then(data => {
+            setUserVisited({...userVisited,social : {...userVisited.social, followStatus : data.body.followStatus}});
+        }).catch(error => {
+            setNotification({
+                sev: NOTIFICATION_SEVERITIES[1],//ERROR
+                msg: error.message,
+                notificationType: NOTIFICATION_TYPE[5],//ERROR
+            });
+        });
+    }
+
 
     return (
         <main className="col-12 col-md-8 col-xl-10">
             <div className="row p-3">
                 <div className="col-12 col-md-5 text-center text-md-end">
-                    <UserImageProfile img={user.user?.image}
+                    <UserImageProfile img={userVisited.user?.image}
                         imgHeight="180px"
                         imgWith="180px" />
                 </div>
                 <div className="col-12 col-md-7">
                     <div className="mt-3 w-100 w-lg-80 d-flex">
-                        <h3>{user.user?.username}</h3>
+                        <h3>{userVisited.user?.username}</h3>
                         <div className="ms-3 d-flex  gap-2">
-                            {user.social?.followStatus === FOLLOWED_STATUS[3] && <button className="btn btn-light">Follow</button>}
-                            {user.social?.followStatus === FOLLOWED_STATUS[0] && <button className="btn btn-light">Unfollow</button>}
-                            {user.social?.followStatus === FOLLOWED_STATUS[2] && <span className="btn btn-light">Follow request in proccess</span>}
-                            {user.social?.followStatus === FOLLOWED_STATUS[1] && <span className="btn btn-light">Follow request was rejected</span>}
+                        {userVisited.social?.followStatus === FOLLOWED_STATUS[0] &&
+                                     <button className="btn btn-light" onClick={unfollowHandler}>Unfollow</button>}
+                        {userVisited.social?.followStatus === FOLLOWED_STATUS[1] &&
+                                     <span className="btn btn-light">Follow request was rejected</span>}       
+                        {userVisited.social?.followStatus === FOLLOWED_STATUS[2] &&
+                                     <span className="btn btn-light">Follow request in proccess</span>}
+                        {userVisited.social?.followStatus === FOLLOWED_STATUS[3] && 
+                                     <button className="btn btn-light" onClick={followHanlder}>Follow</button>}
                             <button className="btn btn-light">Send a message</button>
                         </div>
                     </div>
                     <div className="mt-3 w-100 w-lg-80 d-flex justify-content-between">
-                        <p>{user.social?.numberPublications} {PUBLICATIONS_LABEL}</p>
-                        <p>{user.social?.numberFollowers} {FOLLOWERS_LABEL}</p>
-                        <p>{user.social?.numberFollowed} {FOLLOWED_LABEL}</p>
+                        <p>{userVisited.social?.numberPublications} {PUBLICATIONS_LABEL}</p>
+                        <p>{userVisited.social?.numberFollowers} {FOLLOWERS_LABEL}</p>
+                        <p>{userVisited.social?.numberFollowed} {FOLLOWED_LABEL}</p>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,5 @@
-import { Trash, Eye, Envelope, Heart, Pencil, Image, Key } from "react-bootstrap-icons";
+import { Trash, Eye, Envelope, Heart, Pencil, Image, Key, XCircle, Exclamation } from "react-bootstrap-icons";
+import UserImageProfile from "../UserImageProfile";
 
 
 //MOFICAR EL COMMENTTT
@@ -10,23 +11,65 @@ import { Trash, Eye, Envelope, Heart, Pencil, Image, Key } from "react-bootstrap
  * @returns {JSX.Element} - notifications popover.
  */
 function NotificationsPopover({ hidePopover, container, notificationList }) {
+
+    /**
+     * Function to convert notification creation time from utc to local date. 
+     * 
+     * @param {String} date - date when the notification was created 
+     * @returns string local creation date of the notification.
+     */
+    function localDate(date) {
+        const utcLocalCreateAt = new Date(date);
+        const options = {
+            month: "numeric",
+            day: "numeric",
+            year: "numeric"
+        }
+        const localCreatedAt = utcLocalCreateAt.toLocaleDateString(undefined, options);
+        return localCreatedAt;
+    }
+
+    function deleteNotification(notificationId) {
+        console.log("borrando notificacion con id" + notificationId)
+    }
+
     return (
-        <div className={`${container} border rounded p-2 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
+        <div className={`${container} border rounded p-1 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
             <div className="text-center"><h4>Notifications</h4></div>
-            <hr />
             <div className="vstack gap-2 h-80 overflow-auto">
-                <div className="d-flex">
-                    <div className="btn btn-light ps-1 d-flex rounded w-100 me-2">
-                        <div className="d-flex align-items-center">
-                            <Eye size={30} />{/*ACA TENDRIA QUE PONER LA IMAGEN DEL USUARIO QUE HIZO LA ACCION, PARA REFERENCIA, EN VEZ DE UN ICONO*/ }
-                        </div>
-                        <div className="ms-1 ps-1 border-start">
-                            <small>Aca iria el contenido de la noti</small>{/*TENGO QUE HACER LA CONEXION WEBSOCKET */}
-                        </div>
-                    </div>
-                    <button className="btn btn-danger">
-                        <Trash size={30} color="black" />
-                    </button>
+                <div className="d-flex mt-3">
+                    {notificationList.map((notif) => {
+                            return (
+                                <div key={notif.notiId} className="position-relative w-95">
+                                    <span className="badge bg-warning rounded-pill
+                                           position-absolute top-0 start-50 translate-middle">
+                                        <Exclamation size={18} className="m-0" />
+                                    </span>
+                                    <div className="btn btn-light p-0 ps-1 pt-1 px-1 
+                                                d-flex rounded w-100 me-2">
+                                        <div className="d-flex align-items-center">
+                                            <UserImageProfile img={notif.fromWho.image} imgWith="60px" imgHeight="60px" />
+                                        </div>
+                                        <div className="ms-1 ps-1 border-start">
+                                            <div className="text-start m-0">
+                                                <small style={{ fontSize: "15px" }}>From: {notif.fromWho.username}</small>
+                                            </div>
+                                            <div>
+                                                <small style={{ fontSize: "13px" }}>{notif.notiMessage}</small>
+                                            </div>
+                                            <div className="text-end">
+                                                <small style={{ fontSize: "10px" }}>{localDate(notif.createdAt)}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span className="badge bg-danger rounded-pill
+                                           position-absolute top-50 start-100 translate-middle
+                                           cursor-pointer-hover"
+                                        onClick={deleteNotification(notif.notiId)}
+                                    ><Trash size={15} /></span>
+                                </div>
+                            )
+                        }) }
                 </div>
             </div>
         </div>

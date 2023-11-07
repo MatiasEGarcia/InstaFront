@@ -34,7 +34,7 @@ export function NotificationProvider({ children }) {
                 fromWho,
                 createdAt
             }
-            setNotificationList(...notificationList, notification);
+            setNotificationList([...notificationList, notification]);
         }
 
         setTimeout(() => {

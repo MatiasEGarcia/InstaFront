@@ -239,7 +239,7 @@ export async function getPersonalNotifications({
         headers: {}
     }
     data = await fetchApi({
-        endpoint: `${USERS_ENDPOINT}/notifications`,
+        endpoint: `${USERS_ENDPOINT}/notifications?${params.toString()}`,
         options
     })
     return data;

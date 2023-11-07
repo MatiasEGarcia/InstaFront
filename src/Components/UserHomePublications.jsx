@@ -22,7 +22,7 @@ export default function UsersHomePublications({ showModal, userOwnerId }) {
     const [pagDetailsFlag, setPagDetailsFlag] = useState(false);//??, is for the useEffect that is listening pagDetails, becuase changes pagDetails content too, and with this I avoid a loop.
     const [pagDetails, setPagDetails] = useState(basePagDetails);
     const [loading, setLoading] = useState(false);
-    const setNotification = useNotification();
+    const {setNotification} = useNotification();
 
     /**
      * Function to change current page in the pagination.
