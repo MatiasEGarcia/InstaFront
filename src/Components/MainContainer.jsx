@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import HomeMain from "./HomeMain";
 import UserMainHome from "./UserMainHome";
-import { APP_TITLE, TYPE_NAV, TYPE_MAIN } from "../Util/UtilTexts";
-import Navigation from "./Navigation/Navigation";
+import { APP_TITLE, TYPE_MAIN } from "../Util/UtilTexts";
 import UserDetailsMain from "./UserDetailsMain";
 import CreatePublicationMain from "./CreatePublicationMain";
+import LeftNavigation from "./Navigation/LeftNavigation";
+import StickyBottomIconNavigation from "./Navigation/StickyBottomIconNavigation";
 /**
  * Will hold basic Main display.
  * 
@@ -39,9 +40,9 @@ function MainContainer({ wichMain }) {
                 </Link>
             </div>
             <div className="row vh-100 position-relative">
-                <Navigation typeNavigation={TYPE_NAV[0]} />
+                <LeftNavigation/> 
                 {main}
-                <Navigation typeNavigation={TYPE_NAV[1]} />
+                <StickyBottomIconNavigation/>
             </div>
         </div>
     )

@@ -33,8 +33,6 @@ export const NAV_OPTIONS = ['Search','Notifications', 'Chats', 'Navigate', 'Crea
 
 export const PAG_TYPES = ['navPagination', 'scrollDownPagination'];
 
-//types of navigation for the app
-export const TYPE_NAV = ['leftNavigation', 'stickyBottomIconNavigation'];
 export const TYPE_MAIN = ['home', 'userMainHome', 'userDetailsMain','createPublicationMain'];
 
 export const SIGN_IN = 'signIn';

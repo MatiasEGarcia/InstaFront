@@ -1,35 +1,28 @@
-import { Search, PlusCircle, ChatSquareText, ExclamationCircle, Compass, Gear } from "react-bootstrap-icons";
+import { APP_TITLE, NAV_OPTIONS } from "../../Util/UtilTexts";
+import { Search, ExclamationCircle, ChatSquareText, Compass, PlusCircle, Gear } from "react-bootstrap-icons";
+import { Link } from "react-router-dom";
+import ConfigurationPopover from "../Popovers/ConfigurationPopover";
 import SearchPopover from "../Popovers/SearchPopover";
 import NotificationsPopover from "../Popovers/NotificationsPopover";
-import ConfigurationPopover from "../Popovers/ConfigurationPopover";
-import { Link } from "react-router-dom";
-import { APP_TITLE, NAV_OPTIONS } from "../../Util/UtilTexts";
+import { useState } from "react";
 
 
 /**
- * @param {Object} param - The component props.
- * @param {String} param.username - username value for input in search popover.
- * @param {Function} param.setUsername - function to change the value in username.
- * @param {Array} param.usersFound - array with users found in search popover.
- * @param {Function} param.logout - logout function for configuration popover.
- * @param {String} param.showPopover - wich popover should be active.
- * @param {Function} param.setShowPopover - function to change wich popover should be active.
- * @param {Function} param.hidePopover - function to hide the active popover.
- * @returns {JSX.Element} - The rendered left basic nav.
+ * 
+ * @returns {JSX.Element} - The rendered left basic nav. 
  */
-function LeftNavigation({
-    username,
-    setUsername,
-    usersFound,
-    logout,
-    showPopover,
-    setShowPopover,
-    hidePopover,
-    userVisibiliy,
-    setUserVisibility,
-    notificationList
-}) {
+export default function LeftNavigation() {
+    const [showPopover, setShowPopover] = useState('');//should containe name of the popover to show, if is empty then no one.
 
+    function hidePopover() {
+        /**
+        * After a second it runs this, 
+        * but if the mouse re-entered the popover, then it won't close, it's to give the user time to get from the icon to the popover.
+        */
+        setTimeout(() => {
+            setShowPopover('');
+        }, 500);
+    }
 
     return (
         <nav className="d-none d-md-block col-md-4 col-xl-2 
@@ -47,10 +40,7 @@ function LeftNavigation({
                     </button>
                     {showPopover === 'search' &&
                         <SearchPopover hidePopover={hidePopover}
-                            container="custom-popover-container"
-                            username={username}
-                            setUsername={setUsername}
-                            usersFound={usersFound}/>
+                            container="custom-popover-container" />
                     }
                 </li>
                 <li className="nav-item position-relative">
@@ -60,8 +50,7 @@ function LeftNavigation({
                     </button>
                     {showPopover === 'notifications' &&
                         <NotificationsPopover hidePopover={hidePopover}
-                            container="custom-popover-container"
-                            notificationList={notificationList} />
+                            container="custom-popover-container"/>
                     }
                 </li>
                 <li className="nav-item">
@@ -91,15 +80,10 @@ function LeftNavigation({
                     </button>
                     {showPopover === 'config' &&
                         <ConfigurationPopover hidePopover={hidePopover}
-                            container="custom-popover-container"
-                            logoutAction = {logout}
-                            userVisibiliy = {userVisibiliy}
-                            setUserVisibility = {setUserVisibility}/>
+                            container="custom-popover-container" />
                     }
                 </li>
             </ul>
         </nav>
     )
-}
-
-export default LeftNavigation;
+}   

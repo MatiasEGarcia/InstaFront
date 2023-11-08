@@ -1,18 +1,48 @@
 import UserImageProfile from "../UserImageProfile";
 import { Link } from "react-router-dom";
+import { searchUsersByOneCondition } from "../../Service/UserService";
+import { useNotification } from "../../hooks/useNotification";
+import { useState, useEffect } from "react";
+import { NOTIFICATION_SEVERITIES } from "../../Util/UtilTexts";
+import { LIKE } from "../../Util/UtilTexts";
 
 
 /**
  * Components that returns search popover to use in some navigation.
  * @param {Object} param - The component props.
  * @param {Function} param.hidePopover - function to close popover.
- * @param {String} param.username - username to search.
- * @param {Function} param.setUsername - function to search users.
  * @param {String} param.container - type of container , for bottom navigation or left navigation.
- * @param {Array} param.usersFound - array with users found.
  * @returns {JSX.Element} - search popover.
  */
-function SearchPopover({ hidePopover, username, setUsername, container, usersFound, saveFollow}) {
+function SearchPopover({ hidePopover, container}) {
+    const [username, setUsername] = useState('');
+    const [usersFound, setUsersFound] = useState([]); // users founded in search popover
+    const {setNotification} = useNotification();
+
+    useEffect(() => {
+        if (username.length !== 0) {
+            searchUsersByOneCondition({
+                column: 'username',
+                value: username,
+                operation: LIKE,
+            }).then((data) => {
+                if (data.body?.list !== undefined) {
+                    setUsersFound(data.body.list);
+                } else {
+                    console.log(data.headers.get('moreInfo'))//moreInfo: name of the header with the more info
+                }
+            }).catch((error) => {
+                setNotification({
+                    sev: NOTIFICATION_SEVERITIES[1],//error
+                    msg: error.message,
+                })
+            })
+        } else {
+            //to reset usersFoundList
+            setUsersFound([]);
+        }
+    }, [username]);
+
     return (
         <div className={`${container} border rounded p-2 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
             <div className="mb-3">

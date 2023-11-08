@@ -1,8 +1,7 @@
 import { Trash, Eye, Envelope, Heart, Pencil, Image, Key, XCircle, Exclamation } from "react-bootstrap-icons";
 import UserImageProfile from "../UserImageProfile";
+import { useNotification } from "../../hooks/useNotification";
 
-
-//MOFICAR EL COMMENTTT
 /**
  * Component that returns notifications popover to use in some navigation.
  * @param {Object} param - The component props.
@@ -10,7 +9,13 @@ import UserImageProfile from "../UserImageProfile";
  * @param {String} param.container - type of container , for bottom navigation or left navigation
  * @returns {JSX.Element} - notifications popover.
  */
-function NotificationsPopover({ hidePopover, container, notificationList }) {
+function NotificationsPopover({ hidePopover, container }) {
+    const {notificationList} = useNotification();
+
+    //ESTE PODRIA PONERO EN EL NOTIFICATION CONTEXT NO???
+    function deleteNotiById(notificationId) {
+        console.log("borrando notificacion con id" + notificationId)
+    }
 
     /**
      * Function to convert notification creation time from utc to local date. 
@@ -27,10 +32,6 @@ function NotificationsPopover({ hidePopover, container, notificationList }) {
         }
         const localCreatedAt = utcLocalCreateAt.toLocaleDateString(undefined, options);
         return localCreatedAt;
-    }
-
-    function deleteNotification(notificationId) {
-        console.log("borrando notificacion con id" + notificationId)
     }
 
     return (
@@ -65,7 +66,7 @@ function NotificationsPopover({ hidePopover, container, notificationList }) {
                                     <span className="badge bg-danger rounded-pill
                                            position-absolute top-50 start-100 translate-middle
                                            cursor-pointer-hover"
-                                        onClick={deleteNotification(notif.notiId)}
+                                        onClick={() => deleteNotiById(notif.notiId)}
                                     ><Trash size={15} /></span>
                                 </div>
                             )

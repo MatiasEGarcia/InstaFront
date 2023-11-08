@@ -1,4 +1,7 @@
 import { Link } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
+import { changeUserVisibility } from "../../Service/UserService";
+import { useNotification } from "../../hooks/useNotification";
 
 
 /**
@@ -6,12 +9,27 @@ import { Link } from "react-router-dom";
  * @param {Object} param - The component props.
  * @param {Function} param.hidePopover - function to close popover
  * @param {String} param.container - type of container , for bottom navigation or left navigation
- * @param {Function} param.logoutAction - user logout function.
- * @param {String} param.userVisibility - authenticated user visibility. private or public.
- * @param {Function} param.setUserVisibility - function to change user visibility.
  * @returns {JSX.Element} - configuration popover.
  */
-function ConfigurationPopover({ hidePopover, container, logoutAction, userVisibiliy, setUserVisibility }) {
+function ConfigurationPopover({ hidePopover, container }) {
+    const {auth,logout, setAuth} = useAuth();
+    const {setNotification} = useNotification();
+
+    function setUserVisibility() {
+        changeUserVisibility().then((data) => {
+            setAuth({ ...auth, user: data.body });
+            setNotification({
+                sev: NOTIFICATION_SEVERITIES[0],//success
+                msg: "visibility changed",
+            })
+        }).catch((error) => {
+            setNotification({
+                sev: NOTIFICATION_SEVERITIES[1],//error
+                msg: error.message,
+            })
+        })
+    }
+
 
     return (
         <div className={`${container} border rounded p-2 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
@@ -25,8 +43,8 @@ function ConfigurationPopover({ hidePopover, container, logoutAction, userVisibi
                                 type="radio"
                                 name="visibilityRadio"
                                 id="publicRadio"
-                                checked={userVisibiliy === true}
-                                onChange={() => setUserVisibility()} />
+                                checked={auth.user.visible === true}
+                                onChange={setUserVisibility} />
                             <label className="form-check-label" htmlFor="publicRadio">
                                 Public
                             </label>
@@ -36,8 +54,8 @@ function ConfigurationPopover({ hidePopover, container, logoutAction, userVisibi
                                 type="radio"
                                 name="visibilityRadio"
                                 id="privateRadio"
-                                checked={userVisibiliy === false}
-                                onChange={() => setUserVisibility()} />
+                                checked={auth.user.visible === false}
+                                onChange={setUserVisibility} />
                             <label className="form-check-label" htmlFor="privateRadio">
                                 Private
                             </label>
@@ -49,7 +67,7 @@ function ConfigurationPopover({ hidePopover, container, logoutAction, userVisibi
                 </Link>
             </div>
             <div className="h-15 text-center">
-                <button className="btn btn-danger w-50" onClick={() => logoutAction()}>
+                <button className="btn btn-danger w-50" onClick={() => logout()}>
                     <p className="m-0">Logout</p>
                 </button>
             </div>
