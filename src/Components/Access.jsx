@@ -74,9 +74,10 @@ function Access({ typeOfAccess }) {
             password: evt.target.password.value,
         }).then(() => {
             setNotification({
-                sev:NOTIFICATION_SEVERITIES[0],
+                sev:NOTIFICATION_SEVERITIES[2],
                 msg:`Welcome to instaFrontReact`,
-                notificationType : NOTIFICATION_TYPE[6]
+                notificationType : NOTIFICATION_TYPE[6],
+                formWho:'app'
             });
             navigate('/home');
         }).catch((error) => {

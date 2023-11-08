@@ -44,12 +44,12 @@ export default function CreatePublicationMain() {
             description: evt.target.imgDescription.value
         }).then((data) => {//data should be the new publication already saved
             setNotification({
-                sev: NOTIFICATION_SEVERITIES[0],//SUCCESS
+                sev: NOTIFICATION_SEVERITIES[0],
                 msg: 'Publication successfully created'
             })
         }).catch((error) => {
             setNotification({
-                sev: NOTIFICATION_SEVERITIES[1],//ERROR
+                sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message
             })
         }).finally(() => {

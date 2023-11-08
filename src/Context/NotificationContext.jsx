@@ -17,17 +17,16 @@ export function NotificationProvider({ children }) {
      * 
      * @param {NOTIFICATION_SEVERITIES} props.sev - Type of message,success,error,etc.
      * @param {String} props.msg - Notification content.
-     * @param {Object} props.fromWho - object that will contain info about who trigger the notification, the server or a user 
-     * that wants to follow the currect user as example, default server.
+     * @param {Object} props.fromWho - origen 
      * @param {NOTIFICATION_TYPE} prop.type - type of the notification, follow, comment,etc.
      * @param {Date} prop.createdAt - from when is the notification, (mostly to have a sort atribute)
      * @param {Number} props.timeout - Notification time of existence. no required.(default 7).
      * @returns {JSX.Element} - NotificationContext provider
      */
-    function setNotification({ sev, msg, fromWho = { username: 'server' }, type, createdAt, timeout = 7 }) {
+    function setNotification({ sev, msg, fromWho, type, createdAt, timeout = 7 }) {
         setMsgConfig({ severity: sev, message: msg, type});
 
-        if (sev == NOTIFICATION_SEVERITIES[2]) {//I only save info notifications.
+        if (sev == NOTIFICATION_SEVERITIES[2] && fromWho !== 'app') {//I only save info notifications, and only if they are not from the app. like, follow,etc
             const notification = {
                 msg,
                 type,

@@ -41,7 +41,8 @@ export function AuthProvider({ children }) {
                     setNotification({
                         sev: NOTIFICATION_SEVERITIES[2],
                         msg: data.headers.get('moreInfo'),
-                        type: NOTIFICATION_TYPE[5]//serverMessage
+                        type: NOTIFICATION_TYPE[5],//serverMessage
+                        fromWho:'app'
                     })
                 }
             }).catch((error) => {

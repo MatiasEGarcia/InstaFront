@@ -51,12 +51,13 @@ export default function UsersHomePublications({ showModal, userOwnerId }) {
             } else if (data.headers) {
                 setNotification({
                     sev: NOTIFICATION_SEVERITIES[2],
-                    msg: data.headers.get('moreInfo')
+                    msg: data.headers.get('moreInfo'),
+                    fromWho: 'app', //this is to don't save it in notification popover.
                 });
             }
         }).catch((error) => {
             setNotification({
-                sev: NOTIFICATION_SEVERITIES[1],//ERROR
+                sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message
             });
         }).finally(() => {
@@ -79,13 +80,14 @@ export default function UsersHomePublications({ showModal, userOwnerId }) {
                     })
                 } else if (data.headers) {
                     setNotification({
-                        sev: NOTIFICATION_SEVERITIES[2],//INFO
-                        msg: data.headers.get('moreInfo')
+                        sev: NOTIFICATION_SEVERITIES[2],
+                        msg: data.headers.get('moreInfo'),
+                        fromWho: 'app', //this is to don't save it in notification popover.
                     });
                 }
             }).catch((error) => {
                 setNotification({
-                    sev: NOTIFICATION_SEVERITIES[1],//ERROR
+                    sev: NOTIFICATION_SEVERITIES[1],
                     msg: error.message
                 });
             }).finally(() => {
@@ -110,13 +112,14 @@ export default function UsersHomePublications({ showModal, userOwnerId }) {
                 })
             } else if (data.headers) {
                 setNotification({
-                    sev: NOTIFICATION_SEVERITIES[2],//INFO
-                    msg: data.headers.get('moreInfo')
+                    sev: NOTIFICATION_SEVERITIES[2],
+                    msg: data.headers.get('moreInfo'),
+                    fromWho: 'app', //this is to don't save it in notification popover.
                 });
             }
         }).catch((error) => {
             setNotification({
-                sev: NOTIFICATION_SEVERITIES[1],//ERROR
+                sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message
             });
         }).finally(() => {

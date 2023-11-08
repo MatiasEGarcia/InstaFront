@@ -44,9 +44,9 @@ function UserMainHome() {
             setUserVisited(data.body);
         }).catch((error) => {
             setNotification({
-                sev: NOTIFICATION_SEVERITIES[1],//ERROR
+                sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message,
-                notificationType: NOTIFICATION_TYPE[5],//ERROR
+                notificationType: NOTIFICATION_TYPE[5],
             });
             navigate("/home");
         }).finally(() => {
@@ -67,9 +67,9 @@ function UserMainHome() {
             setUserVisited({...userVisited,social : {...userVisited.social, followStatus : data.body.followStatus}});
         }).catch(error => {
             setNotification({
-                sev: NOTIFICATION_SEVERITIES[1],//ERROR
+                sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message,
-                notificationType: NOTIFICATION_TYPE[5],//ERROR
+                notificationType: NOTIFICATION_TYPE[5],
             });
         });
     }
@@ -78,9 +78,9 @@ function UserMainHome() {
             setUserVisited({...userVisited,social : {...userVisited.social, followStatus : data.body.followStatus}});
         }).catch(error => {
             setNotification({
-                sev: NOTIFICATION_SEVERITIES[1],//ERROR
+                sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message,
-                notificationType: NOTIFICATION_TYPE[5],//ERROR
+                notificationType: NOTIFICATION_TYPE[5],
             });
         });
     }

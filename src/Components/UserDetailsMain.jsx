@@ -72,7 +72,7 @@ export default function UserDetailsMain() {
             }
         }).catch((error) => {
             setNotification({
-                sev: NOTIFICATION_SEVERITIES[0],//error
+                sev: NOTIFICATION_SEVERITIES[0],
                 msg: error.message
             })
         }).finally(() => {
@@ -97,12 +97,12 @@ export default function UserDetailsMain() {
         uploadProfileImage(evt.target.files[0]).then((data) => {
             setAuth({ ...auth, user: { ...auth.user, image: data.body.image64 } });
             setNotification({
-                sev: NOTIFICATION_SEVERITIES[0], //success
+                sev: NOTIFICATION_SEVERITIES[0],
                 msg: 'user profile image updated'
             })
         }).catch((error) => {
             setNotification({
-                sev: NOTIFICATION_SEVERITIES[1], //error
+                sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message
             })
         }).finally(() => {
@@ -123,12 +123,12 @@ export default function UserDetailsMain() {
             email: evt.target.email.value
         }).then((data) => {//we recive a data, but I don't need it now.
             setNotification({
-                sev: NOTIFICATION_SEVERITIES[0], //SUCCESS
-                msg: `${auth.user.username} update it's personal details succefuly`
+                sev: NOTIFICATION_SEVERITIES[0], 
+                msg: `${auth.user.username} update it's personal details succefully`
             })
         }).catch((error) => {
             setNotification({
-                sev: NOTIFICATION_SEVERITIES[1], //ERROR
+                sev: NOTIFICATION_SEVERITIES[1], 
                 msg: error.message
             })
         }).finally(() => {

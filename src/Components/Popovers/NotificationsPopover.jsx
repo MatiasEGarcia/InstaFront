@@ -10,7 +10,7 @@ import { useNotification } from "../../hooks/useNotification";
  * @returns {JSX.Element} - notifications popover.
  */
 function NotificationsPopover({ hidePopover, container }) {
-    const {notificationList} = useNotification();
+    const { notificationList } = useNotification();
 
     //ESTE PODRIA PONERO EN EL NOTIFICATION CONTEXT NO???
     function deleteNotiById(notificationId) {
@@ -39,15 +39,17 @@ function NotificationsPopover({ hidePopover, container }) {
             <div className="text-center"><h4>Notifications</h4></div>
             <div className="vstack gap-2 h-80 overflow-auto">
                 <div className="d-flex mt-3">
-                    {notificationList.map((notif) => {
+                    {notificationList.length === 0
+                        ? <div className="w-100 text-center"><p>There is no notifications</p></div>
+                        : notificationList.map((notif) => {
                             return (
                                 <div key={notif.notiId} className="position-relative w-95">
                                     <span className="badge bg-warning rounded-pill
-                                           position-absolute top-0 start-50 translate-middle">
+                                       position-absolute top-0 start-50 translate-middle">
                                         <Exclamation size={18} className="m-0" />
                                     </span>
                                     <div className="btn btn-light p-0 ps-1 pt-1 px-1 
-                                                d-flex rounded w-100 me-2">
+                                            d-flex rounded w-100 me-2">
                                         <div className="d-flex align-items-center">
                                             <UserImageProfile img={notif.fromWho.image} imgWith="60px" imgHeight="60px" />
                                         </div>
@@ -64,13 +66,13 @@ function NotificationsPopover({ hidePopover, container }) {
                                         </div>
                                     </div>
                                     <span className="badge bg-danger rounded-pill
-                                           position-absolute top-50 start-100 translate-middle
-                                           cursor-pointer-hover"
+                                       position-absolute top-50 start-100 translate-middle
+                                       cursor-pointer-hover"
                                         onClick={() => deleteNotiById(notif.notiId)}
                                     ><Trash size={15} /></span>
                                 </div>
                             )
-                        }) }
+                        })}
                 </div>
             </div>
         </div>

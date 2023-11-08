@@ -13,13 +13,13 @@ function NotificationToast({ message, severity, notificationType }) {
 
     //I don't know how many type of severities I will have so I use switch, if only are 2 , maybe I'll use conditional in the classname
     switch (severity) {
-        case NOTIFICATION_SEVERITIES[0]:
+        case NOTIFICATION_SEVERITIES[0]://SUCCESS
             bgSeverityColor = 'bg-success';
             break;
-        case NOTIFICATION_SEVERITIES[1]:
+        case NOTIFICATION_SEVERITIES[1]://ERROR
             bgSeverityColor = 'bg-danger';
             break;
-        case NOTIFICATION_SEVERITIES[2]:
+        case NOTIFICATION_SEVERITIES[2]://INFO
             bgSeverityColor = 'bg-info-subtle';
             break;
     }

@@ -5,6 +5,7 @@ import ConfigurationPopover from "../Popovers/ConfigurationPopover";
 import SearchPopover from "../Popovers/SearchPopover";
 import NotificationsPopover from "../Popovers/NotificationsPopover";
 import { useState } from "react";
+import { useNotification } from "../../hooks/useNotification";
 
 
 /**
@@ -13,6 +14,7 @@ import { useState } from "react";
  */
 export default function LeftNavigation() {
     const [showPopover, setShowPopover] = useState('');//should containe name of the popover to show, if is empty then no one.
+    const {notificationList} = useNotification();
 
     function hidePopover() {
         /**
@@ -44,9 +46,18 @@ export default function LeftNavigation() {
                     }
                 </li>
                 <li className="nav-item position-relative">
-                    <button type="button" className="btn btn-light w-100 text-start fs-5" onClick={() => setShowPopover('notifications')}>
+                    <button type="button" className="btn btn-light w-100 text-start fs-5
+                                                     position-relative" 
+                            onClick={() => setShowPopover('notifications')}>
                         <ExclamationCircle size={30} />
                         <span className="ms-2">{NAV_OPTIONS[1]}</span>
+                        {notificationList.length !== 0 && 
+                            <span class="position-absolute top-50 start-100 translate-middle rounded-circle
+                                    text-bg-danger
+                                    d-flex justify-content-center">
+                            <small className="px-2">{notificationList.length}</small>
+                        </span>
+                        }
                     </button>
                     {showPopover === 'notifications' &&
                         <NotificationsPopover hidePopover={hidePopover}
