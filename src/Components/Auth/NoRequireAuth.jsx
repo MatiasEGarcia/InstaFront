@@ -15,7 +15,7 @@ import { LOADING_OPTIONS } from "../../Util/UtilTexts";
 export default function noRequireAuth(){
     const {auth, setAuth, socketConnected} = useAuth();
     const [loading, setLoading] = useState(true);
-    const {setNotification} = useNotification();
+    const {setNotificationToast} = useNotification();
     const location = useLocation();
 
 
@@ -23,7 +23,7 @@ export default function noRequireAuth(){
         auth,
         setAuth,
         socketConnected,
-        setNotification,
+        setNotificationToast,
         setLoading
     });
 

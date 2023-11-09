@@ -13,36 +13,43 @@ export function NotificationProvider({ children }) {
     const [notificationList, setNotificationList] = useState([]);
 
     /**
-     * Function to set notification.
+     * Function to set notification toast.
      * 
-     * @param {NOTIFICATION_SEVERITIES} props.sev - Type of message,success,error,etc.
+     * @param {NOTIFICATION_SEVERITIES} props.sev - Severity of message,success,error,etc.
      * @param {String} props.msg - Notification content.
-     * @param {Object} props.fromWho - origen 
-     * @param {NOTIFICATION_TYPE} prop.type - type of the notification, follow, comment,etc.
-     * @param {Date} prop.createdAt - from when is the notification, (mostly to have a sort atribute)
      * @param {Number} props.timeout - Notification time of existence. no required.(default 7).
      * @returns {JSX.Element} - NotificationContext provider
      */
-    function setNotification({ sev, msg, fromWho, type, createdAt, timeout = 7 }) {
-        setMsgConfig({ severity: sev, message: msg, type});
-
-        if (sev == NOTIFICATION_SEVERITIES[2] && fromWho !== 'app') {//I only save info notifications, and only if they are not from the app. like, follow,etc
-            const notification = {
-                msg,
-                type,
-                fromWho,
-                createdAt
-            }
-            setNotificationList([...notificationList, notification]);
-        }
+    function setNotificationToast({ sev, msg, timeout = 7 }) {
+        setMsgConfig({ severity: sev, message: msg});
 
         setTimeout(() => {
             setMsgConfig({ ...msgConfig, message: '' });
         }, timeout * 1000);
     }
 
+    /**
+     * Create a notification and add to the notification popover in navigation var.
+     * @param {String} props.msg - notification message (What is the notification about?)
+     * @param {Object} props.fromWhoUser - user that produced the action(follow,like,etc) and in consequence 
+     * create the notification.
+     * @param {NOTIFICATION_TYPE} props.notificationType - type of notification (like theme, follow theme, etc).
+     * @param {Date} pros.createdAt - from when is the notification.
+     */
+    function createNotification({ msg, fromWhoUser, notificationType, createdAt }) {
+        const notification = {
+            msg,
+            type,
+            fromWhoUser,
+            createdAt,
+            notificationType
+        }
+        setNotificationList([...notificationList, notification]);
+    }
+
+//TENGO QUE AGREGARLO AL VALUE DEL PROVIDER EL METODO CREATENOTIFICATION Y FIJARME EN QUECLASES DEBERIA AGREGARLO
     return (
-        <NotificationContext.Provider value={{ setNotification, notificationList, setNotificationList }}>
+        <NotificationContext.Provider value={{ setNotificationToast, notificationList, setNotificationList, createNotification}}>
             <NotificationToast message={msgConfig.message}
                 severity={msgConfig.severity}
                 notificationType={msgConfig.notificationType} />

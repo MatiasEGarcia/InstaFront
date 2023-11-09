@@ -18,15 +18,10 @@ export const PUBLICATIONS_LABEL = 'Publications';
 
 export const LOADING_OPTIONS = ['allWindow', 'justAvailable'];
 
-export const NOTIFICATION_SEVERITIES=['Success', 'Error', 'Info'];//info for follow, like, etc notifications, 
-export const NOTIFICATION_TYPE=['FOLLOW','MESSAGE','LIKE','COMMENT','PUBLICATION','SERVERERROR','SUCCESSACCESS']//error and successaccess is custom in frontend, backend will not give this type of notif
-export const NOTIFICATION_MESSAGES= new Map([
-    [NOTIFICATION_TYPE[0], 'There is a new follow'],
-    [NOTIFICATION_TYPE[1], 'There is a new message'],
-    [NOTIFICATION_TYPE[2], 'There is a new like'],
-    [NOTIFICATION_TYPE[3], 'There is a new comment'],
-    [NOTIFICATION_TYPE[4], 'There is a new publication']
-]);
+//for server notifications.
+export const NOTIFICATION_SEVERITIES=['Success', 'Error', 'Info'];
+//for events from anothers users, like a follow request, a new message, etc
+export const NOTIFICATION_TYPE=['FOLLOW','MESSAGE','LIKE','COMMENT','PUBLICATION']
 
 export const APP_TITLE = 'FrontReact';
 export const NAV_OPTIONS = ['Search','Notifications', 'Chats', 'Navigate', 'Create' , 'Settings'];

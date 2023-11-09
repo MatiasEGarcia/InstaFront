@@ -13,18 +13,18 @@ import { useNotification } from "../../hooks/useNotification";
  */
 function ConfigurationPopover({ hidePopover, container }) {
     const {auth,logout, setAuth} = useAuth();
-    const {setNotification} = useNotification();
+    const {setNotificationToast} = useNotification();
 
     function setUserVisibility() {
         changeUserVisibility().then((data) => {
             setAuth({ ...auth, user: data.body });
-            setNotification({
-                sev: NOTIFICATION_SEVERITIES[0],//success
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[0],
                 msg: "visibility changed",
             })
         }).catch((error) => {
-            setNotification({
-                sev: NOTIFICATION_SEVERITIES[1],//error
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message,
             })
         })

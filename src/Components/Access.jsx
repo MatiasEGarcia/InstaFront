@@ -44,7 +44,7 @@ const validationsForm = (form) => {
 function Access({ typeOfAccess }) {
     const [loading, setLoading] = useState(false);
     const auth = useAuth();
-    const {setNotification} = useNotification();
+    const {setNotificationToast} = useNotification();
     const { form,
         fieldsTouched,
         errors,
@@ -73,18 +73,15 @@ function Access({ typeOfAccess }) {
             username: evt.target.username.value,
             password: evt.target.password.value,
         }).then(() => {
-            setNotification({
+            setNotificationToast({
                 sev:NOTIFICATION_SEVERITIES[2],
-                msg:`Welcome to instaFrontReact`,
-                notificationType : NOTIFICATION_TYPE[6],
-                formWho:'app'
+                msg:`Welcome to instaFrontReact`
             });
             navigate('/home');
         }).catch((error) => {
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
-                msg: error.message,
-                notificationType : NOTIFICATION_TYPE[5]
+                msg: error.message
             });
         }).finally(() => {
             setLoading(false);

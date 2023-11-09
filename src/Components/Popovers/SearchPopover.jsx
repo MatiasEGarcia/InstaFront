@@ -17,7 +17,7 @@ import { LIKE } from "../../Util/UtilTexts";
 function SearchPopover({ hidePopover, container}) {
     const [username, setUsername] = useState('');
     const [usersFound, setUsersFound] = useState([]); // users founded in search popover
-    const {setNotification} = useNotification();
+    const {setNotificationToast} = useNotification();
 
     useEffect(() => {
         if (username.length !== 0) {
@@ -32,7 +32,7 @@ function SearchPopover({ hidePopover, container}) {
                     console.log(data.headers.get('moreInfo'))//moreInfo: name of the header with the more info
                 }
             }).catch((error) => {
-                setNotification({
+                setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[1],//error
                     msg: error.message,
                 })

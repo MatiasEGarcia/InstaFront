@@ -27,7 +27,7 @@ const validationsForm = (form) => {
 
 export default function CreatePublicationMain() {
     const [loading, setLoading] = useState(false);
-    const setNotification = useNotification();
+    const {setNotificationToast} = useNotification();
     const { form,
         fieldsTouched,
         errors,
@@ -43,12 +43,12 @@ export default function CreatePublicationMain() {
             img: evt.target.img.files[0],
             description: evt.target.imgDescription.value
         }).then((data) => {//data should be the new publication already saved
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[0],
                 msg: 'Publication successfully created'
             })
         }).catch((error) => {
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message
             })

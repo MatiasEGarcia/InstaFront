@@ -48,7 +48,7 @@ export default function UserDetailsMain() {
     const [loading, setLoading] = useState({ allWindow: false, image: false, detailsForm: false });
     const fileInputRef = useRef(null);
     const { auth, setAuth } = useAuth();
-    const setNotification = useNotification();
+    const {setNotificationToast} = useNotification();
     const {
         form,
         fieldsTouched,
@@ -71,7 +71,7 @@ export default function UserDetailsMain() {
                 console.log(data.headers.get('moreInfo'));
             }
         }).catch((error) => {
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[0],
                 msg: error.message
             })
@@ -96,12 +96,12 @@ export default function UserDetailsMain() {
         setLoading({ ...loading, ['image']: true });
         uploadProfileImage(evt.target.files[0]).then((data) => {
             setAuth({ ...auth, user: { ...auth.user, image: data.body.image64 } });
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[0],
                 msg: 'user profile image updated'
             })
         }).catch((error) => {
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message
             })
@@ -122,12 +122,12 @@ export default function UserDetailsMain() {
             age: evt.target.age.value,
             email: evt.target.email.value
         }).then((data) => {//we recive a data, but I don't need it now.
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[0], 
                 msg: `${auth.user.username} update it's personal details succefully`
             })
         }).catch((error) => {
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1], 
                 msg: error.message
             })

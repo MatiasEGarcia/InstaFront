@@ -22,7 +22,7 @@ export default function UsersHomePublications({ showModal, userOwnerId }) {
     const [pagDetailsFlag, setPagDetailsFlag] = useState(false);//??, is for the useEffect that is listening pagDetails, becuase changes pagDetails content too, and with this I avoid a loop.
     const [pagDetails, setPagDetails] = useState(basePagDetails);
     const [loading, setLoading] = useState(false);
-    const {setNotification} = useNotification();
+    const {setNotificationToast} = useNotification();
 
     /**
      * Function to change current page in the pagination.
@@ -49,14 +49,13 @@ export default function UsersHomePublications({ showModal, userOwnerId }) {
                     ...data.body.pageInfoDto,
                 })
             } else if (data.headers) {
-                setNotification({
+                setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[2],
-                    msg: data.headers.get('moreInfo'),
-                    fromWho: 'app', //this is to don't save it in notification popover.
+                    msg: data.headers.get('moreInfo')
                 });
             }
         }).catch((error) => {
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message
             });
@@ -79,14 +78,13 @@ export default function UsersHomePublications({ showModal, userOwnerId }) {
                         ...data.body.pageInfoDto,
                     })
                 } else if (data.headers) {
-                    setNotification({
+                    setNotificationToast({
                         sev: NOTIFICATION_SEVERITIES[2],
-                        msg: data.headers.get('moreInfo'),
-                        fromWho: 'app', //this is to don't save it in notification popover.
+                        msg: data.headers.get('moreInfo')
                     });
                 }
             }).catch((error) => {
-                setNotification({
+                setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[1],
                     msg: error.message
                 });
@@ -111,14 +109,13 @@ export default function UsersHomePublications({ showModal, userOwnerId }) {
                     ...data.body.pageInfoDto,
                 })
             } else if (data.headers) {
-                setNotification({
+                setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[2],
-                    msg: data.headers.get('moreInfo'),
-                    fromWho: 'app', //this is to don't save it in notification popover.
+                    msg: data.headers.get('moreInfo')
                 });
             }
         }).catch((error) => {
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message
             });

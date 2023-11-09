@@ -11,7 +11,7 @@ var stompClient = null;
 
 export function AuthProvider({ children }) {
     const [auth, setAuth] = useState({});
-    const { setNotification, setNotificationList } = useNotification();
+    const { setNotificationToast, setNotificationList } = useNotification();
     const [socketConnected, setSocketConnected] = useState(false);
 
     function logout() {
@@ -38,18 +38,15 @@ export function AuthProvider({ children }) {
                 if (data.body?.list) {
                     setNotificationList(data.body.list);
                 } else if (data.headers) {//in case that there are not notifi
-                    setNotification({
+                    setNotificationToast({
                         sev: NOTIFICATION_SEVERITIES[2],
-                        msg: data.headers.get('moreInfo'),
-                        type: NOTIFICATION_TYPE[5],//serverMessage
-                        fromWho:'app'
+                        msg: data.headers.get('moreInfo')
                     })
                 }
             }).catch((error) => {
-                setNotification({
+                setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[1],//error
-                    msg: error.message,
-                    type: NOTIFICATION_TYPE[5]//serverMessage
+                    msg: error.message
                 })
             });
         }
@@ -72,15 +69,16 @@ export function AuthProvider({ children }) {
         }
 
         function onError(error) {
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1], // ERROR
-                msg: error,
-                type: NOTIFICATION_TYPE[5], //SERVERERROR
+                msg: error
             });
         }
 
         function handleServerNotification(payload) {
             console.log("LLEGOOOOOOOOOOOOOOOO " + payload);
+
+            //ACA TENGO QUE USAR EL createNotification y el notification toast maybe
             /*setNotification({
                 sev: NOTIFICATION_SEVERITIES[2], //info
                 msg: NOTIFICATION_MESSAGES.get(payload.type),

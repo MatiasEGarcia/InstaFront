@@ -32,7 +32,7 @@ function UserMainHome() {
         setModalState,
         contentModal,
         showModal } = useModal(JustReturnModelContentExample);
-    const {setNotification} = useNotification();
+    const {setNotificationToast} = useNotification();
     const navigate = useNavigate();
     const { userId } = useParams();
     const [loading, setLoading] = useState(false);
@@ -43,10 +43,9 @@ function UserMainHome() {
         getGeneralUserInfo(userId).then((data) => {
             setUserVisited(data.body);
         }).catch((error) => {
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
-                msg: error.message,
-                notificationType: NOTIFICATION_TYPE[5],
+                msg: error.message
             });
             navigate("/home");
         }).finally(() => {
@@ -66,10 +65,9 @@ function UserMainHome() {
         follow(userVisited.user.userId).then(data => {
             setUserVisited({...userVisited,social : {...userVisited.social, followStatus : data.body.followStatus}});
         }).catch(error => {
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
-                msg: error.message,
-                notificationType: NOTIFICATION_TYPE[5],
+                msg: error.message
             });
         });
     }
@@ -77,10 +75,9 @@ function UserMainHome() {
         unFollow(userVisited.user.userId).then(data => {
             setUserVisited({...userVisited,social : {...userVisited.social, followStatus : data.body.followStatus}});
         }).catch(error => {
-            setNotification({
+            setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
-                msg: error.message,
-                notificationType: NOTIFICATION_TYPE[5],
+                msg: error.message
             });
         });
     }

@@ -16,7 +16,7 @@ export default function useCheckUserEffect({
     auth,
     setAuth,
     socketConnected,
-    setNotification,
+    setNotificationToast,
     setLoading
 }) {
     /**
@@ -28,10 +28,9 @@ export default function useCheckUserEffect({
             getGeneralInfo(socketConnected).then((data) => {
                 setAuth({ ...auth, user: data.body });
             }).catch((error) => {
-                setNotification({
+                setNotificationToast({
                     sev:NOTIFICATION_SEVERITIES[1],
                     msg:error.message,
-                    notificationType : NOTIFICATION_TYPE[5]
                 });
             }).finally(() => {
                 setLoading(false);
