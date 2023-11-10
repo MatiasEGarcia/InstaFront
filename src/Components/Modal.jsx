@@ -15,7 +15,6 @@ function Modal({ children, modalState, setModalState }) {
     function clickOverlay(evt) {
         if (evt.target.classList.contains('modal')) {
             setModalState(false)
-            console.log("entro")
         }
     }
 

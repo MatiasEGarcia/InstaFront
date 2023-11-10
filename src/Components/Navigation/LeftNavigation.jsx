@@ -52,7 +52,7 @@ export default function LeftNavigation() {
                         <ExclamationCircle size={30} />
                         <span className="ms-2">{NAV_OPTIONS[1]}</span>
                         {notificationList.length !== 0 && 
-                            <span class="position-absolute top-50 start-100 translate-middle rounded-circle
+                            <span className="position-absolute top-50 start-100 translate-middle rounded-circle
                                     text-bg-danger
                                     d-flex justify-content-center">
                             <small className="px-2">{notificationList.length}</small>

@@ -47,7 +47,6 @@ export function NotificationProvider({ children }) {
         setNotificationList([...notificationList, notification]);
     }
 
-//TENGO QUE AGREGARLO AL VALUE DEL PROVIDER EL METODO CREATENOTIFICATION Y FIJARME EN QUECLASES DEBERIA AGREGARLO
     return (
         <NotificationContext.Provider value={{ setNotificationToast, notificationList, setNotificationList, createNotification}}>
             <NotificationToast message={msgConfig.message}

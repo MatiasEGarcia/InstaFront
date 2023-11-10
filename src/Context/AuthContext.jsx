@@ -1,10 +1,10 @@
 import { createContext, useEffect, useState } from "react";
-import { useNotification } from "../hooks/useNotification";
-import { getPersonalNotifications, logout as logoutFromService } from "../Service/UserService";
-import { NOTIFICATION_MESSAGES, NOTIFICATION_SEVERITIES, NOTIFICATION_TYPE } from "../Util/UtilTexts";
-import { RefreshTokenException } from "../Errors/Errors";
 import SockJS from 'sockjs-client';
 import { over } from 'stompjs';
+import { RefreshTokenException } from "../Errors/Errors";
+import { getPersonalNotifications, logout as logoutFromService } from "../Service/UserService";
+import { NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
+import { useNotification } from "../hooks/useNotification";
 
 const AuthContext = createContext();
 var stompClient = null;

@@ -39,6 +39,7 @@ export const DIR_DESC_DIRECTION = 'DESC';
 //OPERATION FOR SEARCH
 export const BETWEEN = 'BETWEEN';
 export const EQUAL = 'EQUAL';
+export const NOT_EQUAL = 'NOT_EQUAL';
 export const GREATER_THAN = 'GREATER_THAN';
 export const IN = 'IN';
 export const IS_FALSE = 'IS_FALSE';
@@ -46,3 +47,4 @@ export const IS_TRUE = 'IS_TRUE';
 export const LESS_THAN = 'LESS_THAN';
 export const LIKE = 'LIKE';
 export const IN_ZONED_DATE_TIME = 'IN_DATES';
+export const GLOBAL_OPERATORS = ['AND', 'OR', 'NONE']
