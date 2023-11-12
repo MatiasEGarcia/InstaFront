@@ -9,14 +9,14 @@
  * @returns {JSX.Element} - The rendered UserImageProfile component.
  */
 export default function UserImageProfile({
-    imgWith,
+    imgWidth,
     imgHeight,
     img,
     moreClasses
 }) {
 
     return (
-        <img height={imgHeight} width={imgWith}
+        <img height={imgHeight} width={imgWidth}
             className={`rounded-circle ${moreClasses}`}
             src={(img) ? `data:image/jpeg;charset=utf-8;base64,${img}` : "/defaultImg/profile.jpg" }
         />

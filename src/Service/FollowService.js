@@ -65,11 +65,11 @@ export async function updateFollowStatus(newFollowStatus){
  * in that case return an header with info about why is empty)
  */
 export async function findUsersThatWantToFollowYou({
-    page,pageSize, sortDir, authUserId
+    pageNo,pageSize, sortDir, authUserId
 }){
     let data;
     const params = new URLSearchParams({
-        page: page || '0',
+        page: pageNo || '0',
         pageSize: pageSize || '10',
         sortField: 'followId',
         sortDir: sortDir || DIR_ASC_DIRECTION
@@ -120,11 +120,11 @@ export async function findUsersThatWantToFollowYou({
  * in that case return an header with info about why is empty)
  */
 export async function usersYouWantFollowButIsNotAllowedYet({
-    page,pageSize, sortDir, authUserId
+    pageNo,pageSize, sortDir, authUserId
 }){
     let data;
     const params = new URLSearchParams({
-        page: page || '0',
+        page: pageNo || '0',
         pageSize: pageSize || '10',
         sortField: 'followId',
         sortDir: sortDir || DIR_ASC_DIRECTION

@@ -4,29 +4,33 @@ import { PAG_TYPES } from "../Util/UtilTexts";
 /**
  * Component to diplay pagination.
  * @param {Array} param.itemList  list of items to show in the pagination.
- * @param {String} param.itemList  type of pagination wanted.(see PAG_TYPES in UtilTexts).
+ * @param {String} param.pagType  type of pagination wanted.(see PAG_TYPES in UtilTexts).
  * @param {Function} param.changePage funciton to change the current page.
  * @param {Object} param.pagDetails object with all the paginations details, like number of the page, sortField, etc.
  * @param {Component} param.ComponentToDisplayItem component that will be used to show a item from the itemList.
+ * @param {String} param.divId in the case of a scrollDownPagination, we need this to know when to change the page
  */
-export default function Pagination({itemsList, pagType, changePage, pagDetails, ComponentToDisplayItem}){
-
+export default function Pagination({
+    itemsList, pagType, changePage, pagDetails, ComponentToDisplayItem,
+    divId
+}){
     /**
      * Use effect only for scroll down pagination. 
-     * Change the current page if the user reach bottom of the document.
+     * Change the current page if the user reach bottom of the selected div.
      */
     useEffect(() => {
         if(pagType === PAG_TYPES[1]){ //scrollDownPagination
+            const divElement = document.getElementById(divId);
             function handleScroll(){
-                const {scrollTop, userHeight, scrollHeight} = document.documentElement;
-                if(scrollTop + userHeight === scrollHeight) {
+                const {scrollTop, clientHeight, scrollHeight} = divElement; //PONE UN BREAKPOINT ACA, LA PAGINA NO ESTA ACTUALIZANDOSE
+                if(scrollTop + clientHeight === scrollHeight) {
                    // User has reached the bottom of the page
                    changePage(pagDetails.pageNo + 1);//next page.
                 }
             }
-            window.addEventListener('scroll', handleScroll);
+            divElement.addEventListener('scroll', handleScroll);
             return() => {
-                window.removeEventListener('scroll', handleScroll);
+                divElement.removeEventListener('scroll', handleScroll);
             };
         }
     },[]);
@@ -74,7 +78,7 @@ export default function Pagination({itemsList, pagType, changePage, pagDetails, 
                 })
             }
             {/*navPagination navigation*/}
-            {pagDetails.totalPages && pagDetails.totalPages > 1 && pagType === PAG_TYPES[0] &&
+            {pagType === PAG_TYPES[0] && pagDetails.totalPages && pagDetails.totalPages > 1 &&  
                 <nav aria-label="Page navigation">
                     <ul className="pagination justify-content-center mt-2">
                         <li className={`${pagDetails.pageNo === 0 ? 'page-item disabled' : 'page-item'}`}>

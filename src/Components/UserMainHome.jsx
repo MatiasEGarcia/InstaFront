@@ -19,10 +19,10 @@ import FollowModal from "./FollowModal";
 const basePagDetail = {
     pageNo: 0,
     pageSize: 10,
-    totalPages : undefined,
-    totalElements : undefined,
+    totalPages: undefined,
+    totalElements: undefined,
     sortField: undefined,
-    sortDir : undefined
+    sortDir: undefined
 }
 
 //cuando me comunique con el server esto lo borro
@@ -40,6 +40,8 @@ function UserMainHome() {
     const [publicationModalState, setPublicationModalState] = useState(false);//used by Modal component to know if should show the modal or not
     const [followModalState, setFollowModalState] = useState(false);//used by Modal component to know if should show the modal or not
     const [userIsFollower, setUserIsFollower] = useState();// used in follow Modal as flag to know if I should show follow's follower or followed user.
+    const [pagDetails, setPagDetails] = useState(basePagDetail);
+    const [pagDetailsFlag, setPagDetailsFlag] = useState(false);//??, is for the useEffect that is listening pagDetails, because changes pagDetails content too, and with this I avoid a loop. I will only put on true when the client wants to change the page.
     const { setNotificationToast } = useNotification();
     const navigate = useNavigate();
     const { auth } = useAuth();
@@ -62,6 +64,64 @@ function UserMainHome() {
             setLoading(false);
         });
     }, []);
+
+    /**
+     * This useEffect will be execute when the user wants the follow records from the next page.
+     * First will be called one of these methods {@link whoWantToFollowYou} or {@link whoYouWantToFollow}
+     */
+    useEffect(() => {
+        if (pagDetailsFlag) {
+            if (userIsFollower === false) { //with this I know what function a need to do to get more follow records
+                findUsersThatWantToFollowYou({ ...pagDetails, authUserId: auth.user.userId }).then(data => {
+                    const numberOfElementsAlreadyInModal = followModalContent.length;//to don't keep adding last users when they are already in the modal list.
+                    if (data.body?.list && data.body.pageInfoDto.totalElements > numberOfElementsAlreadyInModal) {
+                        //I want to have follow records from prev request and new request
+                        setFollowModalContent([...followModalContent, ...data.body.list]);
+                        setPagDetails({
+                            ...pagDetails,
+                            ...data.body.pageInfoDto
+                        });
+                    }
+                }).catch((error) => {
+                    setNotificationToast({
+                        sev: NOTIFICATION_SEVERITIES[1],
+                        msg: error.message
+                    });
+                });
+            } else {
+                usersYouWantFollowButIsNotAllowedYet({ ...pagDetails, authUserId: auth.user.userId })
+                    .then(data => {
+                        const numberOfElementsAlreadyInModal = followModalContent.length;//to don't keep adding last users when they are already in the modal list.
+                        if (data.body?.list && data.body.pageInfoDto.totalElements > numberOfElementsAlreadyInModal) {
+                            //I want to have follow records from prev request and new request
+                            setFollowModalContent([...followModalContent, data.body.list]);
+                            setPagDetails({
+                                ...pagDetails,
+                                ...data.body.pageInfoDto
+                            })
+                        }
+                    }).catch(error => {
+                        setNotificationToast({
+                            sev: NOTIFICATION_SEVERITIES[1],
+                            msg: error.message
+                        });
+                    });
+            }
+            setPagDetailsFlag(false);
+        }
+    }, [pagDetails]);
+
+    /**
+     * Function to change current page in the pagination
+     * @param {String} newPageNo new Page 
+     */
+    function changePage(newPageNo) {
+        setPagDetails({
+            ...pagDetails,
+            ['pageNo']: newPageNo
+        })
+        setPagDetailsFlag(true);
+    }
 
     /**
      * Function to show a modal with publication selected information.
@@ -101,15 +161,19 @@ function UserMainHome() {
 
 
     /**
-     * function to open follow model with info about users who want to follow you, but you haven't allowed it yet
+     * function to open follow model with info about users who want to follow you, but you haven't allowed it yet.
      */
-    function whoWantToFollowYou(){
-        findUsersThatWantToFollowYou({...basePagDetail ,authUserId: auth.user.userId}).then(data => {
-            if(data.body?.list){
+    function whoWantToFollowYou() {
+        findUsersThatWantToFollowYou({ ...basePagDetail, authUserId: auth.user.userId }).then(data => {
+            if (data.body?.list) {
                 setFollowModalContent(data.body.list);
                 setUserIsFollower(false);
                 setFollowModalState(true); //to show modal with users list
-            }else if(data.headers){
+                setPagDetails({
+                    ...pagDetails,
+                    ...data.body.pageInfoDto
+                })
+            } else if (data.headers) {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[2],
                     msg: data.headers.get('moreInfo')
@@ -123,23 +187,30 @@ function UserMainHome() {
         });
     }
 
-    function whoYouWantToFollow(){
-        usersYouWantFollowButIsNotAllowedYet({...basePagDetail ,authUserId: auth.user.userId})
+    /**
+     * function to open the following model with information about users you want to follow, but are not yet allowed.
+     */
+    function whoYouWantToFollow() {
+        usersYouWantFollowButIsNotAllowedYet({ ...basePagDetail, authUserId: auth.user.userId })
             .then(data => {
-                if(data.body?.list){
+                if (data.body?.list) {
                     setFollowModalContent(data.body.list);
                     setUserIsFollower(true);
                     setFollowModalState(true);
-                }else if(data.headers){
+                    setPagDetails({
+                        ...pagDetails,
+                        ...data.body.pageInfoDto
+                    })
+                } else if (data.headers) {
                     setNotificationToast({
-                        sev:NOTIFICATION_SEVERITIES[2],
+                        sev: NOTIFICATION_SEVERITIES[2],
                         msg: data.headers.get('moreInfo')
                     });
                 }
             }).catch(error => {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[1],
-                    msg:error.message
+                    msg: error.message
                 });
             });
     }
@@ -195,7 +266,11 @@ function UserMainHome() {
                 <PublicationModal setModalState={setPublicationModalState} contentModal={contentModalPublication} />
             </Modal>
             <Modal modalState={followModalState} setModalState={setFollowModalState}>
-                 <FollowModal setModalState={setFollowModalState} contentModalList={followModalContent} userIsFollower={userIsFollower}/>     
+                <FollowModal setModalState={setFollowModalState}
+                    contentModalList={followModalContent}
+                    userIsFollower={userIsFollower}
+                    pagDetails={pagDetails}
+                    changePage={changePage} />
             </Modal>
         </main>
     )
