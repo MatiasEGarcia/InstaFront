@@ -50,8 +50,21 @@ export async function unFollow(followedId){
  * @param {String} followedId  id of user want to left to follow.
  * @returns {Promise<Object>} data object with the body of the response.
  */
-export async function updateFollowStatus(newFollowStatus){
-
+export async function updateFollowStatus({newFollowStatus, followId}){
+    let data;
+    const options = {
+        method : 'PUT',
+        headers:{}
+    }
+    const params = new URLSearchParams({
+        followStatus : newFollowStatus,
+        followId : followId
+    });
+    data = await fetchApi({
+        endpoint: `${FOLLOW_ENDPOINT}/updateFollowStatus?${params.toString()}`,
+        options
+    });
+    return data;
 }
 
 

@@ -239,6 +239,7 @@ export default function UsersHomeInformation({ userId }) {
             <Modal modalState={followModalState} setModalState={setFollowModalState}>
                 <FollowModal setModalState={setFollowModalState}
                     contentModalList={followModalContent}
+                    setContentModalList = {setFollowModalContent}
                     userIsFollower={userIsFollower}
                     pagDetails={pagDetails}
                     changePage={changePage} />

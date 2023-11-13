@@ -2,7 +2,17 @@ import { FOLLOWED_STATUS } from "../Util/UtilTexts";
 import { ArrowDownSquare } from "react-bootstrap-icons";
 import CardUserSimple from "./CardUserSimple";
 
-export default function FollowTr({item, openAndCloseDropdown,showPopover, userIsFollower}) {//ITEM is follow record
+/**
+ * 
+ * @param {Object} param.item item to show.
+ * @param {Function} param.openAndCloseDropdown to open Dropdown and show the differents status to choose. 
+ * @param {String} param.showDropdown id of the follow record to show the dropdown. 
+ * @param {Boolean} param.userIsFollower to know if the auth user is the followed or the follower , and decide to show status 
+ * to update or not(for example if the auth user is the follower, it cannot update the followstatus).
+ * @param {Function} param.handlerFollowStatusUpdate function to update the follow's followStatus. 
+ * @returns 
+ */
+export default function FollowTr({item, openAndCloseDropdown,showDropdown, userIsFollower, handlerFollowStatusUpdate}) {//ITEM is follow record
 
     return (
         <tr key={item.followId}>
@@ -28,7 +38,7 @@ export default function FollowTr({item, openAndCloseDropdown,showPopover, userIs
                             <p className="m-0 me-1">Change status</p>
                             <ArrowDownSquare />
                         </div>
-                        {showPopover === item.followId &&
+                        {showDropdown === item.followId &&
                             <ul className="position-absolute 
                                             bg-body
                                             border border-dark-subtle rounded 
@@ -42,7 +52,8 @@ export default function FollowTr({item, openAndCloseDropdown,showPopover, userIs
                                     }
 
                                     return (
-                                        <li key={status} className="text-center">
+                                        <li key={status} className="text-center"
+                                             onClick={() => handlerFollowStatusUpdate({newFollowStatus : status, followId : item.followId})}>
                                             {status.toUpperCase()}
                                         </li>
                                     );
