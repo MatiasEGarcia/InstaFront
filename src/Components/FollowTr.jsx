@@ -1,18 +1,19 @@
 import { FOLLOWED_STATUS } from "../Util/UtilTexts";
 import { ArrowDownSquare } from "react-bootstrap-icons";
 import CardUserSimple from "./CardUserSimple";
+import useUserHomeInfo from "../hooks/useUserHomeInfo";
 
 /**
  * 
  * @param {Object} param.item item to show.
  * @param {Function} param.openAndCloseDropdown to open Dropdown and show the differents status to choose. 
- * @param {String} param.showDropdown id of the follow record to show the dropdown. 
- * @param {Boolean} param.userIsFollower to know if the auth user is the followed or the follower , and decide to show status 
- * to update or not(for example if the auth user is the follower, it cannot update the followstatus).
- * @param {Function} param.handlerFollowStatusUpdate function to update the follow's followStatus. 
- * @returns 
+ * @param {String} param.showDropdown id of the follow record to show the dropdown.
+ * @returns {JSX.Element} tr for follow model's table of follows records
  */
-export default function FollowTr({item, openAndCloseDropdown,showDropdown, userIsFollower, handlerFollowStatusUpdate}) {//ITEM is follow record
+export default function FollowTr({item, openAndCloseDropdown,showDropdown}) {//ITEM is follow record
+    const {handlerFollowStatusUpdate, userIsFollower} = useUserHomeInfo();
+
+    
 
     return (
         <tr key={item.followId}>

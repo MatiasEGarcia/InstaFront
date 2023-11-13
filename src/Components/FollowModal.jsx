@@ -6,23 +6,21 @@ import { NOTIFICATION_SEVERITIES, PAG_TYPES } from "../Util/UtilTexts";
 import { updateFollowStatus } from "../Service/FollowService";
 import { FOLLOWED_STATUS } from "../Util/UtilTexts";
 import { useNotification } from "../hooks/useNotification";
+import useUserHomeInfo from "../hooks/useUserHomeInfo";
 
 /**
- * Component with the content that will be display when we want to see the follow info in a modal.
- * 
- * @param {Function} param.setModalState - function to close currently modal. 
- * @param {Array} param.contentModalList - array with the users.  
- * @param {Function} param.setContentModalList - function to set the array with the users. 
- * @param {Boolean} param.userIsFollower - flag to know if I should show follow's follower or followed user. 
- * @param {Boolean} param.basePagDetails - pagination details. 
+ * @param {Function} param.setModalState - function to close currently modal.
+ * @param {Boolean} param.pagDetails - pagination details. 
+ * @param {Function} changePage - function to change page in the Pagination.
+ * @returns {JSX.Element}  Component with the content that will be display when we want to see the follow info in a modal.
  */
 export default function FollowModal({ 
-    pagDetails,setModalState, contentModalList,setContentModalList, userIsFollower , changePage
+    pagDetails,setModalState, changePage
 }) {
     //popover to show follow status dropdown
     const [showDropdown, setShowDropdown] = useState(''); // should contain the id of the follow
-    const setNotificationToast = useNotification();
-    
+    const {followModalContent} = useUserHomeInfo();
+
     /**
      * Function to open the change status dropdown, and close if is already open. 
      * @param {String} followId - if of the follow record/entity 
@@ -37,30 +35,6 @@ export default function FollowModal({
 
     function closeModal() {
         setModalState(false);
-    }
-
-
-    /**
-     * Function to change follow status in some record
-     * 
-     * @param {FOLLOWED_STATUS} newFollowStatus new follow status in follow record. 
-     * @param {String} followId follow's id( to know which follow record update).
-     */
-    function handlerFollowStatusUpdate({newFollowStatus, followId}){
-        updateFollowStatus({newFollowStatus, followId}).then(data => {
-            const newContentModalList = contentModalList.map((follow) => {
-                if(follow.followId === data.body.followId){
-                    follow.followStatus = data.body.followStatus;
-                }
-                return follow;
-            });
-            setContentModalList([...newContentModalList]);
-        }).catch( error => {
-            setNotificationToast({
-                sev: NOTIFICATION_SEVERITIES[1],
-                msg: error.message
-            })        
-        });
     }
 
 
@@ -80,14 +54,13 @@ export default function FollowModal({
                         </thead>
                         <tbody>
                             <Pagination 
-                                itemsList = {contentModalList}
+                                itemsList = {followModalContent}
                                 pagType = {PAG_TYPES[1]} 
                                 pagDetails = {pagDetails}
                                 changePage = {changePage}
                                 divId = {"followModalCardBody"}
                                 ComponentToDisplayItem = {(props) => <FollowTr openAndCloseDropdown={openAndCloseDropdown}
-                                    handlerFollowStatusUpdate = {handlerFollowStatusUpdate}
-                                    showDropdown={showDropdown} userIsFollower={userIsFollower} {...props}/>}/>
+                                    showDropdown={showDropdown} {...props}/>}/>
                         </tbody>
                     </table>
                 </div>

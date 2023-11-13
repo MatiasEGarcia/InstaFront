@@ -47,7 +47,8 @@ export async function unFollow(followedId){
 
 /**
  * Async function to update follow status.
- * @param {String} followedId  id of user want to left to follow.
+ * @param {FOLLOWED_STATUS} prop.newFollowStatus  new follow status in follow record.
+ * @param {String} prop.followId  id of follow record
  * @returns {Promise<Object>} data object with the body of the response.
  */
 export async function updateFollowStatus({newFollowStatus, followId}){

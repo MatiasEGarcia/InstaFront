@@ -9,6 +9,7 @@ import FollowModal from "./FollowModal";
 import Loading from "./Loading";
 import Modal from "./Modal";
 import UserImageProfile from "./UserImageProfile";
+import useUserHomeInfo from "../hooks/useUserHomeInfo";
 
 const basePagDetail = {
     pageNo: 0,
@@ -20,14 +21,20 @@ const basePagDetail = {
 }
 
 
+/**
+ * 
+ * 
+ * @param {String} param.userId user id to search. 
+ * @returns {JSX.Element} show user general information, like number of followers ,etc.
+ */
 export default function UsersHomeInformation({ userId }) {
-    const [userVisited, setUserVisited] = useState({}); //user owner of this page
     const [followModalState, setFollowModalState] = useState(false);//used by Modal component to know if should show the modal or not
-    const [userIsFollower, setUserIsFollower] = useState();// used in follow Modal as flag to know if I should show follow's follower or followed user.
     const [pagDetails, setPagDetails] = useState(basePagDetail);
     const [pagDetailsFlag, setPagDetailsFlag] = useState(false);//??, is for the useEffect that is listening pagDetails, because changes pagDetails content too, and with this I avoid a loop. I will only put on true when the client wants to change the page.
-    const [followModalContent, setFollowModalContent] = useState([]); //list of follows
     const [loading, setLoading] = useState(false);
+    const {userVisited, setUserVisited,
+           followModalContent, setFollowModalContent,
+           userIsFollower,setUserIsFollower} = useUserHomeInfo();
     const { auth } = useAuth();
     const navigate = useNavigate();
     const { setNotificationToast } = useNotification();
@@ -238,9 +245,6 @@ export default function UsersHomeInformation({ userId }) {
             </div>
             <Modal modalState={followModalState} setModalState={setFollowModalState}>
                 <FollowModal setModalState={setFollowModalState}
-                    contentModalList={followModalContent}
-                    setContentModalList = {setFollowModalContent}
-                    userIsFollower={userIsFollower}
                     pagDetails={pagDetails}
                     changePage={changePage} />
             </Modal>
