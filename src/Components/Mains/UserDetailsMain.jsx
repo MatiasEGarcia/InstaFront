@@ -1,12 +1,12 @@
-import useAuth from "../hooks/useAuth";
-import { getPersonalDetails, savePersonalDetails, uploadProfileImage } from "../Service/UserService";
+import useAuth from "../../hooks/useAuth";
+import { getPersonalDetails, savePersonalDetails, uploadProfileImage } from "../../Service/UserService";
 import { PencilSquare } from "react-bootstrap-icons";
-import { useNotification } from "../hooks/useNotification";
-import { NOTIFICATION_SEVERITIES, LOADING_OPTIONS } from "../Util/UtilTexts";
-import UserImageProfile from "./UserImageProfile";
+import { useNotification } from "../../hooks/useNotification";
+import { NOTIFICATION_SEVERITIES, LOADING_OPTIONS } from "../../Util/UtilTexts";
+import UserImageProfile from "../UserImageProfile";
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "../hooks/useForm";
-import Loading from "./Loading";
+import { useForm } from "../../hooks/useForm";
+import Loading from "../Loading";
 
 /**
  * Initial valies in user details input form.

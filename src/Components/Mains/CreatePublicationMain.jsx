@@ -1,9 +1,9 @@
 import { useState } from "react"
-import Loading from "./Loading";
-import { LOADING_OPTIONS, NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
-import { save } from "../Service/PublicationService";
-import { useNotification } from "../hooks/useNotification";
-import { useForm } from "../hooks/useForm";
+import Loading from "../Loading";
+import { LOADING_OPTIONS, NOTIFICATION_SEVERITIES } from "../../Util/UtilTexts";
+import { save } from "../../Service/PublicationService";
+import { useNotification } from "../../hooks/useNotification";
+import { useForm } from "../../hooks/useForm";
 
 const initialForm = {
     img: '',

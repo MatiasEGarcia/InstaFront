@@ -37,8 +37,8 @@ function NotificationsPopover({ hidePopover, container }) {
     return (
         <div className={`${container} border rounded p-1 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
             <div className="text-center"><h4>Notifications</h4></div>
-            <div className="vstack gap-2 h-80 overflow-auto">
-                <div className="d-flex mt-3">
+            <div className="h-80 overflow-auto">
+                <div className="vstack gap-3 mt-3">
                     {notificationList.length === 0
                         ? <div className="w-100 text-center"><p>There is no notifications</p></div>
                         : notificationList.map((notif) => {

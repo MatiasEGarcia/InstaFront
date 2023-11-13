@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import HomeMain from "./HomeMain";
-import UserMainHome from "./UserMainHome";
-import { APP_TITLE, TYPE_MAIN } from "../Util/UtilTexts";
-import UserDetailsMain from "./UserDetailsMain";
-import CreatePublicationMain from "./CreatePublicationMain";
-import LeftNavigation from "./Navigation/LeftNavigation";
-import StickyBottomIconNavigation from "./Navigation/StickyBottomIconNavigation";
+import HomeMain from "../Mains/HomeMain";
+import UserMainHome from "../Mains/UserMainHome";
+import { APP_TITLE, TYPE_MAIN } from "../../Util/UtilTexts";
+import UserDetailsMain from "../Mains/UserDetailsMain";
+import CreatePublicationMain from "../Mains/CreatePublicationMain";
+import LeftNavigation from "../Navigation/LeftNavigation";
+import StickyBottomIconNavigation from "../Navigation/StickyBottomIconNavigation";
 /**
  * Will hold basic Main display.
  * 

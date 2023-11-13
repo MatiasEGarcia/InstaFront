@@ -1,6 +1,6 @@
 import Access from "../Components/Access";
-import ChatContainer from "../Components/ChatContainer";
-import MainContainer from "../Components/MainContainer";
+import ChatContainer from "../Components/Containers/ChatContainer";
+import MainContainer from "../Components/Containers/MainContainer";
 import { SIGN_IN, SIGN_UP, TYPE_MAIN } from "./UtilTexts"
 
 

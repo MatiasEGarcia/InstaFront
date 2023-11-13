@@ -1,9 +1,9 @@
-import { useModal } from "../hooks/useModal";
-import Modal from "./Modal";
-import PublicationModal from "./PublicationModal";
+import { useModal } from "../../hooks/useModal";
+import Modal from "../Modal";
+import PublicationModal from "../PublicationModal";
 import { Link } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
-import UserImageProfile from "./UserImageProfile";
+import useAuth from "../../hooks/useAuth";
+import UserImageProfile from "../UserImageProfile";
 
 //cuando me comunique con el server esto lo borro
 function JustReturnModelContentExample() {
