@@ -38,15 +38,13 @@ export function NotificationProvider({ children }) {
      * @param {Date} pros.createdAt - from when is the notification.
      */
     function createNotification({ notiId, notificationType, notiMessage, fromWho, createdAt}) {
-        //watched not implementated yet
-        const notification = {
+        setNotificationList(prevNotificationList => [...prevNotificationList, {
             notiId,
             notificationType,
             notiMessage,
             fromWho,
             createdAt
-        }
-        setNotificationList([...notificationList, notification]);
+          }]);
     }
 
     return (

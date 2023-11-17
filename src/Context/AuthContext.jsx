@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { RefreshTokenException } from "../Errors/Errors";
 import { getPersonalNotifications, logout as logoutFromService } from "../Service/UserService";
-import { NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
+import { NOTIFICATION_SEVERITIES, NOTIFICATION_TYPE } from "../Util/UtilTexts";
 import { useNotification } from "../hooks/useNotification";
 import { getWebSocketToken } from "../Service/UserService";
 import SockJS from "sockjs-client";
@@ -39,7 +39,7 @@ export function AuthProvider({ children }) {
         if (auth.user) {
             getPersonalNotifications({}).then((data) => {
                 if (data.body?.list) {
-                    setNotificationList(data.body.list);
+                    setNotificationList([...data.body.list]);
                 } else if (data.headers) {//in case that there are not notifi
                     setNotificationToast({
                         sev: NOTIFICATION_SEVERITIES[2],
@@ -99,12 +99,19 @@ export function AuthProvider({ children }) {
         }
 
         function handleServerNotification(payload) {
-            console.log("LLEGOOOOOOOOOOOOOOOO " + payload);
+            const payloadBodyString = payload.body;
+            const payloadBody = JSON.parse(payloadBodyString);
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[2],
-                msg: payload.notiMessage
+                msg: payloadBody.notiMessage
             });
-            createNotification({ ...payload });
+            createNotification({ 
+                notiId: payloadBody.notiId,
+                notificationType: NOTIFICATION_TYPE[0], //follow
+                notiMessage: payloadBody.notiMessage,
+                fromWho: payloadBody.fromWho,
+                createdAt: payloadBody.createdAt
+             });
         }
 
         if(!auth.user && socketConnected){
@@ -119,7 +126,7 @@ export function AuthProvider({ children }) {
 
 
     return (
-        <AuthContext.Provider value={{ auth, setAuth, logout, socketConnected, setSocketConnected }}>
+        <AuthContext.Provider value={{ auth, setAuth, logout}}>
             {children}
         </AuthContext.Provider>
     )

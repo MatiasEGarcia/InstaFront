@@ -1,6 +1,7 @@
-import { Trash, Eye, Envelope, Heart, Pencil, Image, Key, XCircle, Exclamation } from "react-bootstrap-icons";
-import UserImageProfile from "../UserImageProfile";
+import { Exclamation, Trash } from "react-bootstrap-icons";
+import { Link } from "react-router-dom";
 import { useNotification } from "../../hooks/useNotification";
+import UserImageProfile from "../UserImageProfile";
 
 /**
  * Component that returns notifications popover to use in some navigation.
@@ -48,7 +49,7 @@ function NotificationsPopover({ hidePopover, container }) {
                                        position-absolute top-0 start-50 translate-middle">
                                         <Exclamation size={18} className="m-0" />
                                     </span>
-                                    <div className="btn btn-light p-0 ps-1 pt-1 px-1 
+                                    <Link to={`/userHome/${notif.fromWho.userId}`} className="btn btn-light p-0 ps-1 pt-1 px-1 
                                             d-flex rounded w-100 me-2">
                                         <div className="d-flex align-items-center">
                                             <UserImageProfile img={notif.fromWho.image} imgWith="60px" imgHeight="60px" />
@@ -64,7 +65,7 @@ function NotificationsPopover({ hidePopover, container }) {
                                                 <small style={{ fontSize: "10px" }}>{localDate(notif.createdAt)}</small>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                     <span className="badge bg-danger rounded-pill
                                        position-absolute top-50 start-100 translate-middle
                                        cursor-pointer-hover"
