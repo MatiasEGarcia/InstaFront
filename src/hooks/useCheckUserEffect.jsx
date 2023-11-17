@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { NOTIFICATION_SEVERITIES, NOTIFICATION_TYPE } from "../Util/UtilTexts";
-import { getGeneralInfo } from "../Service/UserService";
+import { NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
+import { getBasicUserInfo } from "../Service/UserService";
 
 /**
  * Use effect that will be executed in the load of the component , [].
@@ -10,14 +10,13 @@ import { getGeneralInfo } from "../Service/UserService";
  * @param {Object} props.auth - object that have the user authenticated if there is.  
  * @param {Function} props.setAuth - function to set the authenticated user
  * @param {Function} props.setNotification - function to set a notification as response to the user.
- * @param {Function} props.setLoading - functon to left loading state. 
+ * @param {Function} props.setLoading - functon to set loading state. 
  */
 export default function useCheckUserEffect({
     auth,
     setAuth,
-    socketConnected,
     setNotificationToast,
-    setLoading
+    setLoading,
 }) {
     /**
      * if the user signs in but at any moment reload the page, then we will lose the auth state the user will sign in again,
@@ -25,7 +24,7 @@ export default function useCheckUserEffect({
      */
     useEffect(() => {
         if (!auth?.user && localStorage.getItem("authToken")) {
-            getGeneralInfo(socketConnected).then((data) => {
+            getBasicUserInfo().then((data) => {
                 setAuth({ ...auth, user: data.body });
             }).catch((error) => {
                 setNotificationToast({

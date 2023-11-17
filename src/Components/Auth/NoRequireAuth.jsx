@@ -1,10 +1,10 @@
-import useAuth from "../../hooks/useAuth";
 import { useState } from "react";
-import { useNotification } from "../../hooks/useNotification";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import useCheckUserEffect from "../../hooks/useCheckUserEffect";
-import Loading from "../Loading";
 import { LOADING_OPTIONS } from "../../Util/UtilTexts";
+import useAuth from "../../hooks/useAuth";
+import useCheckUserEffect from "../../hooks/useCheckUserEffect";
+import { useNotification } from "../../hooks/useNotification";
+import Loading from "../Loading";
 
 /**
  * will check if a user is authenticated. If is then will send it to /home and avoid all the components
@@ -13,16 +13,14 @@ import { LOADING_OPTIONS } from "../../Util/UtilTexts";
  * @returns {JSX.Element} 
  */
 export default function noRequireAuth(){
-    const {auth, setAuth, socketConnected} = useAuth();
     const [loading, setLoading] = useState(true);
+    const {auth, setAuth} = useAuth();
     const {setNotificationToast} = useNotification();
     const location = useLocation();
-
 
     useCheckUserEffect({
         auth,
         setAuth,
-        socketConnected,
         setNotificationToast,
         setLoading
     });

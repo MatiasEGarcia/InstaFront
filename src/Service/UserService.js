@@ -88,7 +88,7 @@ export async function changeUserVisibility() {
  * Just search auth user profile image,username and if is visible.
   * @returns {Promise<Object>} data object with the body of the response.
  */
-async function getBasicUserInfo() {
+export async function getBasicUserInfo() {
     let data;
     const options = {
         method: 'GET',
@@ -248,7 +248,7 @@ export async function getPersonalNotifications({
 /**
  * Function to get web socket token and save it in local storage.
  */
-async function getWebSocketToken() {
+export async function getWebSocketToken() {
     let data;
     const options = {
         method: 'GET',
@@ -259,19 +259,4 @@ async function getWebSocketToken() {
         options
     })
     setWebSocketToken(data.body.webSocketAuthToken);
-}
-
-
-/**
- * Function that if 'webSocket' is false then calls {@link getWebSocketToken} otherwise don't call it.
- * After calls {@link getBasicUserInfo} (this will return auth user basic info).
- * 
- * @param {Boolean} webSocket - true if webSockets is already connected , false if not. 
- * @returns {Promise<Object>} data object with the general user Info.
- */
-export async function getGeneralInfo(webSocket) {
-    if (!webSocket) {
-        await getWebSocketToken();
-    }
-    return await getBasicUserInfo();
 }

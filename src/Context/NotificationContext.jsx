@@ -30,19 +30,21 @@ export function NotificationProvider({ children }) {
 
     /**
      * Create a notification and add to the notification popover in navigation var.
-     * @param {String} props.msg - notification message (What is the notification about?)
-     * @param {Object} props.fromWhoUser - user that produced the action(follow,like,etc) and in consequence 
+     * @param {String} props.notiId notification id.
+     * @param {String} props.notiMessage - notification message (What is the notification about?)
+     * @param {Object} props.fromWho - user that produced the action(follow,like,etc) and in consequence 
      * create the notification.
      * @param {NOTIFICATION_TYPE} props.notificationType - type of notification (like theme, follow theme, etc).
      * @param {Date} pros.createdAt - from when is the notification.
      */
-    function createNotification({ msg, fromWhoUser, notificationType, createdAt }) {
+    function createNotification({ notiId, notificationType, notiMessage, fromWho, createdAt}) {
+        //watched not implementated yet
         const notification = {
-            msg,
-            type,
-            fromWhoUser,
-            createdAt,
-            notificationType
+            notiId,
+            notificationType,
+            notiMessage,
+            fromWho,
+            createdAt
         }
         setNotificationList([...notificationList, notification]);
     }

@@ -1,30 +1,30 @@
 import { createContext, useEffect, useState } from "react";
-import SockJS from 'sockjs-client';
-import { over } from 'stompjs';
 import { RefreshTokenException } from "../Errors/Errors";
 import { getPersonalNotifications, logout as logoutFromService } from "../Service/UserService";
 import { NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
 import { useNotification } from "../hooks/useNotification";
+import { getWebSocketToken } from "../Service/UserService";
+import SockJS from "sockjs-client";
+import { over } from "stompjs";
 
 const AuthContext = createContext();
-var stompClient = null;
-
+let stompClient = null;
 export function AuthProvider({ children }) {
     const [auth, setAuth] = useState({});
-    const { setNotificationToast, setNotificationList } = useNotification();
+    const { setNotificationToast, setNotificationList, createNotification } = useNotification();
     const [socketConnected, setSocketConnected] = useState(false);
+    const [tokensOk, setTokensOk] = useState(false);
 
     function logout() {
         logoutFromService().then((data) => {
             setAuth({});
-            console.log(data.body.message);
         }).catch((error) => {
             if (error instanceof RefreshTokenException) {
                 //success because the tokens are not valid, which is what 
                 //the user wanted from the beginning so it's the same
                 setAuth({});
             } else {
-                setNotification({
+                setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[1], //Error
                     msg: error.message
                 })
@@ -32,6 +32,9 @@ export function AuthProvider({ children }) {
         })
     }
 
+    /**
+     * Getting personal notifications from server is a user is authenticated
+     */
     useEffect(() => {
         if (auth.user) {
             getPersonalNotifications({}).then((data) => {
@@ -50,10 +53,30 @@ export function AuthProvider({ children }) {
                 })
             });
         }
+    }, [auth]);
 
-        if (auth.user && !socketConnected) {//if socket is alreay connected then user was changed but I don't need to connect again to websocket
-            //connect to web socket
-            const sockJsProtocols = ['websocket']
+    /**
+     * Web socket, get tokens and make connection.
+     */
+    useEffect(() => {
+        //web socket connection only if user is authenticated and socketConnected is false
+        if (auth.user && !socketConnected) {
+            //getting web socket token
+            getWebSocketToken().then(() => {
+                console.log('obtuvimos los tokens')
+                setTokensOk(true);
+            }).catch((error) => {
+                setNotificationToast({
+                    sev: NOTIFICATION_SEVERITIES[1],
+                    msg:error.message
+                });
+            });
+
+        }
+
+        if(tokensOk && auth.user){
+            //making connection
+            const sockJsProtocols = ['websocket'];
             let sock = new SockJS(`http://localhost:8080/ws/connect?authentication=${localStorage.getItem('webSocketToken')}`,
                 null,
                 { transports: sockJsProtocols });
@@ -77,25 +100,26 @@ export function AuthProvider({ children }) {
 
         function handleServerNotification(payload) {
             console.log("LLEGOOOOOOOOOOOOOOOO " + payload);
-
-            //ACA TENGO QUE USAR EL createNotification y el notification toast maybe
-            /*setNotification({
-                sev: NOTIFICATION_SEVERITIES[2], //info
-                msg: NOTIFICATION_MESSAGES.get(payload.type),
-                fromWho: payload.fromWho,
-                type: payload.type,
-                createdAt: new Date(payload.createdAt)
-            });*/
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[2],
+                msg: payload.notiMessage
+            });
+            createNotification({ ...payload });
         }
 
-    }, [auth]);
-
-
+        if(!auth.user && socketConnected){
+            if (stompClient) {
+                console.log('desconectando sockets')
+                stompClient.disconnect();
+                setSocketConnected(false);
+            }
+        }
+    },[auth,tokensOk]);
 
 
 
     return (
-        <AuthContext.Provider value={{ auth, setAuth, logout, socketConnected }}>
+        <AuthContext.Provider value={{ auth, setAuth, logout, socketConnected, setSocketConnected }}>
             {children}
         </AuthContext.Provider>
     )

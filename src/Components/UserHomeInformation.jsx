@@ -10,6 +10,7 @@ import Loading from "./Loading";
 import Modal from "./Modal";
 import UserImageProfile from "./UserImageProfile";
 import useUserHomeInfo from "../hooks/useUserHomeInfo";
+import { follow, unFollow } from "../Service/FollowService";
 
 const basePagDetail = {
     pageNo: 0,
