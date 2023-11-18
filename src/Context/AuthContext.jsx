@@ -1,11 +1,12 @@
 import { createContext, useEffect, useState } from "react";
 import { RefreshTokenException } from "../Errors/Errors";
-import { getPersonalNotifications, logout as logoutFromService } from "../Service/UserService";
+import { logout as logoutFromService } from "../Service/UserService";
 import { NOTIFICATION_SEVERITIES, NOTIFICATION_TYPE } from "../Util/UtilTexts";
 import { useNotification } from "../hooks/useNotification";
 import { getWebSocketToken } from "../Service/UserService";
 import SockJS from "sockjs-client";
 import { over } from "stompjs";
+import { getPersonalNotifications } from "../Service/NotificationService";
 
 const AuthContext = createContext();
 let stompClient = null;

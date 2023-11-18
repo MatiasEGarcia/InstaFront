@@ -1,7 +1,7 @@
 import { NOTIFICATION_SEVERITIES, NOTIFICATION_TYPE } from "../Util/UtilTexts";
 import { createContext, useState } from 'react';
 import NotificationToast from "../Components/NotificationToast";
-import { deletePersonalNotificationById } from "../Service/UserService";
+import { deletePersonalNotificationById } from "../Service/NotificationService";
 
 export const NotificationContext = createContext();
 
