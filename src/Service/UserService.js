@@ -246,6 +246,26 @@ export async function getPersonalNotifications({
 }
 
 /**
+ * Function to delete notification record by id.
+ * 
+ * @param {String} notiId notification id. 
+ * @returns {Promise<Object} data object with the body of the response.
+ */
+export async function deletePersonalNotificationById(notiId){
+    let data;
+    const options = {
+        method : 'DELETE',
+        headers:{}
+    }
+    data = await fetchApi({
+        endpoint: `${USERS_ENDPOINT}/deleteNotification/${notiId}`,
+        options
+    })
+    return data;
+}
+
+
+/**
  * Function to get web socket token and save it in local storage.
  */
 export async function getWebSocketToken() {

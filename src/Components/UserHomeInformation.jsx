@@ -55,7 +55,7 @@ export default function UsersHomeInformation({ userId }) {
         }).finally(() => {
             setLoading(false);
         });
-    }, []);
+    }, [userId]);
 
     /**
      * This useEffect will be execute when the user wants the follow records from the next page.

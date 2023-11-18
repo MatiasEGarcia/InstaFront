@@ -1,6 +1,7 @@
 import { NOTIFICATION_SEVERITIES, NOTIFICATION_TYPE } from "../Util/UtilTexts";
 import { createContext, useState } from 'react';
 import NotificationToast from "../Components/NotificationToast";
+import { deletePersonalNotificationById } from "../Service/UserService";
 
 export const NotificationContext = createContext();
 
@@ -47,8 +48,40 @@ export function NotificationProvider({ children }) {
           }]);
     }
 
+    /**
+     * Function to delete notification in notification popover list.
+     * @param {String} notificationId notification id.
+     */
+    function deleteNotificationFromNotificationPopover(notificationId){
+        setNotificationList(notificationList.filter((notif) => notif.notiId !== notificationId));
+    }
+
+
+    /**
+     * Function to delete notification from server by id.
+     * @param {String} notificationId notification id. 
+     */
+    function deleteNotificationById(notificationId){
+        deletePersonalNotificationById(notificationId).then((data) => {
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[2],
+                msg: data.body.message
+            })
+            deleteNotificationFromNotificationPopover(notificationId);
+        }).catch((error) => {
+            setNotificationToast({
+                sev:NOTIFICATION_SEVERITIES[1],
+                msg:error.message
+            });
+        })
+    }
+
     return (
-        <NotificationContext.Provider value={{ setNotificationToast, notificationList, setNotificationList, createNotification}}>
+        <NotificationContext.Provider value={{ setNotificationToast, 
+                                                notificationList, 
+                                                setNotificationList, 
+                                                createNotification,
+                                                deleteNotificationById}}>
             <NotificationToast message={msgConfig.message}
                 severity={msgConfig.severity}
                 notificationType={msgConfig.notificationType} />

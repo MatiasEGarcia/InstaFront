@@ -11,12 +11,7 @@ import UserImageProfile from "../UserImageProfile";
  * @returns {JSX.Element} - notifications popover.
  */
 function NotificationsPopover({ hidePopover, container }) {
-    const { notificationList } = useNotification();
-
-    //ESTE PODRIA PONERO EN EL NOTIFICATION CONTEXT NO???
-    function deleteNotiById(notificationId) {
-        console.log("borrando notificacion con id" + notificationId)
-    }
+    const { notificationList, deleteNotificationById } = useNotification();
 
     /**
      * Function to convert notification creation time from utc to local date. 
@@ -69,7 +64,7 @@ function NotificationsPopover({ hidePopover, container }) {
                                     <span className="badge bg-danger rounded-pill
                                        position-absolute top-50 start-100 translate-middle
                                        cursor-pointer-hover"
-                                        onClick={() => deleteNotiById(notif.notiId)}
+                                        onClick={() => deleteNotificationById(notif.notiId)}
                                     ><Trash size={15} /></span>
                                 </div>
                             )
