@@ -1,7 +1,150 @@
+import { useEffect, useState } from "react";
 import { PencilSquare, InfoCircle, House } from "react-bootstrap-icons";
 import { Link } from 'react-router-dom';
+import { getChats } from "../../Service/ChatService";
+import { useNotification } from "../../hooks/useNotification";
+import { CHAT_TYPE, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
+import ChatCard from "../ChatCard";
+import Pagination from "../Pagination";
+import ChatMain from "../Mains/ChatMain";
+import useAuth from "../../hooks/useAuth";
+import Modal from "../Modal";
+import NewChatModal from "../NewChatModal";
 
+const basePagDetail = {
+    pageNo: 0,
+    pageSize: 15,
+    totalPages: undefined,
+    totalElements: undefined,
+    sortField: undefined,
+    sortDir: undefined
+}
+
+/**
+ * @returns {JSX.Element} Chat view with chats and it's messages
+ */
 function ChatContainer() {
+    const [newChatModal, setNewChatModal] = useState(false);
+    const [chatList, setChatList] = useState([]);
+    const [pageDetails, setPageDetails] = useState(basePagDetail);
+    const [pageDetailsFlag, setPageDetailsFlag] = useState(false);
+    const [selectedChatId, setSelectedChatId] = useState();
+    const [currentChat, setCurrentChat] = useState({ //here we save current chat information.
+        chatUsers: null,
+        chatAdmins: null,
+        chatImage: null,
+        chatMessages: null
+    });
+    const { setNotificationToast } = useNotification();
+    const {auth} = useAuth();
+
+    /**
+     * UseEffect to execute in mount moment and search authUser's chats.
+     */
+    useEffect(() => {
+        getChats({ ...pageDetails }).then((data) => {
+            if(data.body?.list){
+                setChatList(data.body.list);//I'll use scroll pagination so I will add new list elemnents and old list elements. 
+            }else if(data.headers){
+                setNotificationToast({
+                    sev: NOTIFICATION_SEVERITIES[2],
+                    msg: data.headers.get('moreInfo')
+                })
+            }
+            setPageDetails({
+                ...pageDetails,
+                ...data.body?.pageInfoDto
+            });
+        }).catch((error) => {
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[1],
+                msg: error.message
+            })
+        });
+    }, []);
+
+    /**
+     * UseEffect to search next AuthUser's chats and add them to the chatList with previous chats in paginations page.
+     */
+    useEffect(() => {
+        if (pageDetailsFlag) {
+            getChats({ ...pageDetails }).then((data) => {
+                setChatList([...chatList, ...data.body.list]);//I'll use scroll pagination so I will add new list elemnents and old list elements. 
+                setPageDetails({
+                    ...pageDetails,
+                    ...data.body.pageInfoDto
+                });
+                setPageDetailsFlag(false);
+            }).catch((error) => {
+                setNotificationToast({
+                    sev: NOTIFICATION_SEVERITIES,
+                    msg: error.message
+                })
+            });
+        }
+    }, [pageDetails]);
+
+    /**
+     * UseEffect to search messages in the chatSelected
+     */
+    useEffect(() => {
+
+    },[selectedChatId])
+
+    /**
+     * Function to change selected chat and get it's messages.
+     * @param {String} chatId  chat's id
+     */
+    function selectChat(chatId){
+        setSelectedChatId(chatId);
+    }
+
+    /**
+     * Function to open modal to create a new chat.
+     */
+    function openNewChatModal(){
+        setNewChatModal(true);
+    }
+
+    /**
+     * Function to close modal to create a new chat.
+     */
+    function closeNewChatModal(){
+        setNewChatModal(false);
+    }
+
+    /**
+    * Function to change current page in the pagination
+    * @param {String} newPageNo new Page 
+    */
+    function changePage(newPageNo) {
+        setPageDetails({
+            ...pageDetails,
+            ['pageNo']: newPageNo
+        })
+        setPageDetailsFlag(true);
+    }
+
+    /**
+     * This function has to be applied to each chat, to see if is private, if is, 
+     * then chat name will be the other user's username,
+     * and chat image will be the other user's image;
+     * @param {Object} chat - chat item that is in chatList
+     * @returns {Object} chat object .
+     */
+    function setChatContent(chat){
+        if(chat.type === CHAT_TYPE[0]){
+            const otherUser = chat.users.find((user) => user.userId !== auth.user.userId);
+            const newChatPrivate = {
+                ...chat,
+                name : otherUser.username,
+                image: otherUser.image
+            }
+            return newChatPrivate;
+        }
+        return chat;
+    }
+
     return (
         <div className="container-lg">
             <div className="row">
@@ -15,184 +158,27 @@ function ChatContainer() {
                         </button>
                     </Link>
                     <div className="p-2 d-flex justify-content-center justify-content-md-between">
-                        <span className="fs-4 d-none d-md-block">Username</span>
-                        <button className="btn">
+                        <span className="fs-4 d-none d-md-block">{auth.user.username}</span>
+                        <button className="btn" onClick={openNewChatModal}>
                             <PencilSquare size={40} />
                         </button>
                     </div>
                     <hr />
-                    <div className="vstack h-75 overflow-auto">
-                        <div className="pe-4">
-                            <button className="btn btn-light d-flex w-100">
-                                <div className="position-relative">
-                                    <img height="60px" width="60px" className="rounded-circle"
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                    <span className="d-lg-none badge bg-danger rounded-pill 
-                                                    position-absolute top-0 start-100">14</span>
-                                </div>
-                                <div className="d-none d-lg-block ps-1 w-100 text-start position-relative">
-                                    <p className="mb-1">Username</p>
-                                    <p className="m-0"><small>LastMessage</small></p>
-                                    <span className="badge bg-danger rounded-pill 
-                                                    position-absolute top-0 start-100">14</span>
-                                </div>
-                            </button>
-                        </div>
-                        <div className="p-2">Second item</div>
-                        <div className="p-2">Third item</div>
-                        <div className="p-2">First item</div>
-                        <div className="p-2">Second item</div>
-                        <div className="p-2">Third item</div>
-                        <div className="p-2">First item</div>
-                        <div className="p-2">Second item</div>
-                        <div className="p-2">Third item</div>
-                        <div className="p-2">First item</div>
-                        <div className="p-2">Second item</div>
-                        <div className="p-2">Third item</div>
-                        <div className="p-2">First item</div>
-                        <div className="p-2">Second item</div>
-                        <div className="p-2">Third item</div>
-                        <div className="p-2">First item</div>
+                    <div id="chatStack" className="vstack h-75 overflow-auto">
+                        <Pagination 
+                            itemsList = {chatList}
+                            pageType = {PAG_TYPES[1]}
+                            changePage = {changePage}
+                            divId = {"chatStack"}
+                            mapItem = {setChatContent}
+                            ComponentToDisplayItem = {(props) => <ChatCard selectChat={selectChat} {...props}/>}/>
                     </div>
                 </nav>
-                <main className="col-8 col-md-9">
-                    <div className="card w-100 vh-100">
-                        <div className="card-header d-flex justify-content-between ">
-                            <div>
-                                <img height="60px" width="60px" className="rounded-circle"
-                                    src="/defaultImg/profile.jpg"
-                                    alt="userImage" />
-                                <span className="ps-2 fs-5">Username</span>
-                            </div>
-                            <button className="btn">
-                                <InfoCircle className="align-self-center" size={35} />
-                            </button>
-                        </div>
-                        <div className="card-body overflow-auto">
-                            <div className="hstack gap-1 mb-2">
-                                <div>
-                                    <img height="60px" width="60px" className="rounded-circle "
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                </div>
-                                <div className="border rounded p-2">
-                                    <p className="m-0">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem, asperiores?</p>
-                                </div>
-                            </div>
-                            <div className="hstack gap-1 ps-5 mb-2">
-                                <div className="border rounded p-2">
-                                    <p className="m-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro obcaecati reprehenderit atque ullam deleniti saepe ex fugit sunt perspiciatis dolores!</p>
-                                </div>
-                                <div>
-                                    <img height="60px" width="60px" className="rounded-circle "
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                </div>
-                            </div>
-                            <div className="hstack gap-1">
-                                <div>
-                                    <img height="60px" width="60px" className="rounded-circle "
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                </div>
-                                <div><p className="m-0">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem, asperiores?</p></div>
-                            </div>
-                            <div className="hstack gap-1 ps-5">
-                                <div className="text-end ms-auto">
-                                    <p className="m-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro obcaecati reprehenderit atque ullam deleniti saepe ex fugit sunt perspiciatis dolores!</p>
-                                </div>
-                                <div>
-                                    <img height="60px" width="60px" className="rounded-circle "
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                </div>
-                            </div>
-                            <div className="hstack gap-1">
-                                <div>
-                                    <img height="60px" width="60px" className="rounded-circle "
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                </div>
-                                <div><p className="m-0">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem, asperiores?</p></div>
-                            </div>
-                            <div className="hstack gap-1 ps-5">
-                                <div className="text-end ms-auto">
-                                    <p className="m-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro obcaecati reprehenderit atque ullam deleniti saepe ex fugit sunt perspiciatis dolores!</p>
-                                </div>
-                                <div>
-                                    <img height="60px" width="60px" className="rounded-circle "
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                </div>
-                            </div>
-                            <div className="hstack gap-1">
-                                <div>
-                                    <img height="60px" width="60px" className="rounded-circle "
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                </div>
-                                <div><p className="m-0">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem, asperiores?</p></div>
-                            </div>
-                            <div className="hstack gap-1 ps-5">
-                                <div className="text-end ms-auto">
-                                    <p className="m-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro obcaecati reprehenderit atque ullam deleniti saepe ex fugit sunt perspiciatis dolores!</p>
-                                </div>
-                                <div>
-                                    <img height="60px" width="60px" className="rounded-circle "
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                </div>
-                            </div>
-                            <div className="hstack gap-1">
-                                <div>
-                                    <img height="60px" width="60px" className="rounded-circle "
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                </div>
-                                <div><p className="m-0">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem, asperiores?</p></div>
-                            </div>
-                            <div className="hstack gap-1 ps-5">
-                                <div className="text-end ms-auto">
-                                    <p className="m-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro obcaecati reprehenderit atque ullam deleniti saepe ex fugit sunt perspiciatis dolores!</p>
-                                </div>
-                                <div>
-                                    <img height="60px" width="60px" className="rounded-circle "
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                </div>
-                            </div>
-                            <div className="hstack gap-1">
-                                <div>
-                                    <img height="60px" width="60px" className="rounded-circle "
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                </div>
-                                <div><p className="m-0">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatem, asperiores?</p></div>
-                            </div>
-                            <div className="hstack gap-1 ps-5">
-                                <div className="text-end ms-auto">
-                                    <p className="m-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro obcaecati reprehenderit atque ullam deleniti saepe ex fugit sunt perspiciatis dolores!</p>
-                                </div>
-                                <div>
-                                    <img height="60px" width="60px" className="rounded-circle "
-                                        src="/defaultImg/profile.jpg"
-                                        alt="userImage" />
-                                </div>
-                            </div>
-                        </div>
-                        <div clasNames="card-footer">
-                            <div className="input-group input-group-lg mb-2">
-                                <input type="text" className="form-control" placeholder="Send a message" />
-                                <button className="btn btn-success px-4">
-                                    Send
-                                </button>
-                            </div>
-
-                        </div>
-                    </div>
-                </main>
+                {currentChat.chatUsers && <ChatMain/>}
             </div>
+            <Modal modalState={newChatModal} setModalState={setNewChatModal}>
+                <NewChatModal closeModal={closeNewChatModal}/>
+            </Modal>
         </div >
     )
 }

@@ -1,12 +1,9 @@
 import { useState } from "react";
 import { XSquare } from "react-bootstrap-icons";
+import { PAG_TYPES } from "../Util/UtilTexts";
+import useUserHomeInfo from "../hooks/useUserHomeInfo";
 import FollowTr from "./FollowTr";
 import Pagination from "./Pagination";
-import { NOTIFICATION_SEVERITIES, PAG_TYPES } from "../Util/UtilTexts";
-import { updateFollowStatus } from "../Service/FollowService";
-import { FOLLOWED_STATUS } from "../Util/UtilTexts";
-import { useNotification } from "../hooks/useNotification";
-import useUserHomeInfo from "../hooks/useUserHomeInfo";
 
 /**
  * @param {Function} param.setModalState - function to close currently modal.

@@ -9,10 +9,12 @@ import { PAG_TYPES } from "../Util/UtilTexts";
  * @param {Object} param.pagDetails object with all the paginations details, like number of the page, sortField, etc.
  * @param {Component} param.ComponentToDisplayItem component that will be used to show a item from the itemList.
  * @param {String} param.divId in the case of a scrollDownPagination, we need this to know when to change the page
+ * @param {Function} function param.mapItem that will consume the elements of the itemsList and change it. It is for the case in which 
+ * you want to make a change to the element that is iterated before displaying it.
  */
 export default function Pagination({
     itemsList, pagType, changePage, pagDetails, ComponentToDisplayItem,
-    divId
+    divId , mapItem
 }){
     /**
      * Use effect only for scroll down pagination. 
@@ -71,6 +73,9 @@ export default function Pagination({
             {itemsList.length === 0
                 ? <h2 className="text-center">-</h2>
                 : itemsList.map((item,index) => {
+                    if(mapItem){
+                        item = mapItem(item);
+                    }
                     return (
                         <ComponentToDisplayItem key={index}
                             item={item}/> // every component that wants to be showed in this pagination should have its content as 'item'

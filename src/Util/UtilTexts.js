@@ -28,6 +28,8 @@ export const NAV_OPTIONS = ['Search','Notifications', 'Chats', 'Navigate', 'Crea
 
 export const PAG_TYPES = ['navPagination', 'scrollDownPagination'];
 
+export const CHAT_TYPE = ['PRIVATE', 'GROUP'];
+
 export const TYPE_MAIN = ['home', 'userMainHome', 'userDetailsMain','createPublicationMain'];
 
 export const SIGN_IN = 'signIn';
