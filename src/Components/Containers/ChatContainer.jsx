@@ -3,7 +3,7 @@ import { PencilSquare, InfoCircle, House } from "react-bootstrap-icons";
 import { Link } from 'react-router-dom';
 import { getChats } from "../../Service/ChatService";
 import { useNotification } from "../../hooks/useNotification";
-import { CHAT_TYPE, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
+import { BACK_HEADERS, CHAT_TYPE, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
 import ChatCard from "../ChatCard";
 import Pagination from "../Pagination";
 import ChatMain from "../Mains/ChatMain";
@@ -48,7 +48,7 @@ function ChatContainer() {
             }else if(data.headers){
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[2],
-                    msg: data.headers.get('moreInfo')
+                    msg: data.headers.get(BACK_HEADERS[0])
                 })
             }
             setPageDetails({
@@ -145,6 +145,22 @@ function ChatContainer() {
         return chat;
     }
 
+    /**
+     * This function should be called when a new chat is created, 
+     * this way we add the new chat in chat list whithout the need to do a new request to server.
+     * @param {String} param.chatId  chat's id.
+     * @param {String} param.name  chat's name.
+     * @param {CHAT_TYPE} param.type chat's type.
+     * @param {String} param.image  chat's image.
+     * @param {Array} param.users  chat's users.
+     * @param {Array} param.admins chat's admins.
+     */
+    function addChatToChatList({chatId,name,type,image,users,admins}){
+        const chatCreated = {chatId,name,type,image,users,admins}
+        setChatList([...chatList,chatCreated])
+    }
+
+
     return (
         <div className="container-lg">
             <div className="row">
@@ -164,7 +180,7 @@ function ChatContainer() {
                         </button>
                     </div>
                     <hr />
-                    <div id="chatStack" className="vstack h-75 overflow-auto">
+                    <div id="chatStack" className="vstack gap-2 h-75 overflow-auto">
                         <Pagination 
                             itemsList = {chatList}
                             pageType = {PAG_TYPES[1]}
@@ -174,10 +190,14 @@ function ChatContainer() {
                             ComponentToDisplayItem = {(props) => <ChatCard selectChat={selectChat} {...props}/>}/>
                     </div>
                 </nav>
+                {!currentChat.chatUsers && 
+                    <div className="col d-flex justify-content-center align-items-center">
+                        <p className="m-0 fs-2 pb-5">Select a chat</p>    
+                    </div>}
                 {currentChat.chatUsers && <ChatMain/>}
             </div>
             <Modal modalState={newChatModal} setModalState={setNewChatModal}>
-                <NewChatModal closeModal={closeNewChatModal}/>
+                <NewChatModal closeModal={closeNewChatModal} addChatToChatList={addChatToChatList}/>
             </Modal>
         </div >
     )

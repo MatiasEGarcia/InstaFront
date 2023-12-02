@@ -50,3 +50,6 @@ export const LESS_THAN = 'LESS_THAN';
 export const LIKE = 'LIKE';
 export const IN_ZONED_DATE_TIME = 'IN_DATES';
 export const GLOBAL_OPERATORS = ['AND', 'OR', 'NONE']
+
+//HEADERS FROM BACKEND
+export const BACK_HEADERS = ['exception-detail'];

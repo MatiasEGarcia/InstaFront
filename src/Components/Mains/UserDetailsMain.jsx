@@ -2,7 +2,7 @@ import useAuth from "../../hooks/useAuth";
 import { getPersonalDetails, savePersonalDetails, uploadProfileImage } from "../../Service/UserService";
 import { PencilSquare } from "react-bootstrap-icons";
 import { useNotification } from "../../hooks/useNotification";
-import { NOTIFICATION_SEVERITIES, LOADING_OPTIONS } from "../../Util/UtilTexts";
+import { NOTIFICATION_SEVERITIES, LOADING_OPTIONS, BACK_HEADERS } from "../../Util/UtilTexts";
 import UserImageProfile from "../UserImageProfile";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "../../hooks/useForm";
@@ -68,7 +68,7 @@ export default function UserDetailsMain() {
             if (data.body) {
                 handleMultipleChange(data.body);
             } else if (data.headers) {
-                console.log(data.headers.get('moreInfo'));
+                console.log(data.headers.get(BACK_HEADERS[0]));
             }
         }).catch((error) => {
             setNotificationToast({

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { findUsersThatWantToFollowYou, usersYouWantFollowButIsNotAllowedYet } from "../Service/FollowService";
 import { getGeneralUserInfo } from "../Service/UserService";
-import { FOLLOWED_LABEL, FOLLOWED_STATUS, FOLLOWERS_LABEL, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PUBLICATIONS_LABEL } from "../Util/UtilTexts";
+import { BACK_HEADERS, FOLLOWED_LABEL, FOLLOWED_STATUS, FOLLOWERS_LABEL, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PUBLICATIONS_LABEL } from "../Util/UtilTexts";
 import useAuth from "../hooks/useAuth";
 import { useNotification } from "../hooks/useNotification";
 import FollowModal from "./FollowModal";
@@ -132,7 +132,7 @@ export default function UsersHomeInformation({ userId }) {
             } else if (data.headers) {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[2],
-                    msg: data.headers.get('moreInfo')
+                    msg: data.headers.get(BACK_HEADERS[0])
                 });
             }
         }).catch((error) => {
@@ -160,7 +160,7 @@ export default function UsersHomeInformation({ userId }) {
                 } else if (data.headers) {
                     setNotificationToast({
                         sev: NOTIFICATION_SEVERITIES[2],
-                        msg: data.headers.get('moreInfo')
+                        msg: data.headers.get(BACK_HEADERS[0])
                     });
                 }
             }).catch(error => {

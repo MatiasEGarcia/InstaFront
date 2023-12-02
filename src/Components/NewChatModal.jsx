@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { XSquare, ArrowLeftSquare } from "react-bootstrap-icons";
-import { CHAT_TYPE, NOTIFICATION_SEVERITIES, LIKE } from "../Util/UtilTexts";
+import { CHAT_TYPE, NOTIFICATION_SEVERITIES, LIKE, BACK_HEADERS } from "../Util/UtilTexts";
 import { searchUsersByOneCondition } from "../Service/UserService";
 import { useNotification } from "../hooks/useNotification";
 import NewChatCard from "./NewChatCard";
@@ -11,9 +11,9 @@ import { create } from "../Service/ChatService";
 /**
  * modal to display when auth user wants to create a new chat.
  * @param {Function} param.closeModal function to close this modal.
- * @param {Function} param.createChat function to create new chat.
+ * @param {Function} param.addChatToChatList function to add the new chat created to the chat List.
  */
-export default function NewChatModal({ closeModal, createChat }) {
+export default function NewChatModal({ closeModal, addChatToChatList }) {
     const [chatType, setChatType] = useState();
     const [usernameToSearch, setUsernameToSearch] = useState('');
     const [usersFound, setUsersFound] = useState([]);
@@ -39,7 +39,7 @@ export default function NewChatModal({ closeModal, createChat }) {
                 } else if (data.headers) {
                     setNotificationToast({
                         sev: NOTIFICATION_SEVERITIES[2],
-                        msg: data.headers.get('moreInfo'),
+                        msg: data.headers.get(BACK_HEADERS[0]),
                     });
                 }
             }).catch((error) => {
@@ -73,6 +73,7 @@ export default function NewChatModal({ closeModal, createChat }) {
                     sev: NOTIFICATION_SEVERITIES[2],
                     msg: "chat created"
                 });
+                addChatToChatList(data.body);
                 closeModal();
             })
             .catch((error) => {

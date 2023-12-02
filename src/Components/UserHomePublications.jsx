@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Loading from "./Loading";
 import Pagination from "./Pagination";
-import { PAG_TYPES } from "../Util/UtilTexts";
+import { BACK_HEADERS, PAG_TYPES } from "../Util/UtilTexts";
 import PublicationCard from "./PublicationCard";
 import { useNotification } from "../hooks/useNotification";
 import { NOTIFICATION_SEVERITIES, LOADING_OPTIONS } from "../Util/UtilTexts";
@@ -69,7 +69,7 @@ export default function UsersHomePublications({ userOwnerId }) {
             } else if (data.headers) {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[2],
-                    msg: data.headers.get('moreInfo')
+                    msg: data.headers.get(BACK_HEADERS[0])
                 });
             }
         }).catch((error) => {
@@ -98,7 +98,7 @@ export default function UsersHomePublications({ userOwnerId }) {
                 } else if (data.headers) {
                     setNotificationToast({
                         sev: NOTIFICATION_SEVERITIES[2],
-                        msg: data.headers.get('moreInfo')
+                        msg: data.headers.get(BACK_HEADERS[0])
                     });
                 }
             }).catch((error) => {
@@ -129,7 +129,7 @@ export default function UsersHomePublications({ userOwnerId }) {
             } else if (data.headers) {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[2],
-                    msg: data.headers.get('moreInfo')
+                    msg: data.headers.get(BACK_HEADERS[0])
                 });
             }
         }).catch((error) => {

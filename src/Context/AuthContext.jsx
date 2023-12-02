@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { RefreshTokenException } from "../Errors/Errors";
 import { logout as logoutFromService } from "../Service/UserService";
-import { NOTIFICATION_SEVERITIES, NOTIFICATION_TYPE } from "../Util/UtilTexts";
+import { BACK_HEADERS, NOTIFICATION_SEVERITIES, NOTIFICATION_TYPE } from "../Util/UtilTexts";
 import { useNotification } from "../hooks/useNotification";
 import { getWebSocketToken } from "../Service/UserService";
 import SockJS from "sockjs-client";
@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
                 } else if (data.headers) {//in case that there are not notifi
                     setNotificationToast({
                         sev: NOTIFICATION_SEVERITIES[2],
-                        msg: data.headers.get('moreInfo')
+                        msg: data.headers.get(BACK_HEADERS[0])
                     })
                 }
             }).catch((error) => {
