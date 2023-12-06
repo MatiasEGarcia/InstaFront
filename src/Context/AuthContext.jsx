@@ -1,20 +1,15 @@
 import { createContext, useEffect, useState } from "react";
 import { RefreshTokenException } from "../Errors/Errors";
 import { logout as logoutFromService } from "../Service/UserService";
-import { BACK_HEADERS, NOTIFICATION_SEVERITIES, NOTIFICATION_TYPE } from "../Util/UtilTexts";
+import { BACK_HEADERS, NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
 import { useNotification } from "../hooks/useNotification";
-import { getWebSocketToken } from "../Service/UserService";
-import SockJS from "sockjs-client";
-import { over } from "stompjs";
 import { getPersonalNotifications } from "../Service/NotificationService";
 
 const AuthContext = createContext();
 let stompClient = null;
 export function AuthProvider({ children }) {
     const [auth, setAuth] = useState({});
-    const { setNotificationToast, setNotificationList, createNotification } = useNotification();
-    const [socketConnected, setSocketConnected] = useState(false);
-    const [tokensOk, setTokensOk] = useState(false);
+    const { setNotificationToast, setNotificationList } = useNotification();
 
     function logout() {
         logoutFromService().then((data) => {
@@ -55,77 +50,6 @@ export function AuthProvider({ children }) {
             });
         }
     }, [auth]);
-
-    /**
-     * Web socket, get tokens and make connection.
-     */
-    useEffect(() => {
-        //web socket connection only if user is authenticated and socketConnected is false
-        if (auth.user && !socketConnected) {
-            //getting web socket token
-            getWebSocketToken().then(() => {
-                console.log('obtuvimos los tokens')
-                setTokensOk(true);
-            }).catch((error) => {
-                setNotificationToast({
-                    sev: NOTIFICATION_SEVERITIES[1],
-                    msg:error.message
-                });
-            });
-
-        }
-
-        if(tokensOk && auth.user){
-            //making connection
-            const sockJsProtocols = ['websocket'];
-            let sock = new SockJS(`http://localhost:8080/ws/connect?authentication=${localStorage.getItem('webSocketToken')}`,
-                null,
-                { transports: sockJsProtocols });
-            stompClient = over(sock);
-            stompClient.connect({}, onConnected, onError);
-        }
-
-        function onConnected() {
-            console.log('CONECTANDO CON WEB SOCKETTTTTTTTTTTTTTT')
-            //it suscribe to it's listen chanel
-            stompClient.subscribe(`/user/notifications/${auth.user.userId}/private`, handleServerNotification);
-            setSocketConnected(true);
-        }
-
-        function onError(error) {
-            setNotificationToast({
-                sev: NOTIFICATION_SEVERITIES[1], // ERROR
-                msg: error
-            });
-        }
-
-        function handleServerNotification(payload) {
-            const payloadBodyString = payload.body;
-            const payloadBody = JSON.parse(payloadBodyString);
-            setNotificationToast({
-                sev: NOTIFICATION_SEVERITIES[2],
-                msg: payloadBody.notiMessage
-            });
-            createNotification({ 
-                notiId: payloadBody.notiId,
-                notificationType: NOTIFICATION_TYPE[0], //follow
-                notiMessage: payloadBody.notiMessage,
-                fromWho: payloadBody.fromWho,
-                createdAt: payloadBody.createdAt
-             });
-        }
-
-        if(!auth.user && socketConnected){
-            if (stompClient) {
-                console.log('desconectando sockets')
-                stompClient.disconnect();
-                setSocketConnected(false);
-            }
-        }
-    },[auth,tokensOk]);
-
-
-
     return (
         <AuthContext.Provider value={{ auth, setAuth, logout}}>
             {children}

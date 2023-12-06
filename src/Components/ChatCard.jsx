@@ -24,7 +24,7 @@ export default function ChatCard({
 }) {
     return (
         <div className="pe-4">
-            <button className="btn btn-light d-flex w-100">
+            <button className="btn btn-light d-flex w-100" onClick={() => selectChat(item.chatId)}>
                 <div className="position-relative">
                    <UserImageProfile
                         imgWidth = {sizeImage.width}

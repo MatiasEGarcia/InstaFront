@@ -10,6 +10,7 @@ import ChatMain from "../Mains/ChatMain";
 import useAuth from "../../hooks/useAuth";
 import Modal from "../Modal";
 import NewChatModal from "../NewChatModal";
+import { getAllByChat } from "../../Service/MessageService";
 
 const basePagDetail = {
     pageNo: 0,
@@ -26,33 +27,35 @@ const basePagDetail = {
 function ChatContainer() {
     const [newChatModal, setNewChatModal] = useState(false);
     const [chatList, setChatList] = useState([]);
-    const [pageDetails, setPageDetails] = useState(basePagDetail);
-    const [pageDetailsFlag, setPageDetailsFlag] = useState(false);
-    const [selectedChatId, setSelectedChatId] = useState();
+    const [chatPageDetails, setChatPageDetails] = useState(basePagDetail);
+    const [chatPageDetailsFlag, setChatPageDetailsFlag] = useState(false);
     const [currentChat, setCurrentChat] = useState({ //here we save current chat information.
+        chatId : null,
+        chatName : null,
         chatUsers: null,
         chatAdmins: null,
         chatImage: null,
-        chatMessages: null
+        chatType:null,
+        otherUserId: null
     });
     const { setNotificationToast } = useNotification();
-    const {auth} = useAuth();
+    const { auth } = useAuth();
 
     /**
      * UseEffect to execute in mount moment and search authUser's chats.
      */
     useEffect(() => {
-        getChats({ ...pageDetails }).then((data) => {
-            if(data.body?.list){
+        getChats({ ...chatPageDetails }).then((data) => {
+            if (data.body?.list) {
                 setChatList(data.body.list);//I'll use scroll pagination so I will add new list elemnents and old list elements. 
-            }else if(data.headers){
+            } else if (data.headers) {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[2],
                     msg: data.headers.get(BACK_HEADERS[0])
                 })
             }
-            setPageDetails({
-                ...pageDetails,
+            setChatPageDetails({
+                ...chatPageDetails,
                 ...data.body?.pageInfoDto
             });
         }).catch((error) => {
@@ -67,14 +70,14 @@ function ChatContainer() {
      * UseEffect to search next AuthUser's chats and add them to the chatList with previous chats in paginations page.
      */
     useEffect(() => {
-        if (pageDetailsFlag) {
-            getChats({ ...pageDetails }).then((data) => {
+        if (chatPageDetailsFlag) {
+            getChats({ ...chatPageDetails }).then((data) => {
                 setChatList([...chatList, ...data.body.list]);//I'll use scroll pagination so I will add new list elemnents and old list elements. 
-                setPageDetails({
-                    ...pageDetails,
+                setChatPageDetails({
+                    ...chatPageDetails,
                     ...data.body.pageInfoDto
                 });
-                setPageDetailsFlag(false);
+                setChatPageDetailsFlag(false);
             }).catch((error) => {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES,
@@ -82,47 +85,65 @@ function ChatContainer() {
                 })
             });
         }
-    }, [pageDetails]);
+    }, [chatPageDetails]);
 
-    /**
-     * UseEffect to search messages in the chatSelected
-     */
-    useEffect(() => {
-
-    },[selectedChatId])
 
     /**
      * Function to change selected chat and get it's messages.
+     * Also check if chat is private, if is private chat name and image will be the other username and image.
      * @param {String} chatId  chat's id
      */
-    function selectChat(chatId){
-        setSelectedChatId(chatId);
+    function selectChat(chatId) {
+        const chat = chatList.find((chat) => chat.chatId === chatId);
+        if (chat.type === CHAT_TYPE[0]) {
+            const otherUser = chat.users.find((user) => user.userId !== auth.user.userId);
+            setCurrentChat({
+                chatId : chatId,
+                chatName: otherUser.username,
+                chatUsers: chat.users,
+                chatAdmins: chat.admins,
+                chatImage: otherUser.image,
+                chatType: chat.type,     
+                otherUserId : otherUser.userId
+            });
+        }else{
+            setCurrentChat({
+                chatId : chatId,
+                chatName: chat.name,
+                chatUsers: chat.users,
+                chatAdmins: chat.admins,
+                chatImage: chat.image,
+                chatType: chat.type
+            });
+        }
+        
+        
     }
 
     /**
      * Function to open modal to create a new chat.
      */
-    function openNewChatModal(){
+    function openNewChatModal() {
         setNewChatModal(true);
     }
 
     /**
      * Function to close modal to create a new chat.
      */
-    function closeNewChatModal(){
+    function closeNewChatModal() {
         setNewChatModal(false);
     }
 
     /**
-    * Function to change current page in the pagination
+    * Function to change current page in the chat pagination
     * @param {String} newPageNo new Page 
     */
-    function changePage(newPageNo) {
-        setPageDetails({
-            ...pageDetails,
+    function changeChatPage(newPageNo) {
+        setChatPageDetails({
+            ...chatPageDetails,
             ['pageNo']: newPageNo
         })
-        setPageDetailsFlag(true);
+        setChatPageDetailsFlag(true);
     }
 
     /**
@@ -132,12 +153,12 @@ function ChatContainer() {
      * @param {Object} chat - chat item that is in chatList
      * @returns {Object} chat object .
      */
-    function setChatContent(chat){
-        if(chat.type === CHAT_TYPE[0]){
+    function setChatContent(chat) {
+        if (chat.type === CHAT_TYPE[0]) {
             const otherUser = chat.users.find((user) => user.userId !== auth.user.userId);
             const newChatPrivate = {
                 ...chat,
-                name : otherUser.username,
+                name: otherUser.username,
                 image: otherUser.image
             }
             return newChatPrivate;
@@ -155,9 +176,9 @@ function ChatContainer() {
      * @param {Array} param.users  chat's users.
      * @param {Array} param.admins chat's admins.
      */
-    function addChatToChatList({chatId,name,type,image,users,admins}){
-        const chatCreated = {chatId,name,type,image,users,admins}
-        setChatList([...chatList,chatCreated])
+    function addChatToChatList({ chatId, name, type, image, users, admins }) {
+        const chatCreated = { chatId, name, type, image, users, admins }
+        setChatList([...chatList, chatCreated])
     }
 
 
@@ -181,23 +202,32 @@ function ChatContainer() {
                     </div>
                     <hr />
                     <div id="chatStack" className="vstack gap-2 h-75 overflow-auto">
-                        <Pagination 
-                            itemsList = {chatList}
-                            pageType = {PAG_TYPES[1]}
-                            changePage = {changePage}
-                            divId = {"chatStack"}
-                            mapItem = {setChatContent}
-                            ComponentToDisplayItem = {(props) => <ChatCard selectChat={selectChat} {...props}/>}/>
+                        <Pagination
+                            itemsList={chatList}
+                            pageType={PAG_TYPES[1]}
+                            changePage={changeChatPage}
+                            divId={"chatStack"}
+                            mapItem={setChatContent}
+                            ComponentToDisplayItem={(props) => <ChatCard selectChat={selectChat} {...props} />} />
                     </div>
                 </nav>
-                {!currentChat.chatUsers && 
+                {!currentChat.chatUsers &&
                     <div className="col d-flex justify-content-center align-items-center">
-                        <p className="m-0 fs-2 pb-5">Select a chat</p>    
+                        <p className="m-0 fs-2 pb-5">Select a chat</p>
                     </div>}
-                {currentChat.chatUsers && <ChatMain/>}
+                {currentChat.chatUsers && <ChatMain 
+                                                chatId = {currentChat.chatId}
+                                                name = {currentChat.chatName}
+                                                image = {currentChat.chatImage}
+                                                users = {currentChat.chatUsers}
+                                                admins = {currentChat.chatAdmins}
+                                                type = {currentChat.chatType}
+                                                otherUserId = {currentChat.otherUserId}
+                                                />
+                }
             </div>
             <Modal modalState={newChatModal} setModalState={setNewChatModal}>
-                <NewChatModal closeModal={closeNewChatModal} addChatToChatList={addChatToChatList}/>
+                <NewChatModal closeModal={closeNewChatModal} addChatToChatList={addChatToChatList} />
             </Modal>
         </div >
     )
