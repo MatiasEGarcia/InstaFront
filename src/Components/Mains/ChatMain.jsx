@@ -220,8 +220,10 @@ export default function ChatMain({ chatId, name, image, users, admins, delChatFr
             </div>
             <Modal modalState={groupInfoModal} setModalState={setGroupInfoModal}>
                 <ChatGroupModal
+                    chatId = {chatId}
                     users={users}
                     usersAdmins={admins}
+                    chatImage = {image}
                     closeModal={closeModal}
                     chatName={name} />
             </Modal>
