@@ -21,11 +21,23 @@ export default function Pagination({
      * Change the current page if the user reach bottom of the selected div.
      */
     useEffect(() => {
-        if(pagType === PAG_TYPES[1]){ //scrollDownPagination
-            const divElement = document.getElementById(divId);
+        let divElement = document.getElementById(divId);
+        if(pagType === PAG_TYPES[1]){
             function handleScroll(){
-                const {scrollTop, clientHeight, scrollHeight} = divElement; //PONE UN BREAKPOINT ACA, LA PAGINA NO ESTA ACTUALIZANDOSE
+                const {scrollTop, clientHeight, scrollHeight} = divElement;
                 if(scrollTop + clientHeight === scrollHeight) {
+                   // User has reached the bottom of the page
+                   changePage(pagDetails.pageNo + 1);//next page.
+                }
+            }
+            divElement.addEventListener('scroll', handleScroll);
+            return() => {
+                divElement.removeEventListener('scroll', handleScroll);
+            };
+        }else if(pagType === PAG_TYPES[2]){
+            function handleScroll(){
+                const {scrollTop}= divElement;
+                if(scrollTop === 0) {
                    // User has reached the bottom of the page
                    changePage(pagDetails.pageNo + 1);//next page.
                 }

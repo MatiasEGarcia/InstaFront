@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { InfoCircle } from "react-bootstrap-icons"
 import { create, getAllByChat } from "../../Service/MessageService";
 import { useNotification } from "../../hooks/useNotification";
-import { BACK_HEADERS, CHAT_TYPE, DIR_ASC_DIRECTION, DIR_DESC_DIRECTION, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
+import { BACK_HEADERS, CHAT_TYPE, DIR_ASC_DIRECTION, DIR_DESC_DIRECTION, NOTIFICATION_SEVERITIES, PAG_TYPES, SCROLL_POSITIONS } from "../../Util/UtilTexts";
 import UserImageProfile from "../UserImageProfile";
 import Pagination from "../Pagination";
 import ChatMessage from "../ChatMessage";
@@ -18,11 +18,13 @@ const basePagDetail = {
     totalPages: undefined,
     totalElements: undefined,
     sortField: 'sendedAt',
-    sortDir: DIR_ASC_DIRECTION
+    sortDir: DIR_DESC_DIRECTION
 }
 
 
 /**
+ * 
+ * Block where we see chat's messages
  * 
  * @param {String} param.chatId chat'id, will be used to get chat messages. 
  * @param {String} param.name chat's name.
@@ -34,20 +36,26 @@ const basePagDetail = {
  * @param {String} param.otherUserId other user id in case chat.type === PRIVATE
  * @returns {JSX.Element} Chat messages
  */
-export default function ChatMain({ chatId, name, image, users, admins, delChatFromChatList, type , otherUserId}) {
+export default function ChatMain({ chatId, name, image, users, admins, delChatFromChatList, type, otherUserId }) {
     const [groupInfoModal, setGroupInfoModal] = useState(false);
     const [messagesList, setMessagesList] = useState([]);
     const [pagDetails, setPagDetails] = useState(basePagDetail);
+    const [pagDetailsFlag, setPagDetailsFlag] = useState(false);
+    const [userScrollHeight, setUserScrollHeight] = useState();
     const { setNotificationToast } = useNotification();
     const { newMessage } = useWebSocket();
     const newMessageRef = useRef();
+    const messageBottomDivOverflow = useRef();
+    const messagesContentRef = useRef();
 
-    //aca quiero tener la funcion para borrar un chat si el usuario autenticado es admin. y ademas dentro quiero una funcion que elemine el chat 
-    //del chat lists
+    /**
+     * search chat's last messages.
+     */
     useEffect(() => {
-        getAllByChat({ chatId, ...pagDetails }).then((data) => {
+        getAllByChat({ chatId, ...basePagDetail }).then((data) => {
             if (data.body?.list) {
-                setMessagesList(data.body.list);
+                const reverseList = data.body.list.reverse();
+                setMessagesList(reverseList);
                 setPagDetails({
                     ...pagDetails,
                     ...data.body.pageInfoDto
@@ -57,6 +65,7 @@ export default function ChatMain({ chatId, name, image, users, admins, delChatFr
                     sev: NOTIFICATION_SEVERITIES[2],
                     msg: data.headers.get(BACK_HEADERS[0])
                 })
+                setMessagesList([]);
             }
         }).catch((error) => {
             setNotificationToast({
@@ -64,14 +73,63 @@ export default function ChatMain({ chatId, name, image, users, admins, delChatFr
                 msg: error.message
             });
         });
-    }, []);
+    }, [chatId]);
 
-    //will listen the new message from web socket, and will add it to the message list.
+    /**
+     * if there is some change in pageDetails, means that the user wants to get more messages.
+     */
+    useEffect(() => {
+        if (pagDetailsFlag) {
+            getAllByChat({ chatId, ...pagDetails }).then((data) => {
+                if (data.body?.list && data.body.pageInfoDto.totalElements > messagesList.length) {
+                    const reverseList = data.body.list.reverse();
+                    setMessagesList((prevMessageList) => [...reverseList, ...prevMessageList]);
+                    setPagDetails({
+                        ...pagDetails,
+                        ...data.body.pageInfoDto
+                    });
+                    setUserScrollHeight(messagesContentRef.current.clientHeight);
+
+                } else if (data.headers) {
+                    setNotificationToast({
+                        sev: NOTIFICATION_SEVERITIES[2],
+                        msg: data.headers.get(BACK_HEADERS[0])
+                    })
+                    setMessagesList([]);
+                }
+            }).catch((error) => {
+                setNotificationToast({
+                    sev: NOTIFICATION_SEVERITIES[1],
+                    msg: error.message
+                });
+            }).finally(() => {
+                setPagDetailsFlag(false);
+            });
+        }
+    }, [pagDetails]);
+
+    /**
+     * will listen the new message from web socket, and will add it to the message list.
+     */
     useEffect(() => {
         setMessagesList([...messagesList, newMessage])
     }, [newMessage]);
 
+    /**
+     * listen new messages and change scroll height.
+     */
+    useEffect(() => {
+        if(pagDetails.pageNo === 0){
+            messageBottomDivOverflow.current?.scrollIntoView({ behavior: "smooth" });
+        }else{
+            messagesContentRef.current.scrollTop = userScrollHeight;
+        }
+    }, [messagesList]);
 
+
+    /**
+     * Write a new message on chat.
+     */
     function sendANewMessage() {
         create({
             chatId,
@@ -87,14 +145,31 @@ export default function ChatMain({ chatId, name, image, users, admins, delChatFr
         });
     }
 
-    function changeMessagePage() {
-
+    /**
+     * To change the page in pagination.
+     * @param {String} newPageNo new page in pagination.
+     */
+    function changeMessagePage(newPageNo) {
+        setPagDetails({
+            ...pagDetails,
+            pageNo: newPageNo
+        });
+        setPagDetailsFlag(true);
     }
 
+    /**
+     * Open chat group info.
+     */
     function openGroupInfoModal() {
         setGroupInfoModal(true);
     }
 
+    /**
+     * Close chat group info.
+     */
+    function closeModal() {
+        setGroupInfoModal(false);
+    }
 
     return (
         <main className="col-8 col-md-9">
@@ -113,7 +188,7 @@ export default function ChatMain({ chatId, name, image, users, admins, delChatFr
                         {type === CHAT_TYPE[1] && <InfoCircle className="align-self-center" size={35} onClick={openGroupInfoModal} />}
                     </button>
                 </div>
-                <div id="messagesContent" className="card-body overflow-auto">
+                <div id="messagesContent" className="card-body overflow-auto" ref={messagesContentRef}>
                     {!messagesList &&
                         <div>
                             <p className="m-0">No messages yet</p>
@@ -122,12 +197,14 @@ export default function ChatMain({ chatId, name, image, users, admins, delChatFr
                     {messagesList &&
                         <Pagination
                             itemsList={messagesList}
-                            pageType={PAG_TYPES[1]}
+                            pagType={PAG_TYPES[2]}
+                            pagDetails={pagDetails}
                             changePage={changeMessagePage}
                             divId={"messagesContent"}
                             ComponentToDisplayItem={(props) => <ChatMessage {...props} />}
                         />
                     }
+                    <div ref={messageBottomDivOverflow} />
                 </div>
                 <div className="card-footer">
                     <div className="input-group input-group-lg mb-2">
@@ -142,7 +219,11 @@ export default function ChatMain({ chatId, name, image, users, admins, delChatFr
                 </div>
             </div>
             <Modal modalState={groupInfoModal} setModalState={setGroupInfoModal}>
-                <ChatGroupModal />
+                <ChatGroupModal
+                    users={users}
+                    usersAdmins={admins}
+                    closeModal={closeModal}
+                    chatName={name} />
             </Modal>
         </main>
     )
