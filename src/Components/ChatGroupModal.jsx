@@ -4,29 +4,29 @@ import { PencilSquare, Star, Trash, XSquare, PencilFill ,ArrowLeft, CheckSquare}
 import useAuth from "../hooks/useAuth";
 import { useEffect, useRef, useState } from "react";
 import { setChatGroupImage } from "../Service/ChatService";
+import useChat from "../hooks/UseChat";
+import { useNotification } from "../hooks/useNotification";
+import { NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
 
 /**
  * Modal to see chat type group info. like users, name, etc.
  * 
- * @param {String} param.chatId chat's id
- * @param {String} param.chatName chat's name.
- * @param {String} param.chatImage chat's image.
- * @param {Array} param.users chat's users.
- * @param {Array} param.usersAdmins chat's admin users.
  * @param {Functino} param.closeModal function to close modal. 
  * @returns 
  */
-export default function ChatGroupModal({ chatId, chatName, chatImage, users, usersAdmins, closeModal }) {
+export default function ChatGroupModal({ closeModal }) {
     const [authUserIsAdmin, setAuthUserIsAdmin] = useState();
     const [displayImageEditIcon, setdisplayImageEditIcon] = useState('d-none');//to show or hide PencilSquare
     const [name, setName] = useState(true);
     const { auth } = useAuth();
+    const {chatSelected, updateChat} = useChat();
+    const {setNotificationToast} = useNotification();
     const fileInputRef = useRef();
     const nameInputRef = useRef();
 
 
     useEffect(() => {
-        const authUser = usersAdmins.find((admin) => admin.userId === auth.user.userId);
+        const authUser = chatSelected.admins.find((admin) => admin.userId === auth.user.userId);
         authUser ? setAuthUserIsAdmin(true) : setAuthUserIsAdmin(false);
     }, []);
 
@@ -46,14 +46,21 @@ export default function ChatGroupModal({ chatId, chatName, chatImage, users, use
      * click in image input.
      */
     function handleGroupImageButtonClick() {
-        fileInputRef.current.click;
+        fileInputRef.current.click();
     }
 
     /**
      * Function to change group image.
      */
     function saveNewGroupImage(evt) {
-        setChatGroupImage({img: evt.target.files[0] , chatId }).then().catch();
+        setChatGroupImage({img: evt.target.files[0] , chatId:chatSelected.chatId }).then((data) => {
+            updateChat(data.body);
+        }).catch((error) => {
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[1],
+                msg: error.message
+            });
+        });
     }
 
     /**
@@ -70,7 +77,7 @@ export default function ChatGroupModal({ chatId, chatName, chatImage, users, use
             <div className="card w-100">
                 <div className="card-header position-relative d-flex justify-content-center align-items-center">
                     {name ?
-                        <h3 onClick={editGroupName} className="cursor-pointer-hover">{chatName}</h3>
+                        <h3 onClick={editGroupName} className="cursor-pointer-hover">{chatSelected.name}</h3>
                         :
                         <div className="d-flex justify-content-evenly aling-items-center">
                             <ArrowLeft size={25} onClick={editGroupName} className="cursor-pointer-hover mt-1"/>
@@ -79,7 +86,7 @@ export default function ChatGroupModal({ chatId, chatName, chatImage, users, use
                                 className="rounded w-50 ps-2 text-center"
                                 id="chatNameInput"
                                 name="chatNameInput"
-                                placeholder={chatName}
+                                placeholder={chatSelected.name}
                                 ref={nameInputRef}
                             />
                             <CheckSquare size={25} onClick={saveNewGroupName} color="green" className="cursor-pointer-hover"/>
@@ -99,7 +106,7 @@ export default function ChatGroupModal({ chatId, chatName, chatImage, users, use
                             <UserImageProfile
                                 imgWith="120px"
                                 imgHeight="120px"
-                                img={chatImage}
+                                img={chatSelected.image}
                                 moreClasses="shadow-lg"
                             />
                             <span className={`${displayImageEditIcon} 
@@ -125,8 +132,8 @@ export default function ChatGroupModal({ chatId, chatName, chatImage, users, use
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.map((user) => {
-                                    const admin = usersAdmins.find((admin) => admin.userId === user.userId);
+                                {chatSelected.users.map((user) => {
+                                    const admin = chatSelected.admins.find((admin) => admin.userId === user.userId);
                                     return (
                                         <tr key={user.userId}>
                                             <td className="border-end">

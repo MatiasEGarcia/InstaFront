@@ -1,16 +1,16 @@
-import { useEffect, useRef, useState } from "react"
-import { InfoCircle } from "react-bootstrap-icons"
-import { create, getAllByChat } from "../../Service/MessageService";
-import { useNotification } from "../../hooks/useNotification";
-import { BACK_HEADERS, CHAT_TYPE, DIR_ASC_DIRECTION, DIR_DESC_DIRECTION, NOTIFICATION_SEVERITIES, PAG_TYPES, SCROLL_POSITIONS } from "../../Util/UtilTexts";
-import UserImageProfile from "../UserImageProfile";
-import Pagination from "../Pagination";
-import ChatMessage from "../ChatMessage";
-import useWebSocket from "../../hooks/useWebSocket";
-import Modal from "../Modal";
-import ChatGroupModal from "../ChatGroupModal";
+import { useEffect, useRef, useState } from "react";
+import { InfoCircle } from "react-bootstrap-icons";
 import { Link } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
+import { create, getAllByChat } from "../../Service/MessageService";
+import { BACK_HEADERS, CHAT_TYPE, DIR_DESC_DIRECTION, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
+import useChat from "../../hooks/UseChat";
+import { useNotification } from "../../hooks/useNotification";
+import useWebSocket from "../../hooks/useWebSocket";
+import ChatGroupModal from "../ChatGroupModal";
+import ChatMessage from "../ChatMessage";
+import Modal from "../Modal";
+import Pagination from "../Pagination";
+import UserImageProfile from "../UserImageProfile";
 
 const basePagDetail = {
     pageNo: 0,
@@ -26,23 +26,16 @@ const basePagDetail = {
  * 
  * Block where we see chat's messages
  * 
- * @param {String} param.chatId chat'id, will be used to get chat messages. 
- * @param {String} param.name chat's name.
- * @param {Array} param.users chat's users.
- * @param {Array} param.admins chat's admins.
- * @param {String} param.image chat's image.
- * @param {Function} param.delChatFromChatList function to delete chat from chat list.
- * @param {String} param.type chat's type
- * @param {String} param.otherUserId other user id in case chat.type === PRIVATE
  * @returns {JSX.Element} Chat messages
  */
-export default function ChatMain({ chatId, name, image, users, admins, delChatFromChatList, type, otherUserId }) {
+export default function ChatMain({ delChatFromChatList}) {//creo que termine aca, sigue chatgroupmodal
     const [groupInfoModal, setGroupInfoModal] = useState(false);
     const [messagesList, setMessagesList] = useState([]);
     const [pagDetails, setPagDetails] = useState(basePagDetail);
     const [pagDetailsFlag, setPagDetailsFlag] = useState(false);
     const [userScrollHeight, setUserScrollHeight] = useState();
     const { setNotificationToast } = useNotification();
+    const {chatSelected} = useChat();
     const { newMessage } = useWebSocket();
     const newMessageRef = useRef();
     const messageBottomDivOverflow = useRef();
@@ -52,7 +45,7 @@ export default function ChatMain({ chatId, name, image, users, admins, delChatFr
      * search chat's last messages.
      */
     useEffect(() => {
-        getAllByChat({ chatId, ...basePagDetail }).then((data) => {
+        getAllByChat({ chatId:chatSelected.chatId, ...basePagDetail }).then((data) => {
             if (data.body?.list) {
                 const reverseList = data.body.list.reverse();
                 setMessagesList(reverseList);
@@ -73,14 +66,14 @@ export default function ChatMain({ chatId, name, image, users, admins, delChatFr
                 msg: error.message
             });
         });
-    }, [chatId]);
+    }, [chatSelected]);
 
     /**
      * if there is some change in pageDetails, means that the user wants to get more messages.
      */
     useEffect(() => {
         if (pagDetailsFlag) {
-            getAllByChat({ chatId, ...pagDetails }).then((data) => {
+            getAllByChat({ chatId: chatSelected.chatId, ...pagDetails }).then((data) => {
                 if (data.body?.list && data.body.pageInfoDto.totalElements > messagesList.length) {
                     const reverseList = data.body.list.reverse();
                     setMessagesList((prevMessageList) => [...reverseList, ...prevMessageList]);
@@ -132,7 +125,7 @@ export default function ChatMain({ chatId, name, image, users, admins, delChatFr
      */
     function sendANewMessage() {
         create({
-            chatId,
+            chatId: chatSelected.chatId,
             message: newMessageRef.current.value
         }).then((data) => {
             setMessagesList([...messagesList, data.body]);
@@ -176,16 +169,16 @@ export default function ChatMain({ chatId, name, image, users, admins, delChatFr
             <div className="card w-100 vh-100">
                 <div className="card-header d-flex justify-content-between ">
                     <div>
-                        <UserImageProfile imgWidth="60px" imgHeight="60px" img={image} />
-                        <span className="ps-2 fs-5">{name}</span>
+                        <UserImageProfile imgWidth="60px" imgHeight="60px" img={chatSelected.image} />
+                        <span className="ps-2 fs-5">{chatSelected.name}</span>
                     </div>
                     <button className="btn">
-                        {type === CHAT_TYPE[0] &&
-                            <Link to={`/userHome/${otherUserId}`} className="btn">
+                        {chatSelected.type === CHAT_TYPE[0] &&
+                            <Link to={`/userHome/${chatSelected.otherUserId}`} className="btn">
                                 <InfoCircle className="align-self-center" size={35} />
                             </Link>
                         }
-                        {type === CHAT_TYPE[1] && <InfoCircle className="align-self-center" size={35} onClick={openGroupInfoModal} />}
+                        {chatSelected.type === CHAT_TYPE[1] && <InfoCircle className="align-self-center" size={35} onClick={openGroupInfoModal} />}
                     </button>
                 </div>
                 <div id="messagesContent" className="card-body overflow-auto" ref={messagesContentRef}>
@@ -220,12 +213,12 @@ export default function ChatMain({ chatId, name, image, users, admins, delChatFr
             </div>
             <Modal modalState={groupInfoModal} setModalState={setGroupInfoModal}>
                 <ChatGroupModal
-                    chatId = {chatId}
-                    users={users}
-                    usersAdmins={admins}
-                    chatImage = {image}
+                    chatId = {chatSelected.chatId}
+                    users={chatSelected.users}
+                    usersAdmins={chatSelected.admins}
+                    chatImage = {chatSelected.image}
                     closeModal={closeModal}
-                    chatName={name} />
+                    chatName={chatSelected.name} />
             </Modal>
         </main>
     )

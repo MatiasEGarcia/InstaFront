@@ -6,14 +6,14 @@ import { useNotification } from "../hooks/useNotification";
 import NewChatCard from "./NewChatCard";
 import useAuth from "../hooks/useAuth";
 import { create } from "../Service/ChatService";
+import useChat from "../hooks/UseChat";
 
 
 /**
  * modal to display when auth user wants to create a new chat.
  * @param {Function} param.closeModal function to close this modal.
- * @param {Function} param.addChatToChatList function to add the new chat created to the chat List.
  */
-export default function NewChatModal({ closeModal, addChatToChatList }) {
+export default function NewChatModal({ closeModal}) {
     const [chatType, setChatType] = useState();
     const [usernameToSearch, setUsernameToSearch] = useState('');
     const [usersFound, setUsersFound] = useState([]);
@@ -21,6 +21,7 @@ export default function NewChatModal({ closeModal, addChatToChatList }) {
     const [adminsForChat, setAdminsForChat] = useState([]);
     const { setNotificationToast } = useNotification();
     const { auth } = useAuth();
+    const {addChatToChatList} = useChat();
     const groupNameInputRef = useRef();
 
 

@@ -1,0 +1,170 @@
+import { createContext, useState, useEffect } from "react";
+import { useNotification } from "../hooks/useNotification";
+import { getChats } from "../Service/ChatService";
+import { BACK_HEADERS, CHAT_TYPE, LOADING_OPTIONS, NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
+import useAuth from "../hooks/useAuth";
+import Loading from "../Components/Loading";
+
+const basePagDetail = {
+    pageNo: 0,
+    pageSize: 15,
+    totalPages: undefined,
+    totalElements: undefined,
+    sortField: undefined,
+    sortDir: undefined
+}
+
+const ChatContext = createContext();
+
+export function ChatProvider({ children }) {
+    const [chatSelected, setChatSelected] = useState({});
+    const [chatListPageDetails, setChatListPageDetails] = useState(basePagDetail);
+    const [chatListPageDetailsFlag, setListChatPageDetailsFlag] = useState(false);
+    const [chatList, setChatList] = useState([]);
+    const { setNotificationToast } = useNotification();
+    const { auth } = useAuth();
+
+    /**
+     * UseEffect to execute in mount moment and search authUser's chats.
+     */
+    useEffect(() => {
+        getChats({ ...chatListPageDetails }).then((data) => {
+            if (data.body?.list) {
+                setChatList(data.body.list);//I'll use scroll pagination so I will add new list elemnents and old list elements. 
+            } else if (data.headers) {
+                setNotificationToast({
+                    sev: NOTIFICATION_SEVERITIES[2],
+                    msg: data.headers.get(BACK_HEADERS[0])
+                })
+            }
+            setChatListPageDetails({
+                ...chatListPageDetails,
+                ...data.body?.pageInfoDto
+            });
+        }).catch((error) => {
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[1],
+                msg: error.message
+            })
+        });
+    }, []);
+
+    /**
+     * UseEffect to search next AuthUser's chats and add them to the chatList with previous chats in paginations page.
+     */
+    useEffect(() => {
+        if (chatListPageDetailsFlag) {
+            getChats({ ...chatListPageDetails }).then((data) => {
+                setChatList([...chatList, ...data.body.list]);//I'll use scroll pagination so I will add new list elemnents and old list elements. 
+                setChatListPageDetails({
+                    ...chatListPageDetails,
+                    ...data.body.pageInfoDto
+                });
+                setListChatPageDetailsFlag(false);
+            }).catch((error) => {
+                setNotificationToast({
+                    sev: NOTIFICATION_SEVERITIES,
+                    msg: error.message
+                })
+            });
+        }
+    }, [chatListPageDetails]);
+
+    /**
+    * This function has to be applied to each chat in auth user's chatList, to see if is private, if is, 
+    * then chat name will be the other user's username,
+    * and chat image will be the other user's image;
+    * @param {Object} chat - chat item that is in chatList
+    * @returns {Object} chat object .
+    */
+    function setChatContent(chat) {
+        if (chat.type === CHAT_TYPE[0]) {
+            const otherUser = chat.users.find((user) => user.userId !== auth.user.userId);
+            const newChatPrivate = {
+                ...chat,
+                name: otherUser.username,
+                image: otherUser.image,
+                otherUserId: otherUser.userId
+            }
+            return newChatPrivate;
+        }
+        return chat;
+    }
+
+    /**
+     * Function to change selected chat and get it's messages.
+     * Also check if chat is private, if is private chat name and image will be the other username and image.
+     * @param {String} chatId  chat's id
+     */
+    function selectChat(chatId) {
+        const chat = chatList.find((chat) => chat.chatId === chatId);
+        if (chat.type === CHAT_TYPE[0]) {
+            const otherUser = chat.users.find((user) => user.userId !== auth.user.userId);
+            setChatSelected({
+                ...chat,
+                image: otherUser.image,
+                name: otherUser.username,
+                otherUserId: otherUser.userId
+            });
+        } else {
+            setChatSelected(chat);
+        }
+    }
+
+    /**
+    * Function to change current page in the chat pagination
+    * @param {String} newPageNo new Page 
+    */
+    function changeChatPage(newPageNo) {
+        chatListPageDetails({
+            ...chatListPageDetails,
+            ['pageNo']: newPageNo
+        })
+        setListChatPageDetailsFlag(true);
+    }
+
+    /**
+     * Function to add new chat created in chatList.
+     * @param {*} newChat 
+     */
+    function addChatToChatList(newChat) {
+        setChatList([...chatList, chatCreated]);
+    }
+
+    /**
+     * To update a chat content from chatList.
+     * @param {Object} chatUpdated chat updated.
+     */
+    function updateChat(chatUpdated) {
+        const newChatList = chatList.map((chat) => {
+            if (chat.chatId === chatUpdated.chatId) {
+                return chatUpdated;
+            }
+            return chat;
+        });
+        setChatList(newChatList);
+        setChatSelected(chatUpdated);
+    }
+
+    if (chatList.length === 0) {
+        return (
+            <Loading spaceToTake={LOADING_OPTIONS[0]} />
+        )
+    }
+
+    return (
+        <ChatContext.Provider value={{
+            chatSelected,
+            selectChat,
+            chatList,
+            setChatContent,
+            changeChatPage,
+            addChatToChatList,
+            updateChat
+        }}>
+            {children}
+        </ChatContext.Provider>
+    )
+}
+
+export default ChatContext;

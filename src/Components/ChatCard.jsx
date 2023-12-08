@@ -1,10 +1,10 @@
 import UserImageProfile from "./UserImageProfile";
 import { CHAT_TYPE } from "../Util/UtilTexts";
+import useChat from "../hooks/UseChat";
 
 /**
  * 
  * 
- * @param {Function} param.selectChat function to change selected chat and search it's messages. 
  * @param {Object} param.sizeImage - object with image size.
  * @param {String} param.sizeImage.width - sizeImage width size.
  * @param {String} param.sizeImage.height - sizeImage height size.
@@ -18,10 +18,11 @@ import { CHAT_TYPE } from "../Util/UtilTexts";
  * @returns {JSX.Element} card view for chats in chat container.
  */
 export default function ChatCard({
-    selectChat, 
     sizeImage={width: "60px", height: "60px"},
     item
 }) {
+    const {selectChat} = useChat();
+
     return (
         <div className="pe-4">
             <button className="btn btn-light d-flex w-100" onClick={() => selectChat(item.chatId)}>
@@ -44,8 +45,3 @@ export default function ChatCard({
         </div>
     )
 }
-
-/**
- * ME FALTA EN EL CHAT CONTAINER EL MOSTRAR O NO MOSTRAR LA PARTE DE MENSAJES.
- * 
- */
