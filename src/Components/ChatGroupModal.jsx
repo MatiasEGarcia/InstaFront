@@ -3,7 +3,7 @@ import UserImageProfile from "./UserImageProfile";
 import { PencilSquare, Star, Trash, XSquare, PencilFill ,ArrowLeft, CheckSquare} from "react-bootstrap-icons";
 import useAuth from "../hooks/useAuth";
 import { useEffect, useRef, useState } from "react";
-import { setChatGroupImage } from "../Service/ChatService";
+import { setChatGroupImage, setChatGroupName } from "../Service/ChatService";
 import useChat from "../hooks/UseChat";
 import { useNotification } from "../hooks/useNotification";
 import { NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
@@ -26,8 +26,8 @@ export default function ChatGroupModal({ closeModal }) {
 
 
     useEffect(() => {
-        const authUser = chatSelected.admins.find((admin) => admin.userId === auth.user.userId);
-        authUser ? setAuthUserIsAdmin(true) : setAuthUserIsAdmin(false);
+        const authUser = chatSelected.users.find((user) => user.userId === auth.user.userId);
+        authUser.admin ? setAuthUserIsAdmin(true) : setAuthUserIsAdmin(false);
     }, []);
 
     function editGroupName() {
@@ -64,11 +64,23 @@ export default function ChatGroupModal({ closeModal }) {
     }
 
     /**
-     * Function to edit group name
+     * Function to edit group chat's name.
      */
     function saveNewGroupName() {
-        //tengo que preguntar si es diferente al nombre viejo
-        console.log('ENTRANDO EN EL saveNewGroupName')
+        const newName = nameInputRef?.current?.value;
+        if(newName === chatSelected.name){
+            return;
+        }
+        setChatGroupName({newName, chatId: chatSelected.chatId}).then(((data) => {
+            updateChat(data.body);
+        })).catch((error) => {
+            setNotificationToast({
+                sev : NOTIFICATION_SEVERITIES[1],
+                msg : error.message
+            });
+        }).finally(() => {
+            editGroupName();
+        });
     }
 
 
@@ -133,7 +145,6 @@ export default function ChatGroupModal({ closeModal }) {
                             </thead>
                             <tbody>
                                 {chatSelected.users.map((user) => {
-                                    const admin = chatSelected.admins.find((admin) => admin.userId === user.userId);
                                     return (
                                         <tr key={user.userId}>
                                             <td className="border-end">
@@ -146,15 +157,15 @@ export default function ChatGroupModal({ closeModal }) {
                                                     </Link>
                                                     <Star
                                                         size={30}
-                                                        className="cursor-pointer-hover me-1 mb-2"
-                                                        color={admin ? 'orange' : 'grey'}
+                                                        className={`${authUserIsAdmin ? 'cursor-pointer-hover': ''} me-1 mb-2`}
+                                                        color={user.admin ? 'orange' : 'grey'}
                                                     />
                                                 </div>
                                             </td>
                                             <td className="text-center">
                                                 {authUserIsAdmin ?
-                                                    <Trash size={50} className="cursor-pointer-hover" color="red" />
-                                                    : <Trash size={50} className="cursor-pointer-hover opacity-25" color="red" />}
+                                                    <Trash size={50} className="cursor-pointer-hover opacity-25" color="red" />
+                                                    : <Trash size={50} className="opacity-25" color="red" />}
                                             </td>
                                         </tr>
                                     )

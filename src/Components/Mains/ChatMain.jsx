@@ -212,13 +212,7 @@ export default function ChatMain({ delChatFromChatList}) {//creo que termine aca
                 </div>
             </div>
             <Modal modalState={groupInfoModal} setModalState={setGroupInfoModal}>
-                <ChatGroupModal
-                    chatId = {chatSelected.chatId}
-                    users={chatSelected.users}
-                    usersAdmins={chatSelected.admins}
-                    chatImage = {chatSelected.image}
-                    closeModal={closeModal}
-                    chatName={chatSelected.name} />
+                <ChatGroupModal closeModal={closeModal}/>
             </Modal>
         </main>
     )

@@ -21,6 +21,7 @@ export function ChatProvider({ children }) {
     const [chatListPageDetails, setChatListPageDetails] = useState(basePagDetail);
     const [chatListPageDetailsFlag, setListChatPageDetailsFlag] = useState(false);
     const [chatList, setChatList] = useState([]);
+    const [loading, setLoading] = useState(true);
     const { setNotificationToast } = useNotification();
     const { auth } = useAuth();
 
@@ -28,6 +29,7 @@ export function ChatProvider({ children }) {
      * UseEffect to execute in mount moment and search authUser's chats.
      */
     useEffect(() => {
+        setLoading(true);
         getChats({ ...chatListPageDetails }).then((data) => {
             if (data.body?.list) {
                 setChatList(data.body.list);//I'll use scroll pagination so I will add new list elemnents and old list elements. 
@@ -46,6 +48,8 @@ export function ChatProvider({ children }) {
                 sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message
             })
+        }).finally(() => {
+            setLoading(false);
         });
     }, []);
 
@@ -128,7 +132,7 @@ export function ChatProvider({ children }) {
      * @param {*} newChat 
      */
     function addChatToChatList(newChat) {
-        setChatList([...chatList, chatCreated]);
+        setChatList([newChat,...chatList]);
     }
 
     /**
@@ -146,7 +150,7 @@ export function ChatProvider({ children }) {
         setChatSelected(chatUpdated);
     }
 
-    if (chatList.length === 0) {
+    if (loading) {
         return (
             <Loading spaceToTake={LOADING_OPTIONS[0]} />
         )

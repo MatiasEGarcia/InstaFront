@@ -36,19 +36,19 @@ export async function getChats({
  * 
  * @param {String} param.name in case the chat group, this will be it's name.
  * @param {CHAT_TYPE} param.type type of chat. 
- * @param {Array} param.usersToAdd array of users to add in chat.
- * @param {Array} param.usersTOAddAsAdmins array of users to add in chat as admins. auhtUser is not necessary to add. 
+ * @param {Array} param.usersToAdd array of users' username to add in chat.
+ * @param {Array} param.usersTOAddAsAdmins array of users' username to add in chat as admins. auhtUser is not necessary to add. 
  * @returns {Promise<Object>} Data object with the new chat.
  */
 export async function create({
     name, type , usersToAdd, usersToAddAsAdmins
 }){
     let data;
+    
     const bodyRequest = {
         name,
         type,
-        usersToAdd,
-        usersToAddAsAdmins
+        usersToAdd : setUsersAsAdmins({users:usersToAdd, admins: usersToAddAsAdmins})
     }
     const options = {
         method : 'POST',
@@ -87,4 +87,104 @@ export async function setChatGroupImage({img, chatId}){
         options
     });
     return data;
+}
+
+/**
+ * Function to set chat's new name.(only chat type group).
+ * 
+ * @param {String} param.newName new chat's name.
+ * @param {String} param.chatId  new chat's id. 
+ * @returns {Promise<Object>} Data object with the chat info updated.
+ */
+export async function setChatGroupName({newName,chatId}){
+    let data;
+    const options = {
+        method: 'PUT',
+        headers:{},
+    }
+
+    data = await fetchApi({
+        endpoint : `${CHAT_ENDPOINT}/name/${newName}/${chatId}`,
+        options
+    });
+
+    return data;
+}
+
+/**
+ * Function to add users.
+ * @param {String} param.chatId - chat's id.
+ * @param {Array} param.usersToAdd - users' username to add in chat.
+ * @param {Array} param.usersToAddAsAdmins - users' username to add in chat as admin. (should be inside of usersToAdd too.) 
+ */
+export async function addUsers({chatId,usersToAdd, usersToAddAsAdmins}){
+    let data;
+    const bodyRequest = {
+        chatId,
+        users: setUsersAsAdmins({users:usersToAdd , admins: usersToAddAsAdmins})
+    }
+
+    const options = {
+        method: 'POST',
+        headers:{},
+        body: JSON.stringify(bodyRequest)
+    }
+
+    data = await fetchApi({
+        endpoint: `${CHAT_ENDPOINT}/add`,
+        options : options
+    });
+
+    return data;
+}
+
+/**
+ * Function to quit users from chat.
+ * 
+ * @param {String} param.chatId - chat's id.
+ * @param {Array} param.usersToQuit - users' username from users to quit.
+ */
+export async function quitUsers({chatId, usersToQuit}){
+    let data;
+    const bodyRequest = {
+        chatId,
+        usersUsername: usersToQuit
+    }
+    const options = {
+        method : 'DELETE',
+        headers: {},
+        body: JSON.stringify(bodyRequest)
+    }
+
+    data = await fetchApi({
+        endpoint: `${CHAT_ENDPOINT}/quit`,
+        options: options
+    });
+
+    return data;
+}
+
+
+
+/**
+ * Function to set wich users will be admins and wich not.
+ * 
+ * @param {Array} param.users all users' username to add in chat.
+ * @param {Array} param.admins all users' username to add as admin in chat. 
+ * @returns an array with all the users object to save with a chat.
+ */
+function setUsersAsAdmins({users , admins}){
+    let arrUsersToSave = [];
+
+    users.forEach((username) =>{
+        let userToSave = {
+            username
+        };
+
+        admins.includes(username) ? userToSave.admin = true : userToSave.admin = false;
+
+        arrUsersToSave.push(userToSave);
+    });
+
+    return arrUsersToSave;
 }
