@@ -126,7 +126,9 @@ export async function addUsers({chatId,usersToAdd, usersToAddAsAdmins}){
 
     const options = {
         method: 'POST',
-        headers:{},
+        headers:{
+            'Content-type': 'application/json',
+        },
         body: JSON.stringify(bodyRequest)
     }
 
@@ -152,7 +154,9 @@ export async function quitUsers({chatId, usersToQuit}){
     }
     const options = {
         method : 'DELETE',
-        headers: {},
+        headers: {
+            'Content-type': 'application/json',
+        },
         body: JSON.stringify(bodyRequest)
     }
 
@@ -160,6 +164,26 @@ export async function quitUsers({chatId, usersToQuit}){
         endpoint: `${CHAT_ENDPOINT}/quit`,
         options: options
     });
+
+    return data;
+}
+
+/**
+ * Function to update user admin status in chat.
+ * @param {String} param.chatId - chat's id.
+ * @param {String} param.userId - user's id. 
+ */
+export async function updateAdminStatus({chatId, userId}){
+    let data;
+    const options = {
+        method : 'PUT',
+        headers : {},
+    }
+
+    data = await fetchApi({
+        endpoint : `${CHAT_ENDPOINT}/adminStatus/${chatId}/${userId}`,
+        options: options
+    })
 
     return data;
 }

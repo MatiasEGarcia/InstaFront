@@ -6,51 +6,23 @@ import { useNotification } from "../hooks/useNotification";
 import NewChatCard from "./NewChatCard";
 import useAuth from "../hooks/useAuth";
 import { create } from "../Service/ChatService";
-import useChat from "../hooks/UseChat";
+import useChat from "../hooks/useChat";
+import AddUsersOnGroupChat from "./AddUsersOnGroupChat";
 
 
 /**
  * modal to display when auth user wants to create a new chat.
  * @param {Function} param.closeModal function to close this modal.
  */
-export default function NewChatModal({ closeModal}) {
+export default function NewChatModal({ closeModal }) {
     const [chatType, setChatType] = useState();
-    const [usernameToSearch, setUsernameToSearch] = useState('');
-    const [usersFound, setUsersFound] = useState([]);
     const [usersForChat, setUsersForChat] = useState([]);
     const [adminsForChat, setAdminsForChat] = useState([]);
     const { setNotificationToast } = useNotification();
     const { auth } = useAuth();
-    const {addChatToChatList} = useChat();
+    const { addChatToChatList } = useChat();
     const groupNameInputRef = useRef();
 
-
-    /**
-     * useEffect to search users by username.
-     */
-    useEffect(() => {
-        if (usernameToSearch.length !== 0) {
-            searchUsersByOneCondition({
-                column: 'username',
-                value: usernameToSearch,
-                operation: LIKE
-            }).then((data) => {
-                if (data.body?.list) {
-                    setUsersFound(data.body.list);
-                } else if (data.headers) {
-                    setNotificationToast({
-                        sev: NOTIFICATION_SEVERITIES[2],
-                        msg: data.headers.get(BACK_HEADERS[0]),
-                    });
-                }
-            }).catch((error) => {
-                setNotificationToast({
-                    sev: NOTIFICATION_SEVERITIES[1],
-                    msg: error.message,
-                });
-            });
-        }
-    }, [usernameToSearch]);
 
     /**
      * Function to create a chat.
@@ -63,11 +35,11 @@ export default function NewChatModal({ closeModal}) {
             return user.username;
         });
         create({
-            name : groupNameInputRef?.current?.value,
-            type : chatType,
-            usersToAdd : usersForChatUsernames,
-            usersToAddAsAdmins : adminsForChatUsernames
-            })
+            name: groupNameInputRef?.current?.value,
+            type: chatType,
+            usersToAdd: usersForChatUsernames,
+            usersToAddAsAdmins: adminsForChatUsernames
+        })
             .then((data) => {
                 console.log(data.body);
                 setNotificationToast({
@@ -103,59 +75,7 @@ export default function NewChatModal({ closeModal}) {
         setUsersForChat([]);
     }
 
-    /**
-     * Function to trigger username search.
-     * @param {String} username 
-     */
-    function onchangeSearchUser(username) {
-        setUsernameToSearch(username);
-    }
 
-    /**
-     * Function to add a user to chat wanted to create
-     * @param {String} param.userId user id
-     * @param {String} param.image user image
-     * @param {String} param.username username
-     */
-    function addUserOnChat({ userId, image, username }) {
-        //add user if is not already in chat and if is not the auth user
-        if (!usersForChat.find((user) => user.userId === userId)
-            && auth.user.userId !== userId) {
-            setUsersForChat([...usersForChat, { userId, image, username }]);
-        }
-    }
-
-    /**
-     * Function to remove a user from chat wanted to create.
-     * @param {String} userId user id. 
-     */
-    function removeUserFromChat(userId) {
-        const newList = usersForChat.filter((user) => user.userId !== userId);
-        setUsersForChat(newList);
-    }
-
-    /**
-     * Function to convert an user to admin in chat.
-     * @param {String} param.userId user id
-     * @param {String} param.image user image
-     * @param {String} param.username username
-     */
-    function addUserAsAdmin({ userId, image, username }) {
-        //add user if is not already in chat as admin and if is not the auth user
-        if (!adminsForChat.find((user) => user.userId === userId)
-            && auth.user.userId !== userId) {
-            setAdminsForChat([...adminsForChat, { userId, image, username }]);
-        }
-    }
-
-    /**
-     * Function to remove an user it's admin status.
-     * @param {String} userId user id. 
-     */
-    function removeUserAsAdmin(userId) {
-        const newList = adminsForChat.filter((user) => user.userId !== userId);
-        setAdminsForChat(newList);
-    }
 
     return (
         <div className="card w-50 h-90">
@@ -194,66 +114,12 @@ export default function NewChatModal({ closeModal}) {
                                 </div>
                             </div>
                         }
-                        <div className="row h-100">
-                            <div className="col border-end">
-                                <h4 className="text-center mb-3">Users in chat</h4>
-                                {usersForChat.length === 0 &&
-                                    <div className="text-center">
-                                        <p>Select a user to add it on the chat</p>
-                                    </div>
-                                }
-                                {usersForChat.length !== 0 &&
-                                    <div className="vstack gap-2 h-70 overflow-auto align-items-center">
-                                        {usersForChat.map((user) => {
-                                            let isAdmin;
-                                            const adminUser =
-                                                adminsForChat.find((admin) => admin.userId === user.userId);
-                                            if (adminUser) {
-                                                isAdmin = true;
-                                            } else {
-                                                isAdmin = false;
-                                            }
-
-                                            return (
-                                                <NewChatCard
-                                                    userId={user.userId}
-                                                    username={user.username}
-                                                    image={user.image}
-                                                    removeUserFromChat={removeUserFromChat}
-                                                    onChat={true}
-                                                    isAdmin={isAdmin}
-                                                    addUserAsAdmin={addUserAsAdmin}
-                                                    removeUserAsAdmin={removeUserAsAdmin}
-                                                />
-                                            )
-                                        })}
-                                    </div>
-                                }
-                            </div>
-                            <div className="col">
-                                <input
-                                    type="text"
-                                    className="form-control mb-2"
-                                    placeholder="Search user by username"
-                                    onChange={(evt) => onchangeSearchUser(evt.target.value)}
-                                />
-                                {usersFound.length !== 0 &&
-                                    <div className="vstack gap-2 h-70 overflow-auto align-items-center">
-                                        {usersFound.map((user) => {
-                                            return (
-                                                <NewChatCard
-                                                    userId={user.userId}
-                                                    username={user.username}
-                                                    image={user.image}
-                                                    addUserOnChat={addUserOnChat}
-                                                    onChat={false}
-                                                />
-                                            )
-                                        })}
-                                    </div>
-                                }
-                            </div>
-                        </div>
+                        <AddUsersOnGroupChat
+                            usersForChat={usersForChat}
+                            adminsForChat={adminsForChat}
+                            setUsersForChat={setUsersForChat}
+                            setAdminsForChat={setAdminsForChat}
+                        />
                     </>
                 }
             </div>

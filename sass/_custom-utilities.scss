@@ -9,7 +9,7 @@ $utilities: map-merge($map1: $utilities,
     "height": map-merge(map-get($utilities, "height"),
       (values: map-merge(map-get(map-get($utilities, "height"), "values"),
           $custom-height-values,
-        ),
+        ),responsive:true
       ),
     ),
     "cursor": (
