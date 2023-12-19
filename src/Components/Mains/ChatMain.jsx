@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { InfoCircle } from "react-bootstrap-icons";
 import { Link } from "react-router-dom";
-import { create, getAllByChat } from "../../Service/MessageService";
+import { create, getAllByChat, setMessagesWatched } from "../../Service/MessageService";
 import { BACK_HEADERS, CHAT_TYPE, DIR_DESC_DIRECTION, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
 import useChat from "../../hooks/UseChat";
 import { useNotification } from "../../hooks/useNotification";
@@ -28,14 +28,14 @@ const basePagDetail = {
  * 
  * @returns {JSX.Element} Chat messages
  */
-export default function ChatMain({ delChatFromChatList}) {//creo que termine aca, sigue chatgroupmodal
+export default function ChatMain({ delChatFromChatList }) {
     const [groupInfoModal, setGroupInfoModal] = useState(false);
     const [messagesList, setMessagesList] = useState([]);
     const [pagDetails, setPagDetails] = useState(basePagDetail);
     const [pagDetailsFlag, setPagDetailsFlag] = useState(false);
     const [userScrollHeight, setUserScrollHeight] = useState();
     const { setNotificationToast } = useNotification();
-    const {chatSelected} = useChat();
+    const { chatSelected, updateChat } = useChat();
     const { newMessage } = useWebSocket();
     const newMessageRef = useRef();
     const messageBottomDivOverflow = useRef();
@@ -45,7 +45,7 @@ export default function ChatMain({ delChatFromChatList}) {//creo que termine aca
      * search chat's last messages.
      */
     useEffect(() => {
-        getAllByChat({ chatId:chatSelected.chatId, ...basePagDetail }).then((data) => {
+        getAllByChat({ chatId: chatSelected.chatId, ...basePagDetail }).then((data) => {
             if (data.body?.list) {
                 const reverseList = data.body.list.reverse();
                 setMessagesList(reverseList);
@@ -66,7 +66,26 @@ export default function ChatMain({ delChatFromChatList}) {//creo que termine aca
                 msg: error.message
             });
         });
-    }, [chatSelected]);
+    }, [chatSelected.chatId]);
+
+    //use effect to set all messages from chat as watched by auth user.
+    useEffect(() => {
+        if (chatSelected.messagesNoWatched !== "0") {
+            setMessagesWatched(chatSelected.chatId).then((data) => {
+                const newChat = {
+                    ...chatSelected,
+                    messagesNoWatched: "0"
+                }
+                updateChat(newChat);
+            }).catch((error) => {
+                setNotificationToast({
+                    sev: NOTIFICATION_SEVERITIES[1],
+                    msg: error.message
+                })
+            });
+        }
+    }, [chatSelected.chatId])
+
 
     /**
      * if there is some change in pageDetails, means that the user wants to get more messages.
@@ -102,19 +121,22 @@ export default function ChatMain({ delChatFromChatList}) {//creo que termine aca
     }, [pagDetails]);
 
     /**
-     * will listen the new message from web socket, and will add it to the message list.
+     * will listen the new message from web socket, and will add it to the message list 
+     * if new message chat is the same than the chatSelected.
      */
     useEffect(() => {
-        setMessagesList([...messagesList, newMessage])
+        if(newMessage.chatId === chatSelected.chatId){
+            setMessagesList([...messagesList, newMessage])
+        }
     }, [newMessage]);
 
     /**
      * listen new messages and change scroll height.
      */
     useEffect(() => {
-        if(pagDetails.pageNo === 0){
+        if (pagDetails.pageNo === 0) {
             messageBottomDivOverflow.current?.scrollIntoView({ behavior: "smooth" });
-        }else{
+        } else {
             messagesContentRef.current.scrollTop = userScrollHeight;
         }
     }, [messagesList]);
@@ -212,7 +234,7 @@ export default function ChatMain({ delChatFromChatList}) {//creo que termine aca
                 </div>
             </div>
             <Modal modalState={groupInfoModal} setModalState={setGroupInfoModal}>
-                <ChatGroupModal closeModal={closeModal}/>
+                <ChatGroupModal closeModal={closeModal} />
             </Modal>
         </main>
     )

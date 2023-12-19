@@ -38,8 +38,10 @@ export default function ChatCard({
                 <div className="d-none d-lg-block ps-1 w-100 text-start position-relative">
                     <p className="mb-1">{item.name}</p>
                     <p className="m-0"><small>LastMessage</small></p>
-                    <span className="badge bg-danger rounded-pill 
-                                                    position-absolute top-0 start-100">14</span>
+                    {item.messagesNoWatched !== '0' && item.messagesNoWatched < 100 && <span className="badge bg-danger rounded-pill 
+                                                    position-absolute top-0 start-100">{item.messagesNoWatched}</span>}
+                    {item.messagesNoWatched !== '0' && item.messagesNoWatched > 100 && <span className="badge bg-danger rounded-pill 
+                                                    position-absolute top-0 start-100">+100</span>}
                 </div>
             </button>
         </div>

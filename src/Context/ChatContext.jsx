@@ -4,6 +4,7 @@ import { getChats } from "../Service/ChatService";
 import { BACK_HEADERS, CHAT_TYPE, LOADING_OPTIONS, NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
 import useAuth from "../hooks/useAuth";
 import Loading from "../Components/Loading";
+import useWebSocket from "../hooks/useWebSocket";
 
 const basePagDetail = {
     pageNo: 0,
@@ -24,6 +25,7 @@ export function ChatProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const { setNotificationToast } = useNotification();
     const { auth } = useAuth();
+    const {newMessage} = useWebSocket();
 
     /**
      * UseEffect to execute in mount moment and search authUser's chats.
@@ -52,6 +54,24 @@ export function ChatProvider({ children }) {
             setLoading(false);
         });
     }, []);
+
+    /**
+     * Use effect to execute when there is some new Message and the chat owner is not 
+     * the same than chatSelected
+     */
+    useEffect(()=> {
+        if(newMessage.chatId !== chatSelected.chatId){
+            const newChatList = chatList.map((chat) => {
+                if(chat.chatId === newMessage.chatId){
+                    const msgNoWatchedNumber = Number(chat.messagesNoWatched);
+                    chat.messagesNoWatched = msgNoWatchedNumber + 1;
+                }
+                return chat;
+            })
+            setChatList(newChatList);
+        }
+    },[newMessage]);
+
 
     /**
      * UseEffect to search next AuthUser's chats and add them to the chatList with previous chats in paginations page.

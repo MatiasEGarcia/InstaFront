@@ -56,3 +56,22 @@ export async function getAllByChat({
 
     return data;
 }
+
+/**
+ * Function to set all messages from a chat as watched by auth user.
+ * @param {String} chatId - chat's id
+ * @returns {Promise<Object>} data object with the body of the response.(in best case chat object with messagesWatched updated).
+ */
+export async function setMessagesWatched(chatId){
+    let data;
+    const options = {
+        method: 'PUT',
+        headers:{},
+    }
+
+    data = await fetchApi({
+        endpoint : `${MESSAGES_ENDPOINT}/watchedAll/${chatId}`,
+        options
+    });
+    return data;
+}
