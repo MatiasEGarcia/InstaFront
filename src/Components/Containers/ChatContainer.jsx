@@ -1,16 +1,14 @@
-import { useEffect, useState } from "react";
-import { PencilSquare, InfoCircle, House } from "react-bootstrap-icons";
+import { useState } from "react";
+import { House, PencilSquare } from "react-bootstrap-icons";
 import { Link } from 'react-router-dom';
-import { getChats } from "../../Service/ChatService";
-import { useNotification } from "../../hooks/useNotification";
-import { BACK_HEADERS, CHAT_TYPE, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
-import ChatCard from "../ChatCard";
-import Pagination from "../Pagination";
-import ChatMain from "../Mains/ChatMain";
+import { PAG_TYPES } from "../../Util/UtilTexts";
+import useChat from "../../hooks/UseChat";
 import useAuth from "../../hooks/useAuth";
+import ChatCard from "../ChatCard";
+import ChatMain from "../Mains/ChatMain";
 import Modal from "../Modal";
 import NewChatModal from "../NewChatModal";
-import useChat from "../../hooks/UseChat";
+import Pagination from "../Pagination";
 
 /**
  * @returns {JSX.Element} Chat view with chats and it's messages

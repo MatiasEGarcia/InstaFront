@@ -11,14 +11,12 @@ import fetchApi from "./FetchServices";
  * @returns {Promise<Object>} Data object with a body and inside a list, if there are not, a header with info about. 
  */
 export async function getChats({
-    pageNo, pageSize, sortDir
+    pageNo, pageSize
 }){
     let data;
     const params = new URLSearchParams({
         page: pageNo || '0',
         pageSize: pageSize || '20',
-        sortField: 'chatId',
-        sortDir: sortDir || DIR_ASC_DIRECTION
     })
     const options = {
         method: 'GET',
@@ -26,7 +24,7 @@ export async function getChats({
     }
 
     data = await fetchApi({
-        endpoint: `${CHAT_ENDPOINT}?${params.toString()}`,
+        endpoint: `${CHAT_ENDPOINT}/${pageNo}/${pageSize}`,
         options
     });
     return data;

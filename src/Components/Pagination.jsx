@@ -17,7 +17,7 @@ export default function Pagination({
     divId , mapItem
 }){
     /**
-     * Use effect only for scroll down pagination. 
+     * Use effect only for scroll down/up pagination. 
      * Change the current page if the user reach bottom of the selected div.
      */
     useEffect(() => {

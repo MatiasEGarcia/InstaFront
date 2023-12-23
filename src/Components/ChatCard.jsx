@@ -1,6 +1,7 @@
 import UserImageProfile from "./UserImageProfile";
 import { CHAT_TYPE } from "../Util/UtilTexts";
 import useChat from "../hooks/UseChat";
+import { useEffect, useState } from "react";
 
 /**
  * 
@@ -18,29 +19,44 @@ import useChat from "../hooks/UseChat";
  * @returns {JSX.Element} card view for chats in chat container.
  */
 export default function ChatCard({
-    sizeImage={width: "60px", height: "60px"},
+    sizeImage = { width: "60px", height: "60px" },
     item
 }) {
-    const {selectChat} = useChat();
+    const { selectChat } = useChat();
+    const [messagesNoWatched, setMessagesNotWatched] = useState(0);
+
+    //use effect to change messagesNoWatched to number.
+    useEffect(() => {
+        setMessagesNotWatched(+item.messagesNoWatched);
+    }, []);
 
     return (
         <div className="pe-4">
             <button className="btn btn-light d-flex w-100" onClick={() => selectChat(item.chatId)}>
                 <div className="position-relative">
-                   <UserImageProfile
-                        imgWidth = {sizeImage.width}
-                        imgHeight = {sizeImage.height}
-                        img = {item.image}
+                    <UserImageProfile
+                        imgWidth={sizeImage.width}
+                        imgHeight={sizeImage.height}
+                        img={item.image}
                     />
-                    <span className="d-lg-none badge bg-danger rounded-pill 
-                                                    position-absolute top-0 start-100">14</span>
+                    {messagesNoWatched !== 0 && messagesNoWatched < 100 && <span className="d-lg-none badge 
+                        bg-danger rounded-pill position-absolute top-0 start-100">{item.messagesNoWatched}</span>}
+                    {messagesNoWatched !== 0 && messagesNoWatched > 100 && <span className="d-lg-none badge 
+                        bg-danger rounded-pill position-absolute top-0 start-100">+100</span>}
+
                 </div>
                 <div className="d-none d-lg-block ps-1 w-100 text-start position-relative">
-                    <p className="mb-1">{item.name}</p>
-                    <p className="m-0"><small>LastMessage</small></p>
-                    {item.messagesNoWatched !== '0' && item.messagesNoWatched < 100 && <span className="badge bg-danger rounded-pill 
+                    <div className="w-55 inline-block text-truncate">
+                        <p className="mb-1">{item.name}</p>
+                        <p className="m-0">
+                            <small>
+                                {item.lastMessage}
+                            </small>
+                        </p>
+                    </div>
+                    {messagesNoWatched !== 0 && messagesNoWatched < 100 && <span className="badge bg-danger rounded-pill 
                                                     position-absolute top-0 start-100">{item.messagesNoWatched}</span>}
-                    {item.messagesNoWatched !== '0' && item.messagesNoWatched > 100 && <span className="badge bg-danger rounded-pill 
+                    {messagesNoWatched !== 0 && messagesNoWatched > 100 && <span className="badge bg-danger rounded-pill 
                                                     position-absolute top-0 start-100">+100</span>}
                 </div>
             </button>

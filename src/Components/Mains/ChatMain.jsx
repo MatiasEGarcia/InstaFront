@@ -35,7 +35,7 @@ export default function ChatMain({ delChatFromChatList }) {
     const [pagDetailsFlag, setPagDetailsFlag] = useState(false);
     const [userScrollHeight, setUserScrollHeight] = useState();
     const { setNotificationToast } = useNotification();
-    const { chatSelected, updateChat } = useChat();
+    const { chatSelected, updateChat,updChatUserWNewMessage } = useChat();
     const { newMessage } = useWebSocket();
     const newMessageRef = useRef();
     const messageBottomDivOverflow = useRef();
@@ -103,11 +103,7 @@ export default function ChatMain({ delChatFromChatList }) {
                     setUserScrollHeight(messagesContentRef.current.clientHeight);
 
                 } else if (data.headers) {
-                    setNotificationToast({
-                        sev: NOTIFICATION_SEVERITIES[2],
-                        msg: data.headers.get(BACK_HEADERS[0])
-                    })
-                    setMessagesList([]);
+                    console.info(data.headers.get(BACK_HEADERS[0]));
                 }
             }).catch((error) => {
                 setNotificationToast({
@@ -134,7 +130,7 @@ export default function ChatMain({ delChatFromChatList }) {
      * listen new messages and change scroll height.
      */
     useEffect(() => {
-        if (pagDetails.pageNo === 0) {
+        if (pagDetails.pageNo === 0 || pagDetailsFlag) {
             messageBottomDivOverflow.current?.scrollIntoView({ behavior: "smooth" });
         } else {
             messagesContentRef.current.scrollTop = userScrollHeight;
@@ -146,12 +142,21 @@ export default function ChatMain({ delChatFromChatList }) {
      * Write a new message on chat.
      */
     function sendANewMessage() {
+        const message = newMessageRef.current.value;
+
         create({
             chatId: chatSelected.chatId,
-            message: newMessageRef.current.value
+            message
         }).then((data) => {
             setMessagesList([...messagesList, data.body]);
             newMessageRef.current.value = '';
+            //we update last message, so we can see it in chat list.
+            updChatUserWNewMessage({
+                ...chatSelected,
+                lastMessage : message
+            })
+            //send the user view to the new bottom.
+            messageBottomDivOverflow.current?.scrollIntoView({ behavior: "smooth" });
         }).catch((error) => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],

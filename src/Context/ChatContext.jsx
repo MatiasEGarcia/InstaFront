@@ -9,10 +9,6 @@ import useWebSocket from "../hooks/useWebSocket";
 const basePagDetail = {
     pageNo: 0,
     pageSize: 15,
-    totalPages: undefined,
-    totalElements: undefined,
-    sortField: undefined,
-    sortDir: undefined
 }
 
 const ChatContext = createContext();
@@ -71,6 +67,17 @@ export function ChatProvider({ children }) {
             setChatList(newChatList);
         }
     },[newMessage]);
+
+    /**
+     * To update chat last message when there is a new message from websocket.
+     */
+    useEffect(() => {
+        const chat = chatList.find(chat => chat.chatId === newMessage.chatId);
+        updChatUserWNewMessage({
+            ...chat,
+            lastMessage : newMessage.body,
+        })
+    },[newMessage])
 
 
     /**
@@ -170,6 +177,16 @@ export function ChatProvider({ children }) {
         setChatSelected(chatUpdated);
     }
 
+    /**
+     * Function to update a chat when a user write a new message.
+     * we add the new chatUpdated to the front of the array.
+     */
+    function updChatUserWNewMessage(chatUpdated){
+        const chatListWhithoutChatUdpated = chatList.filter(chat => chat.chatId !== chatUpdated.chatId);
+        setChatList([chatUpdated,...chatListWhithoutChatUdpated]);
+
+    }
+
     if (loading) {
         return (
             <Loading spaceToTake={LOADING_OPTIONS[0]} />
@@ -184,7 +201,8 @@ export function ChatProvider({ children }) {
             setChatContent,
             changeChatPage,
             addChatToChatList,
-            updateChat
+            updateChat,
+            updChatUserWNewMessage
         }}>
             {children}
         </ChatContext.Provider>
