@@ -22,7 +22,6 @@ export default function ChatGroupModal({ closeModal }) {
     const [adminsForChat, setAdminsForChat] = useState([]); //for add admins on the chat.
     const [addUsersMode, setAddUserMode] = useState(false);
     const [name, setName] = useState(true);
-    const { auth } = useAuth();
     const { chatSelected, updateChat } = useChat();
     const { setNotificationToast } = useNotification();
     const fileInputRef = useRef();

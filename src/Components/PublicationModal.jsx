@@ -3,9 +3,9 @@ import { Heart, XCircle } from "react-bootstrap-icons";
  * Component that have the content that will be display when we want to see the publication info in a modal.
  * 
  * @param {Function} setModalState - function to close currently modal. 
- * @param {Object} contentModal - object with publication info to be display in modal.  
+ * @param {Object} publication - object with publication info to be display in modal.  
  */
-function PublicationModal({ setModalState , contentModal }) {
+function PublicationModal({ setModalState , publication }) {
 
     return (
         <div className="w-100 w-md-75 h-80">
@@ -21,7 +21,7 @@ function PublicationModal({ setModalState , contentModal }) {
                                     <img height="60px" width="60px" className="rounded-circle"
                                         src="/defaultImg/profile.jpg"
                                         alt="userImage" />
-                                    <p className=" d-inline m-0 ps-2 fs-5 align-self-center">{contentModal?.username}</p>
+                                    <p className=" d-inline m-0 ps-2 fs-5 align-self-center">{publication?.username}</p>
                                 </button>
                                 <button className="btn btn-link">
                                     Follow
@@ -46,7 +46,7 @@ function PublicationModal({ setModalState , contentModal }) {
                         </div>
                         <div className="card-footer">
                             <div className="d-flex justify-content-between align-items-center">
-                                <p className="pt-3">{contentModal?.description}</p>
+                                <p className="pt-3">{publication?.description}</p>
                                 <button className="btn fs-2">
                                     <Heart />
                                 </button>

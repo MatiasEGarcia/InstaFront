@@ -19,7 +19,6 @@ export default function NewChatModal({ closeModal }) {
     const [usersForChat, setUsersForChat] = useState([]);
     const [adminsForChat, setAdminsForChat] = useState([]);
     const { setNotificationToast } = useNotification();
-    const { auth } = useAuth();
     const { addChatToChatList } = useChat();
     const groupNameInputRef = useRef();
 

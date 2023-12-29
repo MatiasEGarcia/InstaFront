@@ -45,7 +45,7 @@ export async function getAllByAuthUser({
     const params = new URLSearchParams({
         page: pageNo || '0',
         pageSize: pageSize || '20',
-        sortField: sortField || 'pubImaId',
+        sortField: sortField || 'publImgId',
         sortDir: sortDir || DIR_ASC_DIRECTION
     });
 
@@ -61,5 +61,60 @@ export async function getAllByAuthUser({
         options
     })
 
+    return data;
+}
+
+/**
+ * Function to get publications from users that auth user follows.
+ * 
+ * @param {Number} param.pageNo number of the page in pagination.
+ * @param {Number} param.pageSize number of elements for page in pagination.
+ * @param {String} param.sortField field to sort.
+ * @param {String} param.sortDir direction to sort.
+ * @returns {Promise<Object>} data object with the body of the response. 
+ */
+export async function getAllByFollowedUsers({
+    pageNo, pageSize,sortField , sortDir 
+}){
+    let data;
+    const params = new URLSearchParams({
+        page : pageNo || '0',
+        pageSize : pageSize || '20',
+        sortField : sortField || 'publImgId',
+        sortDir : sortDir || DIR_ASC_DIRECTION
+    });
+
+    const options = {
+        method : 'GET',
+        headers : {
+            'Timezone' : 'America/Argentina/Buenos_Aires'
+        }
+    };
+
+    data = await fetchApi({
+        endpoint : `${PUBLICATION_ENDPOINT}/byUsersFollowed?${params.toString()}`,
+        options
+    });
+    return data;
+}
+
+/**
+ * Function to get all the publication info by id.
+ * @param {String} id publication's id. 
+ */
+export async function getById(id){
+    let data;
+
+    const options = {
+        method : 'GET',
+        headers : {
+            'Timezone' : 'America/Argentina/Buenos_Aires'
+        }
+    }
+
+    data = await fetchApi({
+        endpoint : `${PUBLICATION_ENDPOINT}/${id}`,
+        options
+    });
     return data;
 }
