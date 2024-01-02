@@ -27,6 +27,7 @@ const basePagDetails = {
 
 export default function UsersHomePublications({ userOwnerId }) {
     const [publicationModalState, setPublicationModalState] = useState(false);//used by Modal component to know if should show the modal or not
+    const [publicationSelectedId , setPublicationSelectedId] = useState();
     const [userPublications, setUserPublications] = useState([]);
     const [pagDetailsFlag, setPagDetailsFlag] = useState(false);//??, is for the useEffect that is listening pagDetails, becuase changes pagDetails content too, and with this I avoid a loop.
     const [pagDetails, setPagDetails] = useState(basePagDetails);
@@ -50,7 +51,8 @@ export default function UsersHomePublications({ userOwnerId }) {
      * @param {string} id - publication id.
      */
     function showModal(id) {
-        setModalState(true);
+        setPublicationSelectedId(id)
+        setPublicationModalState(true);
     }
 
 
@@ -157,7 +159,7 @@ export default function UsersHomePublications({ userOwnerId }) {
                 />
             }
             <Modal modalState={publicationModalState} setModalState={setPublicationModalState}>
-                <PublicationModal setModalState={setPublicationModalState} contentModal={contentModalPublication} />
+                <PublicationModal setModalState={setPublicationModalState} id={publicationSelectedId} />
             </Modal>
         </div>
     )

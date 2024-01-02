@@ -33,13 +33,13 @@ function MainContainer({ wichMain }) {
 
 
     return (
-        <div className="container-fluid">
+        <div className={`container-fluid vh-100  ${wichMain === TYPE_MAIN[0] && 'overflow-hidden'}`}>
             <div className="row d-flex justify-content-center d-md-none mt-2">
                 <Link to="/home" className="btn btn-light w-50">
                     <h1 className="display-3 m-0 px-2 pb-1">{APP_TITLE}</h1>
                 </Link>
             </div>
-            <div className="row vh-100 position-relative">
+            <div className="row position-relative">
                 <LeftNavigation/> 
                 {main}
                 <StickyBottomIconNavigation/>

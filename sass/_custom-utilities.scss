@@ -12,6 +12,18 @@ $utilities: map-merge($map1: $utilities,
         ),responsive:true
       ),
     ),
+    "viewport-height": map-merge(map-get($utilities, "viewport-height"),
+      (values: map-merge(map-get(map-get($utilities, "viewport-height"), "values"),
+        $custom-viewport-height-values,
+          ),responsive:true
+       ),
+     ),
+     "max-height": map-merge(map-get($utilities, "max-height"),
+     (values: map-merge(map-get(map-get($utilities, "max-height"), "values"),
+       $custom-max-height-values,
+         ),responsive:true
+      ),
+    ),
     "cursor": (
       property: cursor,
       class: cursor,

@@ -28,13 +28,13 @@ const basePagDetails = {
  */
 function HomeMain() {
     const [loading, setLoading] = useState(true);
+    const [publicationSelectedId , setPublicationSelectedId] = useState();
     const [modalState, setModalState] = useState(false);
-    const [publicationSelected, setPublicationSelected] = useState({});
     const [pagDetails, setPagDetails] = useState(basePagDetails);
     const [pagDetailsFlag, setPagDetailsFlag] = useState(true);//??, is for the useEffect that is listening pagDetails, because changes pagDetails content too, and with this I avoid a loop. I will only put on true when the client wants to change the page.
     const [listPublications, setListPublications] = useState([]);
     const { auth } = useAuth();
-    const setNotificationToast = useNotification();
+    const {setNotificationToast} = useNotification();
 
     //use effect to get last publications from followed users
     useEffect(() => {
@@ -69,72 +69,68 @@ function HomeMain() {
     }
 
     /**
-     * Function to search all the data from a publication
-     * @param {String} id  publication's id.
+     * Function to open and pass to modal an id to search a publication
+     * @param {String} id - publication's id 
      */
-    function selectPublication(id) {
-        getById(id).then(data => {
-            setPublicationSelected(data.body);
-        }).catch(error => {
-            setNotificationToast({
-                sev: NOTIFICATION_SEVERITIES[1],
-                msg: error.message
-            })
-        });
+    function selectPublication(id){
+        setPublicationSelectedId(id);
+        setModalState(true);
     }
+     
 
     return (
         <main className="col-12 col-md-8 col-xl-10">
-            <div className="row h-50">
-                <div id="publicationsColumn" className="col-12 col-lg-8 
-                                d-flex flex-column align-items-center gap-5
-                                mt-5 ">
-                    {loading ?
-                        <Loading spaceToTake={LOADING_OPTIONS[1]} />
-                        : <Pagination
-                            itemsList={listPublications}
-                            pagType={PAG_TYPES[1]}
-                            pagDetails={pagDetails}
-                            changePage={changePage}
-                            divId={"publicationsColumn"}
-                            ComponentToDisplayItem={(props) => <PublicationCard showModal={selectPublication}
-                                width="w-75 w-sm-75 w-xl-50" {...props} />}
-                        />}
+            <div className="row">
+                <div id="publicationsColumn" className="col-12 col-lg-8 d-flex w-100
+                                mt-3 pb-5 vh-75 vh-md-95 overflow-auto">
+                    <div className="d-flex flex-column align-items-center gap-5 w-100 w-lg-80">
+                        {loading ?
+                            <Loading spaceToTake={LOADING_OPTIONS[1]} />
+                            : <Pagination
+                                itemsList={listPublications}
+                                pagType={PAG_TYPES[1]}
+                                pagDetails={pagDetails}
+                                changePage={changePage}
+                                divId={"publicationsColumn"}
+                                ComponentToDisplayItem={(props) => <PublicationCard showModal={selectPublication}
+                                    width="w-75 w-sm-75 w-xl-50" {...props} />}
+                            />}
+                    </div>
+                    <aside className="d-none d-lg-block col-lg-4 mt-5">
+                        <ul className="nav flex-column gap-3">
+                            <Link to={`/userHome/${auth.user.userId}`} className="nav-item btn btn-light w-80 d-flex justify-content-between">
+                                <div>
+                                    <UserImageProfile imgWith="60px"
+                                        imgHeight="60px"
+                                        img={auth.user.image} />
+                                    <span className="ps-3 fs-5">{auth.user.username}</span>
+                                </div>
+                            </Link>
+                            <hr className="w-80" />
+                            <li className="nav-item w-80 mb-2">
+                                <p className="m-0 text-center">Suggestions for you</p>
+                            </li>
+                            <Link to="/userHome" className="nav-item btn btn-light w-80 d-flex justify-content-between">
+                                <div>
+                                    <img height="60px" width="60px" className="rounded-circle"
+                                        src="/defaultImg/profile.jpg"
+                                        alt="userImage" />
+                                    <span className="ps-3 fs-5">Username</span>
+                                </div>
+                            </Link>
+                            <Link to="/userHome" className="nav-item btn btn-light w-80 d-flex justify-content-between">
+                                <div>
+                                    <img height="60px" width="60px" className="rounded-circle"
+                                        src="/defaultImg/profile.jpg"
+                                        alt="userImage" />
+                                    <span className="ps-3 fs-5">Username</span>
+                                </div>
+                            </Link>
+                        </ul>
+                    </aside>
                 </div>
-                <aside className="d-none d-lg-block col-lg-4 mt-5">
-                    <ul className="nav flex-column gap-3">
-                        <Link to={`/userHome/${auth.user.userId}`} className="nav-item btn btn-light w-80 d-flex justify-content-between">
-                            <div>
-                                <UserImageProfile imgWith="60px"
-                                    imgHeight="60px"
-                                    img={auth.user.image} />
-                                <span className="ps-3 fs-5">{auth.user.username}</span>
-                            </div>
-                        </Link>
-                        <hr className="w-80" />
-                        <li className="nav-item w-80 mb-2">
-                            <p className="m-0 text-center">Suggestions for you</p>
-                        </li>
-                        <Link to="/userHome" className="nav-item btn btn-light w-80 d-flex justify-content-between">
-                            <div>
-                                <img height="60px" width="60px" className="rounded-circle"
-                                    src="/defaultImg/profile.jpg"
-                                    alt="userImage" />
-                                <span className="ps-3 fs-5">Username</span>
-                            </div>
-                        </Link>
-                        <Link to="/userHome" className="nav-item btn btn-light w-80 d-flex justify-content-between">
-                            <div>
-                                <img height="60px" width="60px" className="rounded-circle"
-                                    src="/defaultImg/profile.jpg"
-                                    alt="userImage" />
-                                <span className="ps-3 fs-5">Username</span>
-                            </div>
-                        </Link>
-                    </ul>
-                </aside>
                 <Modal modalState={modalState} setModalState={setModalState}>
-                    <PublicationModal setModalState={setModalState} publication={publicationSelected} />
+                    <PublicationModal setModalState={setModalState} id={publicationSelectedId} />
                 </Modal>
             </div>
         </main>

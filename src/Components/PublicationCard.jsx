@@ -1,5 +1,6 @@
 import { Heart } from "react-bootstrap-icons";
 import UserImageProfile from "./UserImageProfile";
+import { Link } from "react-router-dom";
 
 /**
  * Component to show publication general information.
@@ -21,10 +22,10 @@ function PublicationCard({ showModal, width, item }) {
     return (
         <div className={`card ${width}`}>
             <div className="card-header d-flex justify-content-between">
-                <div>
+                <Link className="btn" to={`/userHome/${item.userOwner.userId}`}>
                     <UserImageProfile imgWith="60px" imgHeight="60px" img={item.userOwner.image} />
                     <span className="ps-2 fs-5">{item.userOwner.username}</span>
-                </div>
+                </Link>
 
                 <div>
                     {localCreatedAt}
@@ -47,7 +48,7 @@ function PublicationCard({ showModal, width, item }) {
                 </div>
             </div>
             <div className="card-footer">
-                <button type="button" className="btn btn-success" onClick={() => showModal(1)}> {/*aca iria el id de la publicacion*/}
+                <button type="button" className="btn btn-success" onClick={() => showModal(item.id)}> 
                     See comentaries
                 </button>
             </div>

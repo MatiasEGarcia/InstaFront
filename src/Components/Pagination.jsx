@@ -24,7 +24,6 @@ export default function Pagination({
         let divElement = document.getElementById(divId);
         if(pagType === PAG_TYPES[1]){
             function handleScroll(){
-                console.log("EVENTO EJECUTADOOOOOOOOOOOO")
                 const {scrollTop, clientHeight, scrollHeight} = divElement;
                 if(scrollTop + clientHeight === scrollHeight) {
                    // User has reached the bottom of the page
