@@ -54,9 +54,9 @@ export default function StickyBottomIconNavigation() {
                     </Link>
                 </li>
                 <li className="nav-item">
-                    <button type="button" className="btn btn-light w-100 text-start fs-1 px-3">
+                    <Link to="/navigate" type="button" className="btn btn-light w-100 text-start fs-1 px-3">
                         <Compass />
-                    </button>
+                    </Link>
                 </li>
                 <li className="nav-item">
                     <Link to="/createPublication" className="btn btn-light w-100 text-start fs-1 px-3">

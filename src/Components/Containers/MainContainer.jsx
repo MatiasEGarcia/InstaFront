@@ -6,6 +6,7 @@ import UserDetailsMain from "../Mains/UserDetailsMain";
 import CreatePublicationMain from "../Mains/CreatePublicationMain";
 import LeftNavigation from "../Navigation/LeftNavigation";
 import StickyBottomIconNavigation from "../Navigation/StickyBottomIconNavigation";
+import NavigateMain from "../Mains/NavigateMain";
 /**
  * Will hold basic Main display.
  * 
@@ -27,7 +28,10 @@ function MainContainer({ wichMain }) {
             main = <UserDetailsMain />
             break;
         case TYPE_MAIN[3]:
-            main = <CreatePublicationMain/>
+            main = <CreatePublicationMain />
+            break;
+        case TYPE_MAIN[4]:
+            main = <NavigateMain />
             break;
     }
 
@@ -40,9 +44,9 @@ function MainContainer({ wichMain }) {
                 </Link>
             </div>
             <div className="row position-relative">
-                <LeftNavigation/> 
+                <LeftNavigation />
                 {main}
-                <StickyBottomIconNavigation/>
+                <StickyBottomIconNavigation />
             </div>
         </div>
     )

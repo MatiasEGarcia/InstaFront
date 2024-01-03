@@ -2,6 +2,8 @@ import { Exclamation, Trash } from "react-bootstrap-icons";
 import { Link } from "react-router-dom";
 import { useNotification } from "../../hooks/useNotification";
 import UserImageProfile from "../UserImageProfile";
+import { deleteAllPersonalNotifications } from "../../Service/NotificationService";
+import { NOTIFICATION_SEVERITIES } from "../../Util/UtilTexts";
 
 /**
  * Component that returns notifications popover to use in some navigation.
@@ -11,7 +13,10 @@ import UserImageProfile from "../UserImageProfile";
  * @returns {JSX.Element} - notifications popover.
  */
 function NotificationsPopover({ hidePopover, container }) {
-    const { notificationList, deleteNotificationById } = useNotification();
+    const { notificationList,
+        setNotificationList,
+        deleteNotificationById,
+        setNotificationToast } = useNotification();
 
     /**
      * Function to convert notification creation time from utc to local date. 
@@ -30,9 +35,33 @@ function NotificationsPopover({ hidePopover, container }) {
         return localCreatedAt;
     }
 
+    //funciton to delete all personal notifications
+    function deleteAllNotifications() {
+        deleteAllPersonalNotifications().then(data => {
+            setNotificationList([]); //quit all notifications
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[0],
+                msg: data.body.message
+            });
+        }).catch(() => {
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[1],
+                msg: data.message
+            });
+        });
+    }
+
+
     return (
         <div className={`${container} border rounded p-1 gy-2 bg-secondary-subtle`} onMouseLeave={() => hidePopover()}>
-            <div className="text-center"><h4>Notifications</h4></div>
+            <div className="text-center">
+                <h4 >
+                    Notifications
+                </h4>
+                <span>
+                    <Trash className="cursor-pointer-hover" onClick={deleteAllNotifications} size={30} color="red"/>
+                </span>
+            </div>
             <div className="h-80 overflow-auto">
                 <div className="vstack gap-3 mt-3">
                     {notificationList.length === 0

@@ -73,10 +73,10 @@ export default function LeftNavigation() {
                     </Link>
                 </li>
                 <li className="nav-item">
-                    <button type="button" className="btn btn-light w-100 text-start fs-5">
+                    <Link to="/navigate" type="button" className="btn btn-light w-100 text-start fs-5">
                         <Compass size={30} />
                         <span className="ms-2">{NAV_OPTIONS[3]}</span>
-                    </button>
+                    </Link>
                 </li>
                 <li className="nav-item">
                     <Link to="/createPublication" className="btn btn-light w-100 text-start fs-5">

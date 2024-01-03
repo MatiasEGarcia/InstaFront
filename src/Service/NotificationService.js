@@ -46,6 +46,21 @@ export async function deletePersonalNotificationById(notiId){
     data = await fetchApi({
         endpoint: `${NOTIFICATIONS_ENDPOINT}/${notiId}`,
         options
-    })
+    });
+    return data;
+}
+
+export async function deleteAllPersonalNotifications(){
+    let data;
+    const options = {
+        method: 'DELETE',
+        headers: {}
+    }
+    
+    data = await fetchApi({
+        endpoint : NOTIFICATIONS_ENDPOINT,
+        options
+    });
+
     return data;
 }

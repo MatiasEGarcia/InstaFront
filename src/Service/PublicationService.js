@@ -99,6 +99,39 @@ export async function getAllByFollowedUsers({
 }
 
 /**
+ * Function to get publications from users visibles
+ * 
+ * @param {Number} param.pageNo number of the page in pagination.
+ * @param {Number} param.pageSize number of elements for page in pagination.
+ * @param {String} param.sortField field to sort.
+ * @param {String} param.sortDir direction to sort.
+ * @returns {Promise<Object>} data object with the body of the response. 
+ */
+export async function getAllByOwnerVisible({pageNo, pageSize,sortField , sortDir}){
+    let data;
+    const params = new URLSearchParams({
+        page : pageNo || '0',
+        pageSize : pageSize || '20',
+        sortField : sortField || 'publImgId',
+        sortDir : sortDir || DIR_ASC_DIRECTION
+    });
+
+    const options = {
+        method : 'GET',
+        headers : {
+            'Timezone' : 'America/Argentina/Buenos_Aires'
+        }
+    }
+
+    data = await fetchApi({
+        endpoint : `${PUBLICATION_ENDPOINT}/byVisiblesOwners?${params.toString()}`,
+        options
+    });
+    return data;
+
+}
+
+/**
  * Function to get all the publication info by id.
  * @param {String} id publication's id. 
  */

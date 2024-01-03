@@ -74,7 +74,7 @@ function PublicationModal({ setModalState ,id}) {
                             <p>Aca iria un comentario</p>
                         </div>
                         <div className="card-footer h-15 d-flex align-items-center">
-                            <div class="input-group">
+                            <div className="input-group">
                                 <input
                                     type="text"
                                     className="form-control"

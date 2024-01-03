@@ -30,7 +30,7 @@ export const PAG_TYPES = ['navPagination', 'scrollDownPagination','scrollUpPagin
 
 export const CHAT_TYPE = ['PRIVATE', 'GROUP'];
 
-export const TYPE_MAIN = ['home', 'userMainHome', 'userDetailsMain','createPublicationMain'];
+export const TYPE_MAIN = ['home', 'userMainHome', 'userDetailsMain','createPublicationMain', 'navigationMain'];
 
 export const SIGN_IN = 'signIn';
 export const SIGN_UP = 'signUp';
