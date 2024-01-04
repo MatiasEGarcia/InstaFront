@@ -66,7 +66,7 @@ export default function UsersHomeInformation({ userId }) {
             if (userIsFollower === false) { //with this I know what function a need to do to get more follow records
                 findUsersThatWantToFollowYou({ ...pagDetails, authUserId: auth.user.userId }).then(data => {
                     const numberOfElementsAlreadyInModal = followModalContent.length;//to don't keep adding last users when they are already in the modal list.
-                    if (data.body?.list && data.body.pageInfoDto.totalElements > numberOfElementsAlreadyInModal) {
+                    if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInModal) {
                         //I want to have follow records from prev request and new request
                         setFollowModalContent([...followModalContent, ...data.body.list]);
                         setPagDetails({

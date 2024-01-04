@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { House, PencilSquare } from "react-bootstrap-icons";
 import { Link } from 'react-router-dom';
 import { PAG_TYPES } from "../../Util/UtilTexts";
@@ -17,6 +17,7 @@ function ChatContainer() {
     const [newChatModal, setNewChatModal] = useState(false);
     const {chatList, changeChatPage , setChatContent , chatSelected} = useChat();
     const { auth } = useAuth();
+    const refChatListDiv = useRef();
 
     /**
      * Function to open modal to create a new chat.
@@ -51,12 +52,12 @@ function ChatContainer() {
                         </button>
                     </div>
                     <hr />
-                    <div id="chatStack" className="vstack gap-2 h-75 overflow-auto">
+                    <div className="vstack gap-2 h-75 overflow-auto" ref={refChatListDiv}>
                         <Pagination
                             itemsList={chatList}
-                            pageType={PAG_TYPES[1]}
+                            pageType={PAG_TYPES[0]}
                             changePage={changeChatPage}
-                            divId={"chatStack"}
+                            observerRoot = {refChatListDiv.current}
                             mapItem={setChatContent}
                             ComponentToDisplayItem={(props) => <ChatCard {...props} />} />
                     </div>

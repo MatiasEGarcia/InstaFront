@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { XSquare } from "react-bootstrap-icons";
 import { PAG_TYPES } from "../Util/UtilTexts";
 import useUserHomeInfo from "../hooks/useUserHomeInfo";
@@ -17,6 +17,7 @@ export default function FollowModal({
     //popover to show follow status dropdown
     const [showDropdown, setShowDropdown] = useState(''); // should contain the id of the follow
     const {followModalContent} = useUserHomeInfo();
+    const refFollowCardBody = useRef();
 
     /**
      * Function to open the change status dropdown, and close if is already open. 
@@ -41,7 +42,7 @@ export default function FollowModal({
                 <div className="card-header text-center">
                     <h2>List of users</h2>
                 </div>
-                <div id="followModalCardBody" className="card-body overflow-auto">
+                <div className="card-body overflow-auto" ref={refFollowCardBody}>
                     <table className="table">
                         <thead>
                             <tr>
@@ -52,10 +53,10 @@ export default function FollowModal({
                         <tbody>
                             <Pagination 
                                 itemsList = {followModalContent}
-                                pagType = {PAG_TYPES[1]} 
+                                pagType = {PAG_TYPES[0]} 
                                 pagDetails = {pagDetails}
                                 changePage = {changePage}
-                                divId = {"followModalCardBody"}
+                                observerRoot = {refFollowCardBody.current}
                                 ComponentToDisplayItem = {(props) => <FollowTr openAndCloseDropdown={openAndCloseDropdown}
                                     showDropdown={showDropdown} {...props}/>}/>
                         </tbody>

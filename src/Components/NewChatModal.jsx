@@ -1,12 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { XSquare, ArrowLeftSquare } from "react-bootstrap-icons";
-import { CHAT_TYPE, NOTIFICATION_SEVERITIES, LIKE, BACK_HEADERS } from "../Util/UtilTexts";
-import { searchUsersByOneCondition } from "../Service/UserService";
-import { useNotification } from "../hooks/useNotification";
-import NewChatCard from "./NewChatCard";
-import useAuth from "../hooks/useAuth";
+import { useRef, useState } from "react";
+import { ArrowLeftSquare, XSquare } from "react-bootstrap-icons";
 import { create } from "../Service/ChatService";
-import useChat from "../hooks/useChat";
+import { CHAT_TYPE, NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
+import useChat from "../hooks/UseChat";
+import { useNotification } from "../hooks/useNotification";
 import AddUsersOnGroupChat from "./AddUsersOnGroupChat";
 
 

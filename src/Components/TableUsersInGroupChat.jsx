@@ -1,4 +1,4 @@
-import useChat from "../hooks/useChat";
+import useChat from "../hooks/UseChat";
 import { Link } from "react-router-dom";
 import UserImageProfile from "./UserImageProfile";
 import { Star, Trash, ArrowDownCircle } from "react-bootstrap-icons";

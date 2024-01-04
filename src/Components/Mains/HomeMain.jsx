@@ -41,7 +41,7 @@ function HomeMain() {
         if (pagDetailsFlag) {
             getAllByFollowedUsers({ ...pagDetails }).then(data => {
                 const numberOfElementsAlreadyInList = listPublications.length;
-                if (data.body?.list && data.body.pageInfoDto.totalElements > numberOfElementsAlreadyInList) {
+                if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
                     setListPublications([...listPublications, ...data.body.list]);
                     setPagDetails({
                         ...pagDetails,
@@ -82,16 +82,15 @@ function HomeMain() {
         <main className="col-12 col-md-8 col-xl-10">
             <div className="row">
                 <div id="publicationsColumn" className="col-12 col-lg-8 d-flex w-100
-                                mt-3 pb-5 vh-75 vh-md-95 overflow-auto">
+                                mt-3 pb-5 vh-75 vh-md-95">
                     <div className="d-flex flex-column align-items-center gap-5 w-100 w-lg-80">
                         {loading ?
                             <Loading spaceToTake={LOADING_OPTIONS[1]} />
                             : <Pagination
                                 itemsList={listPublications}
-                                pagType={PAG_TYPES[1]}
+                                pagType={PAG_TYPES[0]}
                                 pagDetails={pagDetails}
                                 changePage={changePage}
-                                divId={"publicationsColumn"}
                                 ComponentToDisplayItem={(props) => <PublicationCard showModal={selectPublication}
                                     width="w-75 w-sm-75 w-xl-50" {...props} />}
                             />}

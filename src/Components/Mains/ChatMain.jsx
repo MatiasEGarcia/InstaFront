@@ -11,7 +11,7 @@ import ChatMessage from "../ChatMessage";
 import Modal from "../Modal";
 import Pagination from "../Pagination";
 import UserImageProfile from "../UserImageProfile";
-
+//SE REPITEN LOS MENSAJESSSSSSSSSSSSSSSSS
 const basePagDetail = {
     pageNo: 0,
     pageSize: 20,
@@ -33,13 +33,17 @@ export default function ChatMain({ delChatFromChatList }) {
     const [messagesList, setMessagesList] = useState([]);
     const [pagDetails, setPagDetails] = useState(basePagDetail);
     const [pagDetailsFlag, setPagDetailsFlag] = useState(false);
-    const [userScrollHeight, setUserScrollHeight] = useState();
     const { setNotificationToast } = useNotification();
     const { chatSelected, updateChat,updChatUserWNewMessage } = useChat();
     const { newMessage } = useWebSocket();
     const newMessageRef = useRef();
     const messageBottomDivOverflow = useRef();
-    const messagesContentRef = useRef();
+    const refMessagesContent = useRef();
+
+    useEffect(() => {
+        //set scroll at the bottom
+        messageBottomDivOverflow.current?.scrollIntoView({ behavior: "smooth" });
+    },[]);
 
     /**
      * search chat's last messages.
@@ -93,15 +97,13 @@ export default function ChatMain({ delChatFromChatList }) {
     useEffect(() => {
         if (pagDetailsFlag) {
             getAllByChat({ chatId: chatSelected.chatId, ...pagDetails }).then((data) => {
-                if (data.body?.list && data.body.pageInfoDto.totalElements > messagesList.length) {
+                if (data.body?.list && data.body.pageInfoDto.totalElements >= messagesList.length) {
                     const reverseList = data.body.list.reverse();
                     setMessagesList((prevMessageList) => [...reverseList, ...prevMessageList]);
                     setPagDetails({
                         ...pagDetails,
                         ...data.body.pageInfoDto
                     });
-                    setUserScrollHeight(messagesContentRef.current.clientHeight);
-
                 } else if (data.headers) {
                     console.info(data.headers.get(BACK_HEADERS[0]));
                 }
@@ -132,9 +134,7 @@ export default function ChatMain({ delChatFromChatList }) {
     useEffect(() => {
         if (pagDetails.pageNo === 0 || pagDetailsFlag) {
             messageBottomDivOverflow.current?.scrollIntoView({ behavior: "smooth" });
-        } else {
-            messagesContentRef.current.scrollTop = userScrollHeight;
-        }
+        } 
     }, [messagesList]);
 
 
@@ -208,7 +208,7 @@ export default function ChatMain({ delChatFromChatList }) {
                         {chatSelected.type === CHAT_TYPE[1] && <InfoCircle className="align-self-center" size={35} onClick={openGroupInfoModal} />}
                     </button>
                 </div>
-                <div id="messagesContent" className="card-body overflow-auto" ref={messagesContentRef}>
+                <div className="card-body overflow-auto" ref={refMessagesContent}>
                     {!messagesList &&
                         <div>
                             <p className="m-0">No messages yet</p>
@@ -217,10 +217,10 @@ export default function ChatMain({ delChatFromChatList }) {
                     {messagesList &&
                         <Pagination
                             itemsList={messagesList}
-                            pagType={PAG_TYPES[2]}
+                            pagType={PAG_TYPES[1]}
                             pagDetails={pagDetails}
                             changePage={changeMessagePage}
-                            divId={"messagesContent"}
+                            observerRoot = {refMessagesContent.current}
                             ComponentToDisplayItem={(props) => <ChatMessage {...props} />}
                         />
                     }

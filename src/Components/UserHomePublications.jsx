@@ -18,7 +18,7 @@ const contentModalPublication = {
 
 const basePagDetails = {
     pageNo: 0,//first page is 0
-    pageSize: 2,
+    pageSize: 5,
     totalPages: undefined,
     totalElements: undefined,
     sortField: undefined,
@@ -27,9 +27,9 @@ const basePagDetails = {
 
 export default function UsersHomePublications({ userOwnerId }) {
     const [publicationModalState, setPublicationModalState] = useState(false);//used by Modal component to know if should show the modal or not
-    const [publicationSelectedId , setPublicationSelectedId] = useState();
+    const [publicationSelectedId, setPublicationSelectedId] = useState();
     const [userPublications, setUserPublications] = useState([]);
-    const [pagDetailsFlag, setPagDetailsFlag] = useState(false);//??, is for the useEffect that is listening pagDetails, becuase changes pagDetails content too, and with this I avoid a loop.
+    const [pagDetailsFlag, setPagDetailsFlag] = useState(true);
     const [pagDetails, setPagDetails] = useState(basePagDetails);
     const [loading, setLoading] = useState(false);
     const { setNotificationToast } = useNotification();
@@ -60,48 +60,18 @@ export default function UsersHomePublications({ userOwnerId }) {
     * useEffect to load all the current user Publications at the beggining.
     */
     useEffect(() => {
-        setLoading(true);
-        getAllByAuthUser({ ...pagDetails, ownerId: userOwnerId }).then((data) => {
-            if (data.body?.list) {
-                setUserPublications(data.body.list);
-                setPagDetails({
-                    ...pagDetails,
-                    ...data.body.pageInfoDto,
-                })
-            } else if (data.headers) {
-                setNotificationToast({
-                    sev: NOTIFICATION_SEVERITIES[2],
-                    msg: data.headers.get(BACK_HEADERS[0])
-                });
-            }
-        }).catch((error) => {
-            setNotificationToast({
-                sev: NOTIFICATION_SEVERITIES[1],
-                msg: error.message
-            });
-        }).finally(() => {
-            setLoading(false);
-        });
-    }, []);
-
-    /**
-    * useEffect to search user publications when there is a change in pagDetails content.
-    */
-    useEffect(() => {
         if (pagDetailsFlag) {
             setLoading(true);
+            const numberOfElementsAlreadyInList = userPublications.length;
             getAllByAuthUser({ ...pagDetails, ownerId: userOwnerId }).then((data) => {
-                if (data.body?.list) {
-                    setUserPublications(data.body.list);
+                if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
+                    setUserPublications([...userPublications, ...data.body.list]);
                     setPagDetails({
                         ...pagDetails,
                         ...data.body.pageInfoDto,
                     })
                 } else if (data.headers) {
-                    setNotificationToast({
-                        sev: NOTIFICATION_SEVERITIES[2],
-                        msg: data.headers.get(BACK_HEADERS[0])
-                    });
+                    console.info(data.headers.get(BACK_HEADERS[0]));
                 }
             }).catch((error) => {
                 setNotificationToast({
@@ -114,6 +84,7 @@ export default function UsersHomePublications({ userOwnerId }) {
             });
         }
     }, [pagDetails]);
+
 
     /**
      * useEffect to change user when userId(from useParams) changes
@@ -147,17 +118,14 @@ export default function UsersHomePublications({ userOwnerId }) {
 
     return (
         <div className="row p-3 border d-flex justify-content-center gap-5">
-            {loading
-                ? <Loading spaceToTake={LOADING_OPTIONS[1]} />
-                : <Pagination
+            <Pagination
                     itemsList={userPublications}
-                    pagType={PAG_TYPES[0]} //nav pagination
+                    pagType={PAG_TYPES[0]} 
                     changePage={changePage}
                     pagDetails={pagDetails}
                     ComponentToDisplayItem={(props) => <PublicationCard showModal={showModal}
                         width="w-80 w-sm-75 w-xl-30" {...props} />}
                 />
-            }
             <Modal modalState={publicationModalState} setModalState={setPublicationModalState}>
                 <PublicationModal setModalState={setPublicationModalState} id={publicationSelectedId} />
             </Modal>

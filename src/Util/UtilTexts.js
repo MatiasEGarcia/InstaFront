@@ -26,7 +26,7 @@ export const NOTIFICATION_TYPE=['FOLLOW','MESSAGE','LIKE','COMMENT','PUBLICATION
 export const APP_TITLE = 'FrontReact';
 export const NAV_OPTIONS = ['Search','Notifications', 'Chats', 'Navigate', 'Create' , 'Settings'];
 
-export const PAG_TYPES = ['navPagination', 'scrollDownPagination','scrollUpPagination'];
+export const PAG_TYPES = ['scrollDownPagination', 'scrollUpPagination'];
 
 export const CHAT_TYPE = ['PRIVATE', 'GROUP'];
 

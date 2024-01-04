@@ -1,4 +1,4 @@
-import { Component, useEffect } from "react";
+import { Component, useEffect, useRef, useState } from "react";
 import { PAG_TYPES } from "../Util/UtilTexts";
 
 /**
@@ -8,80 +8,77 @@ import { PAG_TYPES } from "../Util/UtilTexts";
  * @param {Function} param.changePage funciton to change the current page.
  * @param {Object} param.pagDetails object with all the paginations details, like number of the page, sortField, etc.
  * @param {Component} param.ComponentToDisplayItem component that will be used to show a item from the itemList.
- * @param {String} param.divId in the case of a scrollDownPagination, we need this to know when to change the page
- * @param {Function} function param.mapItem that will consume the elements of the itemsList and change it. It is for the case in which 
+ * @param {Function} param.mapItem that will consume the elements of the itemsList and change it. It is for the case in which 
  * you want to make a change to the element that is iterated before displaying it.
+ * @param {Element} param.observerRoot should be a reference to the element which will work as root.
+ * 
  */
 export default function Pagination({
-    itemsList, pagType, changePage, pagDetails, ComponentToDisplayItem,
-    divId , mapItem
+    itemsList, 
+    pagType, 
+    changePage, 
+    pagDetails, 
+    ComponentToDisplayItem, 
+    mapItem , 
+    observerRoot
 }){
+    const [divVisible, setDivVisible] = useState();
+    const [scrollUpFirstPageChange, setScrollUpFirstPageChange] = useState(true);//means that is the first time that the page change in scroll up.
+    const refBottom = useRef();
+    const refTop = useRef();
+
+
     /**
      * Use effect only for scroll down/up pagination. 
      * Change the current page if the user reach bottom of the selected div.
      */
     useEffect(() => {
-        let divElement = document.getElementById(divId);
-        if(pagType === PAG_TYPES[1]){
-            function handleScroll(){
-                const {scrollTop, clientHeight, scrollHeight} = divElement;
-                if(scrollTop + clientHeight === scrollHeight) {
-                   // User has reached the bottom of the page
-                   changePage(pagDetails.pageNo + 1);//next page.
-                }
+        let observer;
+        if(pagType === PAG_TYPES[0]){ //scroll down---cambiar el numero en cuanto pueda
+            observer = new IntersectionObserver(entries => {
+                const entry = entries[0];
+                setDivVisible(entry.isIntersecting)
+            },{
+                threshold : 1,
+                root: observerRoot || null
+            });
+            observer.observe(refBottom.current);
+        }else if(pagType === PAG_TYPES[1]){//scroll up  //scroll down---cambiar el numero en cuanto pueda
+            observer = new IntersectionObserver(entries => {
+                const entry = entries[0];
+                setDivVisible(entry.isIntersecting)
+            },{
+                threshold : 1,
+                root: observerRoot || null
+            });
+            observer.observe(refTop.current);
+        }
+
+        return function cleanUp(){
+            if(observer){
+                observer.disconnect();
             }
-            divElement.addEventListener('scroll', handleScroll);
-            return() => {
-                divElement.removeEventListener('scroll', handleScroll);
-            };
-        }else if(pagType === PAG_TYPES[2]){
-            function handleScroll(){
-                const {scrollTop}= divElement;
-                if(scrollTop === 0) {
-                   // User has reached the top of the page
-                   changePage(pagDetails.pageNo + 1);//next page.
-                }
-            }
-            divElement.addEventListener('scroll', handleScroll);
-            return() => {
-                divElement.removeEventListener('scroll', handleScroll);
-            };
         }
     },[]);
 
-    /**
-     * 
-     * @returns an array of li elments to use in the nav pagination type, will have the total pages of the pagination.
-     */
-    function navLiPageElements() {
-        const liPages = [];
-        //I just want 5 prevPageOptions plus the current page, if not, just the possibles
-        for (let i = 0, pageNoFor = pagDetails.pageNo; i < 5 && pageNoFor >= 0; i++, pageNoFor--) {
-            liPages.unshift(
-                <li className={`page-item ${pageNoFor === pagDetails.pageNo ? 'active disabled' : ''}`} key={pageNoFor}
-                    onClick={() => changePage(pageNoFor)} >
-                    <a className="page-link" href="#">
-                        {pageNoFor + 1} {/*+ 1 because backend return first page as 0, but the user need to see 1 as first */}
-                    </a>
-                </li>
-            );
-        }
 
-        //I just want 5 proxPageOptions without the current page ,that's why pageNo+1, the current page is showed in the prev for
-        for (let i = 0, pageNoFor = pagDetails.pageNo + 1; i < 5 && pageNoFor < pagDetails.totalPages; i++, pageNoFor++) {
-            liPages.push(
-                <li className="page-item" key={pageNoFor} onClick={() => changePage(pageNoFor)} >
-                    <a className="page-link" href="#">
-                        {pageNoFor + 1}
-                    </a>
-                </li>
-            );
+    /**
+     * CHange page if divVisible is true
+     */
+    useEffect(() => {
+        if(divVisible){
+            if(pagType === PAG_TYPES[4] && scrollUpFirstPageChange) {
+                setScrollUpFirstPageChange(false);
+                return;
+            }
+            //we call next page
+            changePage(pagDetails.pageNo + 1);
         }
-        return liPages;
-    };
+    },[divVisible]);
 
     return(
         <>
+            {pagType === PAG_TYPES[1] && <div ref={refTop} className="invisible">The Top</div>}
             {itemsList.length === 0
                 ? <h2 className="text-center">-</h2>
                 : itemsList.map((item,index) => {
@@ -94,24 +91,7 @@ export default function Pagination({
                     )
                 })
             }
-            {/*navPagination navigation*/}
-            {pagType === PAG_TYPES[0] && pagDetails.totalPages && pagDetails.totalPages > 1 &&  
-                <nav aria-label="Page navigation">
-                    <ul className="pagination justify-content-center mt-2">
-                        <li className={`${pagDetails.pageNo === 0 ? 'page-item disabled' : 'page-item'}`}>
-                            <button className="page-link" aria-label="Previous" onClick={() => changePage(pagDetails.pageNo - 1)} >
-                                <span aria-hidden="true">&laquo;</span>
-                            </button>
-                        </li>
-                        {navLiPageElements()}
-                        <li className={`${pagDetails.pageNo === pagDetails.totalPages ? 'page-item disabled' : 'page-item'}`}>
-                            <button className="page-link" aria-label="Next" onClick={() => changePage(pagDetails.pageNo + 1)} >
-                                <span aria-hidden="true">&raquo;</span>
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-            }
+            {pagType === PAG_TYPES[0] && <div ref={refBottom} className="invisible">The bottom</div>}
         </>
     )
 }

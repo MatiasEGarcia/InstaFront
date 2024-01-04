@@ -24,13 +24,13 @@ export default function NavigateMain() {
     const [listPublications, setListPublications] = useState([]);
     const [pagDetails, setPagDetails] = useState(basePagDetail);
     const [pagDetailsFlag, setPagDetailsFlag] = useState(true);
-    const {setNotificationToast} = useNotification();
-
+    const { setNotificationToast } = useNotification();
+    
     useEffect(() => {
-        if(pagDetailsFlag){
-            getAllByOwnerVisible({...pagDetails}).then(data => {
+        if (pagDetailsFlag) {
+            getAllByOwnerVisible({ ...pagDetails }).then(data => {
                 const numberOfElementsAlreadyInList = listPublications.length;
-                if(data.body?.list && data.body.pageInfoDto.totalElements > numberOfElementsAlreadyInList){
+                if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
                     setListPublications([...listPublications, ...data.body.list]);
                     setPagDetails({
                         ...pagDetails,
@@ -47,12 +47,12 @@ export default function NavigateMain() {
                 loading && setLoading(false);
             });
         }
-    },[pagDetails]);
+    }, [pagDetails]);
 
-    function changePage(newPageNo){
+    function changePage(newPageNo) {
         setPagDetails({
             ...pagDetails,
-            pageNo : newPageNo
+            pageNo: newPageNo
         });
         setPagDetailsFlag(true);
     }
@@ -67,20 +67,19 @@ export default function NavigateMain() {
 
     return (
         <main className="col-8 col-md-9 mt-3 ">
-            <div id = 'publicationsRow' className="row mx-auto row-gap-4 ">
+            <div className="row mx-auto row-gap-4">
                 {loading ?
-                    <Loading spaceToTake = {LOADING_OPTIONS[1]}/>
-                    : 
-                    <Pagination//no es lanzada la peticion al llegar al fondo
+                    <Loading spaceToTake={LOADING_OPTIONS[1]} />
+                    :
+                    <Pagination
                         itemsList={listPublications}
-                        pagType={PAG_TYPES[1]}
-                        pagDetails = {pagDetails}
-                        changePage = {changePage}
-                        divId = {'publicationsRow'}
+                        pagType={PAG_TYPES[0]}
+                        pagDetails={pagDetails}
+                        changePage={changePage}
                         ComponentToDisplayItem = {props => <NavigateCard selectPublication = {selectPublication} 
                         {...props}/>}
                     />
-            }
+                }
             </div>
             <Modal modalState={modal} setModalState={setModal}>
                 <PublicationModal setModalState={setModal} id={publicationSelectedId} />

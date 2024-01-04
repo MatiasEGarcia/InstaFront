@@ -1,14 +1,12 @@
-import { Link } from "react-router-dom";
-import UserImageProfile from "./UserImageProfile";
-import { PencilSquare, Star, Trash, XSquare, PencilFill, ArrowLeft, CheckSquare ,ArrowLeftSquare} from "react-bootstrap-icons";
-import useAuth from "../hooks/useAuth";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { ArrowLeft, ArrowLeftSquare, CheckSquare, PencilSquare, XSquare } from "react-bootstrap-icons";
 import { addUsers, setChatGroupImage, setChatGroupName } from "../Service/ChatService";
-import useChat from "../hooks/useChat";
-import { useNotification } from "../hooks/useNotification";
 import { NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
-import TableUsersInGroupChat from "./TableUsersInGroupChat";
+import useChat from "../hooks/UseChat";
+import { useNotification } from "../hooks/useNotification";
 import AddUsersOnGroupChat from "./AddUsersOnGroupChat";
+import TableUsersInGroupChat from "./TableUsersInGroupChat";
+import UserImageProfile from "./UserImageProfile";
 
 /**
  * Modal to see chat type group info. like users, name, etc.
