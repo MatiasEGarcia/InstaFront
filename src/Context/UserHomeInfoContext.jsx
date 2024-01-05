@@ -1,6 +1,7 @@
 import { createContext, useState } from "react";
-import { FOLLOWED_STATUS } from "../Util/UtilTexts";
-import { updateFollowStatus } from "../Service/FollowService";
+import { FOLLOWED_STATUS, NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
+import { updateFollowStatusByFollowId } from "../Service/FollowService";
+import { useNotification } from "../hooks/useNotification";
 
 const UserHomeInfoConext = createContext();
 
@@ -8,6 +9,7 @@ export function UserHomeInfoProvider({children}){
     const [userVisited, setUserVisited] = useState({});//user owner of userHomeInformation page
     const [userIsFollower, setUserIsFollower] = useState(); // used in followTr as flag to know if I should show follow's follower or followed user.
     const [followModalContent, setFollowModalContent] = useState([]);//list of follows
+    const {setNotificationToast} = useNotification();
 
 
     /**
@@ -17,7 +19,7 @@ export function UserHomeInfoProvider({children}){
      * @param {String} followId follow's id( to know which follow record update).
      */
     function handlerFollowStatusUpdate({newFollowStatus, followId}){
-        updateFollowStatus({newFollowStatus, followId}).then(data => {
+        updateFollowStatusByFollowId({newFollowStatus, followId}).then(data => {
             const newFollowModalList = followModalContent.map((follow) => {
                 if(follow.followId === data.body.followId){
                     follow.followStatus = data.body.followStatus;
@@ -46,6 +48,8 @@ export function UserHomeInfoProvider({children}){
         });
     }
 
+    
+
     return (
         <UserHomeInfoConext.Provider value={{
             userVisited,
@@ -54,7 +58,7 @@ export function UserHomeInfoProvider({children}){
             setUserIsFollower,
             handlerFollowStatusUpdate,
             followModalContent,
-            setFollowModalContent
+            setFollowModalContent,
         }}>
             {children}
         </UserHomeInfoConext.Provider>

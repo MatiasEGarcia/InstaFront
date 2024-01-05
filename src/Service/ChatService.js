@@ -14,10 +14,6 @@ export async function getChats({
     pageNo, pageSize
 }){
     let data;
-    const params = new URLSearchParams({
-        page: pageNo || '0',
-        pageSize: pageSize || '20',
-    })
     const options = {
         method: 'GET',
         headers: {},

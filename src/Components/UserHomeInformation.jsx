@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { findUsersThatWantToFollowYou, usersYouWantFollowButIsNotAllowedYet } from "../Service/FollowService";
+import { findUsersThatWantToFollowYou, usersYouWantFollowButIsNotAllowedYet, updateFollowStatusByFollowerId } from "../Service/FollowService";
 import { getGeneralUserInfo } from "../Service/UserService";
 import { BACK_HEADERS, FOLLOWED_LABEL, FOLLOWED_STATUS, FOLLOWERS_LABEL, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PUBLICATIONS_LABEL } from "../Util/UtilTexts";
 import useAuth from "../hooks/useAuth";
@@ -33,9 +33,9 @@ export default function UsersHomeInformation({ userId }) {
     const [pagDetails, setPagDetails] = useState(basePagDetail);
     const [pagDetailsFlag, setPagDetailsFlag] = useState(false);//??, is for the useEffect that is listening pagDetails, because changes pagDetails content too, and with this I avoid a loop. I will only put on true when the client wants to change the page.
     const [loading, setLoading] = useState(false);
-    const {userVisited, setUserVisited,
-           followModalContent, setFollowModalContent,
-           userIsFollower,setUserIsFollower} = useUserHomeInfo();
+    const { userVisited, setUserVisited,
+        followModalContent, setFollowModalContent,
+        userIsFollower, setUserIsFollower } = useUserHomeInfo();
     const { auth } = useAuth();
     const navigate = useNavigate();
     const { setNotificationToast } = useNotification();
@@ -199,6 +199,30 @@ export default function UsersHomeInformation({ userId }) {
         });
     }
 
+    /**
+     * Will handle follow status between authenticated user and the user owner of the page, 
+     * where the authenticated user is the followed user.
+     * @param {FOLLOWED_STATUS} newFollowStatus - new followStatus.
+     * @param {String} followerId - follower's id.
+     */
+    function updateFollowFollowStatusByFollower({ newFollowStatus, followerId }) {
+        updateFollowStatusByFollowerId({ newFollowStatus, followerId }).then(data => {
+            setUserVisited({
+                ...userVisited,
+                social : {
+                    ...userVisited.social,
+                    followedFollowStatus : data.body.followStatus
+                }
+            });
+        }).catch(error => {
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[1],
+                msg: error.message
+            })
+        });
+    }
+
+
     if (loading) {
         return (
             <div className="row p-3">
@@ -220,15 +244,31 @@ export default function UsersHomeInformation({ userId }) {
                     <h3>{userVisited.user?.username}</h3>
                     {auth.user.userId !== userId &&   //if auth user is the same as the one in the page I will not show this
                         <div className="ms-3 d-flex  gap-2">
-                            {userVisited.social?.followStatus === FOLLOWED_STATUS[0] &&
+                            {/**Follow status where authenticated user is the follower */}
+                            {userVisited.social?.followerFollowStatus === FOLLOWED_STATUS[0] &&
                                 <button className="btn btn-light" onClick={unfollowHandler}>Unfollow</button>}
-                            {userVisited.social?.followStatus === FOLLOWED_STATUS[1] &&
+                            {userVisited.social?.followerFollowStatus === FOLLOWED_STATUS[1] &&
                                 <span className="btn btn-light">Follow request was rejected</span>}
-                            {userVisited.social?.followStatus === FOLLOWED_STATUS[2] &&
+                            {userVisited.social?.followerFollowStatus === FOLLOWED_STATUS[2] &&
                                 <span className="btn btn-light">Follow request in proccess</span>}
-                            {userVisited.social?.followStatus === FOLLOWED_STATUS[3] &&
+                            {userVisited.social?.followerFollowStatus === FOLLOWED_STATUS[3] &&
                                 <button className="btn btn-light" onClick={followHanlder}>Follow</button>}
-                            <button className="btn btn-light">Send a message</button>
+
+                            {/**Follow status where authenticated user is the followed */}
+                            {userVisited.social?.followedFollowStatus === FOLLOWED_STATUS[0] &&
+                                <button className="btn btn-light"
+                                    onClick={() => updateFollowFollowStatusByFollower({ newFollowStatus: FOLLOWED_STATUS[1], followerId: userId })}>
+                                    Cancel follow permision
+                                </button>}
+                            {userVisited.social?.followedFollowStatus === FOLLOWED_STATUS[1] ||
+                                userVisited.social?.followedFollowStatus === FOLLOWED_STATUS[2]
+                                ? <button className="btn btn-light"
+                                    onClick={() => updateFollowFollowStatusByFollower({ newFollowStatus: FOLLOWED_STATUS[0], followerId: userId })}>
+                                    Allow to follow you
+                                </button>
+                                : ''
+                            }
+
                         </div>
                     }
                     {auth.user.userId === userId &&

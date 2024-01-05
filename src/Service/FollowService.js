@@ -51,7 +51,7 @@ export async function unFollow(followedId){
  * @param {String} prop.followId  id of follow record
  * @returns {Promise<Object>} data object with the body of the response.
  */
-export async function updateFollowStatus({newFollowStatus, followId}){
+export async function updateFollowStatusByFollowId({newFollowStatus, followId}){
     let data;
     const options = {
         method : 'PUT',
@@ -67,6 +67,32 @@ export async function updateFollowStatus({newFollowStatus, followId}){
     });
     return data;
 }
+
+/**
+ * Async function to update Follow's followStatus by followerId.
+ * 
+ * @param {String} param.newFollowStatus - new follow status.
+ * @param {String} param.followerId - follower's id. 
+ * @returns {Promise<Object>} data object with the body of the response.
+ */
+export async function updateFollowStatusByFollowerId({newFollowStatus, followerId}){
+    let data;
+    const options = {
+        method : 'PUT',
+        headers:{}
+    }
+    const params = new URLSearchParams({
+        followStatus : newFollowStatus,
+        followerId
+    })
+
+    data = await fetchApi({
+        endpoint : `${FOLLOW_ENDPOINT}/updateFollowStatus/byFollowerId?${params.toString()}`,
+        options
+    });
+    return data;
+}
+
 
 
 /**
