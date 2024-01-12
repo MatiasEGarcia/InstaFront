@@ -54,3 +54,7 @@ export const GLOBAL_OPERATORS = ['AND', 'OR', 'NONE']
 //HEADERS FROM BACKEND
 export const BACK_HEADERS = ['exception-detail'];
 export const SCROLL_POSITIONS = ['start' , 'center', 'end'];
+
+//ERROR
+export const REQUIRED_PARAM = 'Some required param was not given.'
+

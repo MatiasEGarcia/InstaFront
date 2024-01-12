@@ -8,6 +8,8 @@ import { NOTIFICATION_SEVERITIES, LOADING_OPTIONS } from "../Util/UtilTexts";
 import { getAllByAuthUser } from "../Service/PublicationService";
 import PublicationModal from "./PublicationModal";
 import Modal from "./Modal";
+import { PublicationModalProvider } from "../Context/PublicationModalContext";
+import { useParams } from "react-router-dom";
 
 //cuando me comunique con el server esto lo borro
 const contentModalPublication = {
@@ -33,6 +35,15 @@ export default function UsersHomePublications({ userOwnerId }) {
     const [pagDetails, setPagDetails] = useState(basePagDetails);
     const [loading, setLoading] = useState(false);
     const { setNotificationToast } = useNotification();
+    const {publicationId} = useParams();
+
+    useEffect(() => {
+        if(publicationId){
+            setPublicationSelectedId(publicationId);
+            setPublicationModalState(true);
+        }
+    },[userOwnerId])
+
 
     /**
      * Function to change current page in the pagination.
@@ -119,15 +130,17 @@ export default function UsersHomePublications({ userOwnerId }) {
     return (
         <div className="row p-3 border d-flex justify-content-center gap-5">
             <Pagination
-                    itemsList={userPublications}
-                    pagType={PAG_TYPES[0]} 
-                    changePage={changePage}
-                    pagDetails={pagDetails}
-                    ComponentToDisplayItem={(props) => <PublicationCard showModal={showModal}
-                        width="w-80 w-sm-75 w-xl-30" {...props} />}
-                />
+                itemsList={userPublications}
+                pagType={PAG_TYPES[0]}
+                changePage={changePage}
+                pagDetails={pagDetails}
+                ComponentToDisplayItem={(props) => <PublicationCard showModal={showModal}
+                    width="w-80 w-sm-75 w-xl-30" {...props} />}
+            />
             <Modal modalState={publicationModalState} setModalState={setPublicationModalState}>
-                <PublicationModal setModalState={setPublicationModalState} id={publicationSelectedId} />
+                <PublicationModalProvider>
+                    <PublicationModal setModalState={setPublicationModalState} id={publicationSelectedId} />
+                </PublicationModalProvider>
             </Modal>
         </div>
     )

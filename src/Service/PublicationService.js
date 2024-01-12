@@ -134,9 +134,20 @@ export async function getAllByOwnerVisible({pageNo, pageSize,sortField , sortDir
 /**
  * Function to get all the publication info by id.
  * @param {String} id publication's id. 
+ * @param {Number} param.pageNo number of the page in comment pagination.
+ * @param {Number} param.pageSize number of elements for page in comment pagination.
+ * @param {String} param.sortField field to sort in comment pagination.
+ * @param {String} param.sortDir direction to sort in comment pagination.
  */
-export async function getById(id){
+export async function getById({id,pageNo, pageSize,sortField , sortDir}){
     let data;
+    const params = new URLSearchParams({
+        page : pageNo || '0',
+        pageSize : pageSize || '20',
+        sortField : sortField || 'publImgId',
+        sortDir : sortDir || DIR_ASC_DIRECTION
+    })
+
 
     const options = {
         method : 'GET',
@@ -146,7 +157,7 @@ export async function getById(id){
     }
 
     data = await fetchApi({
-        endpoint : `${PUBLICATION_ENDPOINT}/${id}`,
+        endpoint : `${PUBLICATION_ENDPOINT}/${id}?${params.toString()}`,
         options
     });
     return data;

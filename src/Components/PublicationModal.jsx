@@ -1,10 +1,23 @@
+import { useRef, useState, useEffect } from "react";
+import { LOADING_OPTIONS, DIR_DESC_DIRECTION, PAG_TYPES, NOTIFICATION_SEVERITIES, BACK_HEADERS  } from "../Util/UtilTexts";
+import { useNotification } from "../hooks/useNotification";
 import { getById } from "../Service/PublicationService";
-import UserImageProfile from "./UserImageProfile";
-import { useEffect, useState } from "react";
+import { getByPublcationId, save, deleteById, updateById} from "../Service/CommentService";
 import Loading from "./Loading";
-import { LOADING_OPTIONS } from "../Util/UtilTexts";
 import { Link } from "react-router-dom";
+import UserImageProfile from "./UserImageProfile";
+import Pagination from "./Pagination";
+import CardComment from "./CardComment";
 
+
+const commentBasePagDetails = {
+    pageNo: 0,
+    pageSize: 20,
+    totalPages: undefined,
+    totalElements: undefined,
+    sortField: 'createdAt',
+    sortDir: DIR_DESC_DIRECTION
+}
 
 /**
  * Component that have the content that will be display when we want to see the publication info in a modal.
@@ -12,16 +25,28 @@ import { Link } from "react-router-dom";
  * @param {Function} setModalState - function to close currently modal. 
  * @param {Object} publication - object with publication info to be display in modal.  
  * @param {String} id - publication id, to search it.
+ * @returns {JSX.Element} modal where show publication info with comments.
  */
-function PublicationModal({ setModalState ,id}) {
+export default function PublicationModal({ setModalState, id }) {
     const [publication, setPublication] = useState({});
     const [loading, setLoading] = useState(true);
+    const [rootComments, setRootComments] = useState([]);
+    const [commentsPagDetailsFlag, setCommentsPagDetiailsFlag] = useState(true);
+    const [commentsPagDetails, setCommentsPagDetails] = useState(commentBasePagDetails);
+    const { setNotificationToast } = useNotification();
+    const refNewComment = useRef();
 
-    //to search all the data from a publication and then show it on publication modal.
+    /**
+     * to search all the data from a publication and then show it on publication modal.
+     * And set base pagination details for comments.
+     */
     useEffect(() => {
         setLoading(true);
-        getById(id).then(data => {
-            setPublication(data.body);
+        getById({ id, ...commentBasePagDetails }).then(data => {
+            setPublication(data.body); //en el backend tengo que editar esto
+            setRootComments(data.body.rootComments.list);
+            setCommentsPagDetiailsFlag(false)
+            setCommentsPagDetails(data.body.rootComments.pageInfoDto);
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -31,14 +56,128 @@ function PublicationModal({ setModalState ,id}) {
         }).finally(() => {
             setLoading(false);
         });
-    },[]);
+    }, []);
+
+    /**
+    * To get more comments
+    */
+    useEffect(() => {
+        if (commentsPagDetailsFlag) {
+            const numberOfElementsAlreadyInList = rootComments.lenght;
+            getByPublcationId({ publicationId: id, ...commentsPagDetails }).then(data => {
+                if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
+                    setRootComments(prev => [...prev, data.body.list]);
+                    setCommentsPagDetails({
+                        ...pagDetails,
+                        ...data.body.pageInfoDto,
+                    })
+                    setCommentsPagDetails(false);
+                } else if (data.headers) {
+                    console.log(data.headers.get(BACK_HEADERS[0]));
+                }
+            }).catch(error => {
+                setNotificationToast({
+                    sev: NOTIFICATION_SEVERITIES[1],
+                    msg: error.message
+                });
+            });
+        }
+    }, [commentsPagDetails]);
+
+    /**
+     * To change page in pagination.
+     * @param {String} newPageNo - new page number 
+     */
+    function changePage(newPageNo) {
+        setCommentsPagDetails({
+            ...commentsPagDetails,
+            pageNo: newPageNo
+        });
+        setCommentsPagDetiailsFlag(true);
+    }
+
+    /**
+     * To save root comments.
+     * 
+     * @param {Stirng} param.body comment's content.
+     * @param {String} param.publImgId publication's id.
+     */
+    function saveRootComment({ body, publImgId }) {
+        save({
+            body,
+            publImgId
+        }).then(data => {
+            //adding new comemnt
+           setRootComments(prev => [data.body , ...prev]);
+        }).catch(error => {
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[1],
+                msg: error.message
+            })
+        });
+    }
+
+    /**
+     * Update a comment by id.
+     * @param {String} param.commentId comment's id.
+     * @param {String} param.body comment new content.
+     * @param {String} param.isRootComment  to know if comment is root or not, if is root true, if not false.
+     */
+    function updateRootCommentBodyById({commentId, body}){
+        updateById({commentId,body}).then(data => {
+            updateRootCommentOnArray(data.body);
+        }).catch(error => {
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[1],
+                msg: error.message
+            })
+        });
+    };
+
+    /**
+     * To delete a root comment from the publication's comments.
+     * @param {String} commentId - comment's id.
+     */
+    function deleteRootCommentById(commentId){
+        deleteById(commentId).then(data => {
+            quitRootCommentFromArray(commentId);
+        }).catch(error => {
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[1],
+                msg: error.message
+            })
+        })
+    };
+
+    /**
+     * To add the updated comment on root comments array an quit the old version.
+     * @param {Object} updatedComment - updated comment 
+     */
+    function updateRootCommentOnArray(updatedComment){
+        const newRootComments = rootComments.map(comment => {
+            if(comment.commentId === updatedComment.commentId){
+                return updatedComment;
+            }
+            return comment;
+        });
+        setRootComments(newRootComments)
+    };
+
+    /**
+     *  To quit a comment from root comments array;
+     * @param {String} commentId - comment's id.
+     */
+    function quitRootCommentFromArray(commentId){
+        const newRootComments = rootComments.filter(comment => comment.commentId !== commentId);
+        setRootComments(newRootComments);
+    }
 
 
-    if(loading){
+    if (loading) {
         return (
             <div className="w-100 w-md-75 h-80">
                 <div className="card h-100 mh-100">
-                    <Loading spaceToTake = {LOADING_OPTIONS[0]}/>
+                    <Loading spaceToTake={LOADING_OPTIONS[0]} />
                 </div>
             </div>
         )
@@ -46,12 +185,12 @@ function PublicationModal({ setModalState ,id}) {
 
 
     return (
-        <div className="w-100 w-md-75 h-80">
+        <div className="w-100 w-md-85 h-90">
             <div className="card h-100 mh-100">
                 <div className="row h-100">
                     <div className="col-md-5 d-flex justify-content-center align-items-center mh-100 pe-0">
-                        <img src={`data:image/jpeg;charset=utf-8;base64,${publication.image}`} 
-                            className="img-fluid rounded-start p-1" 
+                        <img src={`data:image/jpeg;charset=utf-8;base64,${publication.image}`}
+                            className="img-fluid rounded-start p-1"
                             alt="image" />
                     </div>
                     <div className="col-md-7 mh-100">
@@ -62,26 +201,28 @@ function PublicationModal({ setModalState ,id}) {
                             </Link>
                         </div>
                         <div className="card-body h-70 mh-70  overflow-auto">
-                            <p>Aca iria un comentario</p>
-                            <p>Aca iria un comentario</p>
-                            <p>Aca iria un comentario</p>
-                            <p>Aca iria un comentario</p>
-                            <p>Aca iria un comentario</p>
-                            <p>Aca iria un comentario</p>
-                            <p>Aca iria un comentario</p>
-                            <p>Aca iria un comentario</p>
-                            <p>Aca iria un comentario</p>
-                            <p>Aca iria un comentario</p>
+                            <Pagination
+                                itemsList={rootComments}
+                                pagType={PAG_TYPES[0]}
+                                changePage={changePage}
+                                pagDetails={commentsPagDetails}
+                                ComponentToDisplayItem={props => <CardComment updateRootCommentBodyById = {updateRootCommentBodyById}
+                                    deleteRootCommentById={deleteRootCommentById} {...props} />}
+                            />
                         </div>
                         <div className="card-footer h-15 d-flex align-items-center">
                             <div className="input-group">
                                 <input
                                     type="text"
                                     className="form-control"
-                                    placeholder="Send a message"
-                                    aria-label="Send a message"
-                                    aria-describedby="basic-addon1" />
-                                <span className="input-group-text" id="basic-addon1">Comment</span>
+                                    placeholder="Leave a comment ,only 100 characteres"
+                                    maxLength="100"
+                                    ref={refNewComment} />
+                                <span
+                                    className="input-group-text btn btn-light"
+                                    onClick={() => saveRootComment({ body: refNewComment.current.value, publImgId: id })}>
+                                    Comment
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -90,5 +231,3 @@ function PublicationModal({ setModalState ,id}) {
         </div>
     )
 }
-
-export default PublicationModal;

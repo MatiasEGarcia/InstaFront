@@ -34,7 +34,7 @@ export default function Pagination({
      */
     useEffect(() => {
         let observer;
-        if(pagType === PAG_TYPES[0]){ //scroll down---cambiar el numero en cuanto pueda
+        if(pagType === PAG_TYPES[0]){ //scroll down
             observer = new IntersectionObserver(entries => {
                 const entry = entries[0];
                 setDivVisible(entry.isIntersecting)
@@ -43,7 +43,7 @@ export default function Pagination({
                 root: observerRoot || null
             });
             observer.observe(refBottom.current);
-        }else if(pagType === PAG_TYPES[1]){//scroll up  //scroll down---cambiar el numero en cuanto pueda
+        }else if(pagType === PAG_TYPES[1]){//scroll up  
             observer = new IntersectionObserver(entries => {
                 const entry = entries[0];
                 setDivVisible(entry.isIntersecting)
@@ -67,7 +67,7 @@ export default function Pagination({
      */
     useEffect(() => {
         if(divVisible){
-            if(pagType === PAG_TYPES[4] && scrollUpFirstPageChange) {
+            if(pagType === PAG_TYPES[1] && scrollUpFirstPageChange) {
                 setScrollUpFirstPageChange(false);
                 return;
             }

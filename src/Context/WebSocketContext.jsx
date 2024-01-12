@@ -76,7 +76,7 @@ export function WebSocketProvider({ children }) {
             });
             createNotification({
                 notiId: payloadBody.notiId,
-                notificationType: NOTIFICATION_TYPE[0], //follow
+                notificationType: payloadBody.notificationType, 
                 notiMessage: payloadBody.notiMessage,
                 fromWho: payloadBody.fromWho,
                 createdAt: payloadBody.createdAt

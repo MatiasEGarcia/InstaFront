@@ -7,7 +7,7 @@ import { UserHomeInfoProvider } from "../../Context/UserHomeInfoContext";
  * @returns {JSX.Element} - Main component for user home page. where should be its publications,followers ,etc.
  */
 function UserMainHome() {
-    const { userId } = useParams();
+    const { userId } = useParams(); //no es necesario esto porque en teoria los componentes hijos pueden accederlo directamente.
 
     return (
         <main className="col-12 col-md-8 col-xl-10">
