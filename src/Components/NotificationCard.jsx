@@ -8,6 +8,7 @@ import UserImageProfile from "./UserImageProfile";
  * Component to show cards for NotificationPopover component.
  * @param {String} param.notifId -  notification's id.
  * @param {NOTIFICATION_TYPE} param.notifType - notification's type.
+ * @param {String} param.elementId - element's id, for example the publication's id where a comment was written.
  * @param {String} param.notifMessage - notification's message.
  * @param {String} param.notifCreateAt - notification's date of creation.
  * @param {String} param.fromWhoId - id from who send the notificaiton. 
@@ -18,6 +19,7 @@ import UserImageProfile from "./UserImageProfile";
 export default function NotificationCard({ 
     notifId, 
     notifType,
+    elementId,
     notifMessage, 
     notifCreatedAt, 
     fromWhoId, 
@@ -36,7 +38,7 @@ export default function NotificationCard({
             onclickUrl = `/chat`;   //The problem with this is that it doesn't send me just to the chat, but to chats in general
             break;
         case NOTIFICATION_TYPE[3] :
-            onclickUrl = `/userHome/${toWhoId}/:publicationId`;//necesito el toWho y la publicacion.PARA QUE PUEDA DIRECTO A LA PUBLCIACIONNN
+            onclickUrl = `/userHome/${toWhoId}/${elementId}`;//necesito el toWho y la publicacion.PARA QUE PUEDA DIRECTO A LA PUBLCIACIONNN
             break;
     }
 

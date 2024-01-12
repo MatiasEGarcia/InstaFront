@@ -1,9 +1,7 @@
-import { Exclamation, Trash } from "react-bootstrap-icons";
-import { Link } from "react-router-dom";
-import { useNotification } from "../../hooks/useNotification";
-import UserImageProfile from "../UserImageProfile";
+import { Trash } from "react-bootstrap-icons";
 import { deleteAllPersonalNotifications } from "../../Service/NotificationService";
 import { NOTIFICATION_SEVERITIES } from "../../Util/UtilTexts";
+import { useNotification } from "../../hooks/useNotification";
 import NotificationCard from "../NotificationCard";
 
 /**
@@ -53,10 +51,12 @@ function NotificationsPopover({ hidePopover, container }) {
                             return (
                                 <NotificationCard key={notif.notiId}
                                     notifId={notif.notiId}
-                                    notifType={notif.notificationType}  
+                                    notifType={notif.notificationType} 
+                                    elementId={notif.elementId} 
                                     notifMessage={notif.notiMessage}
                                     notifCreatedAt={notif.createdAt}
-                                    fromWhoId={notif.fromWho.username}
+                                    fromWhoId={notif.fromWho.userId}
+                                    toWhoId={notif.toWho.userId}
                                     fromWhoImage={notif.fromWho.image}
                                     fromWhoUsername={notif.fromWho.username}
                                 />

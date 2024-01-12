@@ -1,22 +1,13 @@
-import { useState, useEffect } from "react";
-import Loading from "./Loading";
-import Pagination from "./Pagination";
-import { BACK_HEADERS, PAG_TYPES } from "../Util/UtilTexts";
-import PublicationCard from "./PublicationCard";
-import { useNotification } from "../hooks/useNotification";
-import { NOTIFICATION_SEVERITIES, LOADING_OPTIONS } from "../Util/UtilTexts";
-import { getAllByAuthUser } from "../Service/PublicationService";
-import PublicationModal from "./PublicationModal";
-import Modal from "./Modal";
-import { PublicationModalProvider } from "../Context/PublicationModalContext";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
-//cuando me comunique con el server esto lo borro
-const contentModalPublication = {
-    username: "matias",
-    date: 22 - 5 - 23,
-    description: "Some quick example text to build on the card title and make up thebulk of the card's content. "
-}
+import { getAllByAuthUser } from "../Service/PublicationService";
+import { BACK_HEADERS, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../Util/UtilTexts";
+import { useNotification } from "../hooks/useNotification";
+import Loading from "./Loading";
+import Modal from "./Modal";
+import Pagination from "./Pagination";
+import PublicationCard from "./PublicationCard";
+import PublicationModal from "./PublicationModal";
 
 const basePagDetails = {
     pageNo: 0,//first page is 0
@@ -27,22 +18,22 @@ const basePagDetails = {
     sortDir: undefined
 }
 
-export default function UsersHomePublications({ userOwnerId }) {
+export default function UsersHomePublications() {
     const [publicationModalState, setPublicationModalState] = useState(false);//used by Modal component to know if should show the modal or not
     const [publicationSelectedId, setPublicationSelectedId] = useState();
     const [userPublications, setUserPublications] = useState([]);
     const [pagDetailsFlag, setPagDetailsFlag] = useState(true);
     const [pagDetails, setPagDetails] = useState(basePagDetails);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const { setNotificationToast } = useNotification();
-    const {publicationId} = useParams();
+    const { publicationId,userId } = useParams();
 
     useEffect(() => {
-        if(publicationId){
+        if (publicationId) {
             setPublicationSelectedId(publicationId);
             setPublicationModalState(true);
         }
-    },[userOwnerId])
+    }, [publicationId])
 
 
     /**
@@ -74,7 +65,7 @@ export default function UsersHomePublications({ userOwnerId }) {
         if (pagDetailsFlag) {
             setLoading(true);
             const numberOfElementsAlreadyInList = userPublications.length;
-            getAllByAuthUser({ ...pagDetails, ownerId: userOwnerId }).then((data) => {
+            getAllByAuthUser({ ...pagDetails, ownerId: userId }).then((data) => {
                 if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
                     setUserPublications([...userPublications, ...data.body.list]);
                     setPagDetails({
@@ -103,7 +94,7 @@ export default function UsersHomePublications({ userOwnerId }) {
     useEffect(() => {
         setLoading(true);
         //I need to reset pagDetails so I use basePagDetails
-        getAllByAuthUser({ ...basePagDetails, ownerId: userOwnerId }).then((data) => {
+        getAllByAuthUser({ ...basePagDetails, ownerId: userId }).then((data) => {
             if (data.body?.list) {
                 setUserPublications(data.body.list);
                 setPagDetails({
@@ -125,7 +116,9 @@ export default function UsersHomePublications({ userOwnerId }) {
             setLoading(false);
             setPagDetailsFlag(false);
         });
-    }, [userOwnerId]);
+    }, [userId]);
+
+ 
 
     return (
         <div className="row p-3 border d-flex justify-content-center gap-5">
@@ -138,9 +131,7 @@ export default function UsersHomePublications({ userOwnerId }) {
                     width="w-80 w-sm-75 w-xl-30" {...props} />}
             />
             <Modal modalState={publicationModalState} setModalState={setPublicationModalState}>
-                <PublicationModalProvider>
                     <PublicationModal setModalState={setPublicationModalState} id={publicationSelectedId} />
-                </PublicationModalProvider>
             </Modal>
         </div>
     )

@@ -44,7 +44,9 @@ export default function PublicationModal({ setModalState, id }) {
         setLoading(true);
         getById({ id, ...commentBasePagDetails }).then(data => {
             setPublication(data.body); //en el backend tengo que editar esto
-            setRootComments(data.body.rootComments.list);
+            if(data.body.rootComments.list){
+                setRootComments(data.body.rootComments.list);
+            }
             setCommentsPagDetiailsFlag(false)
             setCommentsPagDetails(data.body.rootComments.pageInfoDto);
         }).catch(error => {

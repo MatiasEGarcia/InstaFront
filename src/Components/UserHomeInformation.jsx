@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { findUsersThatWantToFollowYou, usersYouWantFollowButIsNotAllowedYet, updateFollowStatusByFollowerId } from "../Service/FollowService";
 import { getGeneralUserInfo } from "../Service/UserService";
@@ -28,7 +29,7 @@ const basePagDetail = {
  * @param {String} param.userId user id to search. 
  * @returns {JSX.Element} show user general information, like number of followers ,etc.
  */
-export default function UsersHomeInformation({ userId }) {
+export default function UsersHomeInformation() {
     const [followModalState, setFollowModalState] = useState(false);//used by Modal component to know if should show the modal or not
     const [pagDetails, setPagDetails] = useState(basePagDetail);
     const [pagDetailsFlag, setPagDetailsFlag] = useState(false);//??, is for the useEffect that is listening pagDetails, because changes pagDetails content too, and with this I avoid a loop. I will only put on true when the client wants to change the page.
@@ -39,6 +40,7 @@ export default function UsersHomeInformation({ userId }) {
     const { auth } = useAuth();
     const navigate = useNavigate();
     const { setNotificationToast } = useNotification();
+    const { userId } = useParams();
 
 
     //UseEffect to get general user info of the user seleceted
