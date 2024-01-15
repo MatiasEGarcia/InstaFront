@@ -46,18 +46,18 @@ export async function save({body, parentId, publImgId}){
  * @throws Error if there were some required param not gived.
  */
 export async function getByPublcationId({
-    publicationId ,pageNo, pageSize, sortDir, sortField
+    id ,pageNo, pageSize, sortDir, sortField
 }){
-    if(!publicationId) {
+    if(!id) {
         throw new Error(REQUIRED_PARAM);
     }
     let data;
     const params = new URLSearchParams({
-        publicationId,
+        id,
         page: pageNo || '0',
         pageSize: pageSize || '20',
         sortDir: sortDir || DIR_ASC_DIRECTION,
-        sortField: sortField ||'commentId'
+        sortField: sortField ||'id'
     });
     const options = {
         method : 'GET',
@@ -73,7 +73,7 @@ export async function getByPublcationId({
 
 /**
  * Get comments by parent's id.
- * @param {String} param.parentId  parent comment's id. (required)
+ * @param {String} param.id  parent comment's id. (required)
  * @param {String} param.page page number in case of pagination.
  * @param {String} param.pageSize page size in case of pagination.
  * @param {String} param.sortDir sort direction(ASC, DESC).
@@ -82,16 +82,16 @@ export async function getByPublcationId({
  * @throws Error if there were some required param not gived.
  */
 export async function getByParentId({
-    parentId ,pageNo, pageSize, sortDir, sortField
+    id ,pageNo, pageSize, sortDir, sortField
 }){
-    if(!parentId) throw new Error(REQUIRED_PARAM);
+    if(!id) throw new Error(REQUIRED_PARAM);
     let data;
     const params = new URLSearchParams({
-        parentId,
+        id,
         page: pageNo || '0',
         pageSize: pageSize || '20',
         sortDir: sortDir || DIR_ASC_DIRECTION,
-        sortField: sortField ||'commentId'
+        sortField: sortField ||'id'
     });
     const options = {
         method : 'GET',
@@ -107,19 +107,19 @@ export async function getByParentId({
 
 /**
  * Delete a comment by id.
- * @param {String} commentId comment's id. (required)
+ * @param {String} id comment's id. (required)
  * @returns {Promise<Object>} data object with a confirmation message.
  * @throws Error if some required param was not gived.
  */
-export async function deleteById(commentId){
-    if(!commentId) throw new Error(REQUIRED_PARAM);
+export async function deleteById(id){
+    if(!id) throw new Error(REQUIRED_PARAM);
     let data;
     const options = {
         method: 'DELETE',
         headers : {}
     }
     data = await fetchApi({
-        endpoint : `${COMMENTS_ENDPOINT}/byId/${commentId}`,
+        endpoint : `${COMMENTS_ENDPOINT}/byId/${id}`,
         options
     });
 
@@ -128,16 +128,16 @@ export async function deleteById(commentId){
 
 /**
  * Update a comment by id.
- * @param {String} param.commentId comment's id. (required)
+ * @param {String} param.id comment's id. (required)
  * @param {String} param.body comment's new content. (required)
  * @returns {Promise<Object>} data object with the comment updated.
  * @throw Error if there was some required param not gived 
  */
-export async function updateById({commentId , body}){
-    if(!commentId || !body) throw new Error(REQUIRED_PARAM);
+export async function updateById({id , body}){
+    if(!id || !body) throw new Error(REQUIRED_PARAM);
     let data;
     const bodyRequest = {
-        commentId,
+        id,
         body
     };
     const options = {

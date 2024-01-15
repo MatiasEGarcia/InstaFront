@@ -58,9 +58,9 @@ export default function CardReply({
                         </div>
                         <div className="h-20 mt-1">
                             {/**Only the the owner can delete or change comment */}
-                            {item.ownerUser.userId === auth.user.userId &&
+                            {item.ownerUser.id === auth.user.id &&
                                 <>
-                                    <button className="btn btn-light btn-sm ms-1" onClick={() => deleteReplyById(item.commentId)}>
+                                    <button className="btn btn-light btn-sm ms-1" onClick={() => deleteReplyById(item.id)}>
                                         Delete
                                     </button>
                                     {!flagChangeComment &&
@@ -75,7 +75,7 @@ export default function CardReply({
                                             </button>
                                             <button
                                                 className="btn btn-light btn-sm ms-1"
-                                                onClick={() => updateReplyById({ commentId: item.commentId, body: reply })}>
+                                                onClick={() => updateReplyById({ replyId: item.id, body: reply })}>
                                                 Save
                                             </button>
                                         </>

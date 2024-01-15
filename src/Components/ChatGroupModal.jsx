@@ -48,7 +48,7 @@ export default function ChatGroupModal({ closeModal }) {
      * Function to change group image.
      */
     function saveNewGroupImage(evt) {
-        setChatGroupImage({ img: evt.target.files[0], chatId: chatSelected.chatId }).then((data) => {
+        setChatGroupImage({ img: evt.target.files[0], id: chatSelected.id }).then((data) => {
             updateChat(data.body);
         }).catch((error) => {
             setNotificationToast({
@@ -66,7 +66,7 @@ export default function ChatGroupModal({ closeModal }) {
         if (newName === chatSelected.name) {
             return;
         }
-        setChatGroupName({ newName, chatId: chatSelected.chatId }).then(((data) => {
+        setChatGroupName({ newName, id: chatSelected.id }).then(((data) => {
             updateChat(data.body);
         })).catch((error) => {
             setNotificationToast({

@@ -14,7 +14,7 @@ export async function follow(followedId){
         headers: {},
     };
     const params = new URLSearchParams({
-        followed : followedId,
+        followedId
     });
 
     data = await fetchApi({
@@ -27,10 +27,10 @@ export async function follow(followedId){
 
 /**
  * Async function to follow another user.
- * @param {String} followedId  id of user want to left to follow.
+ * @param {String} id  id of user want to left to follow.
  * @returns {Promise<Object>} data object with the body of the response.
  */
-export async function unFollow(followedId){
+export async function unFollowByFollowedId(id){
     let data;
     const options = {
         method: 'POST',
@@ -38,7 +38,7 @@ export async function unFollow(followedId){
     };
 
     data = await fetchApi({
-        endpoint: `${FOLLOW_ENDPOINT}/${followedId}`,
+        endpoint: `${FOLLOW_ENDPOINT}/${id}`,
         options
     })
 
@@ -48,10 +48,10 @@ export async function unFollow(followedId){
 /**
  * Async function to update follow status.
  * @param {FOLLOWED_STATUS} prop.newFollowStatus  new follow status in follow record.
- * @param {String} prop.followId  id of follow record
+ * @param {String} prop.id  id of follow record
  * @returns {Promise<Object>} data object with the body of the response.
  */
-export async function updateFollowStatusByFollowId({newFollowStatus, followId}){
+export async function updateFollowStatusByFollowId({newFollowStatus, id}){
     let data;
     const options = {
         method : 'PUT',
@@ -59,7 +59,7 @@ export async function updateFollowStatusByFollowId({newFollowStatus, followId}){
     }
     const params = new URLSearchParams({
         followStatus : newFollowStatus,
-        followId : followId
+        followId : id
     });
     data = await fetchApi({
         endpoint: `${FOLLOW_ENDPOINT}/updateFollowStatus?${params.toString()}`,
@@ -72,10 +72,10 @@ export async function updateFollowStatusByFollowId({newFollowStatus, followId}){
  * Async function to update Follow's followStatus by followerId.
  * 
  * @param {String} param.newFollowStatus - new follow status.
- * @param {String} param.followerId - follower's id. 
+ * @param {String} param.id - follower's id. 
  * @returns {Promise<Object>} data object with the body of the response.
  */
-export async function updateFollowStatusByFollowerId({newFollowStatus, followerId}){
+export async function updateFollowStatusByFollowerId({newFollowStatus, id}){
     let data;
     const options = {
         method : 'PUT',
@@ -83,7 +83,7 @@ export async function updateFollowStatusByFollowerId({newFollowStatus, followerI
     }
     const params = new URLSearchParams({
         followStatus : newFollowStatus,
-        followerId
+        id
     })
 
     data = await fetchApi({
@@ -100,12 +100,12 @@ export async function updateFollowStatusByFollowerId({newFollowStatus, followerI
  * @param {String} param.page  page number in case of pagination.
  * @param {String} param.pageSize  page size in case of pagination.
  * @param {String} param.sortDirt  sort direction(ASC, DESC)
- * @param {String} param.authUserId id of the user authenticated.
+ * @param {String} param.id id of the user authenticated.
  * @returns {Promise<Object>} Data object with users. (can be empty, 
  * in that case return an header with info about why is empty)
  */
 export async function findUsersThatWantToFollowYou({
-    pageNo,pageSize, sortDir, authUserId
+    pageNo,pageSize, sortDir, id
 }){
     let data;
     const params = new URLSearchParams({
@@ -116,8 +116,8 @@ export async function findUsersThatWantToFollowYou({
     })
 
     const followedEqualAuthUserCondition = {
-        column: 'userId',
-        value: authUserId,
+        column: 'id',
+        value: id,
         dateValue:false,
         joinTable: 'followed',
         operation: EQUAL
@@ -155,12 +155,12 @@ export async function findUsersThatWantToFollowYou({
  * @param {String} param.page  page number in case of pagination.
  * @param {String} param.pageSize  page size in case of pagination.
  * @param {String} param.sortDirt  sort direction(ASC, DESC)
- * @param {String} param.authUserId id of the user authenticated.
+ * @param {String} param.id id of the user authenticated.
  * @returns {Promise<Object>} Data object with users. (can be empty, 
  * in that case return an header with info about why is empty)
  */
 export async function usersYouWantFollowButIsNotAllowedYet({
-    pageNo,pageSize, sortDir, authUserId
+    pageNo,pageSize, sortDir, id
 }){
     let data;
     const params = new URLSearchParams({
@@ -171,8 +171,8 @@ export async function usersYouWantFollowButIsNotAllowedYet({
     })
 
     const followerEqualAuthUserCondition = {
-        column: 'userId',
-        value: authUserId,
+        column: 'id',
+        value: id,
         dateValue:false,
         joinTable: 'follower',
         operation: EQUAL

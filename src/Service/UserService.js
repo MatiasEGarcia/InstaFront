@@ -108,7 +108,7 @@ export async function getBasicUserInfo() {
  * @param {String} id  id of the user wanted.
  * @returns {Promise<Object>} data object with the body of the response.
  */
-export async function getGeneralUserInfo(id) {
+export async function getGeneralUserInfoById(id) {
     let data;
     const options = {
         method: 'GET',

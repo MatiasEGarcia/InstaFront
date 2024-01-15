@@ -49,14 +49,14 @@ function NotificationsPopover({ hidePopover, container }) {
                         ? <div className="w-100 text-center"><p>There is no notifications</p></div>
                         : notificationList.map((notif) => {
                             return (
-                                <NotificationCard key={notif.notiId}
-                                    notifId={notif.notiId}
+                                <NotificationCard key={notif.id}
+                                    id={notif.id}
                                     notifType={notif.notificationType} 
                                     elementId={notif.elementId} 
                                     notifMessage={notif.notiMessage}
                                     notifCreatedAt={notif.createdAt}
-                                    fromWhoId={notif.fromWho.userId}
-                                    toWhoId={notif.toWho.userId}
+                                    fromWhoId={notif.fromWho.id}
+                                    toWhoId={notif.toWho.id}
                                     fromWhoImage={notif.fromWho.image}
                                     fromWhoUsername={notif.fromWho.username}
                                 />

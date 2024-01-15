@@ -17,7 +17,7 @@ export default function TableUsersInGroupChat() {
     const refButtonQuitUsers = useRef();
 
     useEffect(() => {
-        const authUser = chatSelected.users.find((user) => user.userId === auth.user.userId);
+        const authUser = chatSelected.users.find((user) => user.id === auth.user.id);
         authUser.admin ? setAuthUserIsAdmin(true) : setAuthUserIsAdmin(false);
     }, []);
 
@@ -38,7 +38,7 @@ export default function TableUsersInGroupChat() {
      * Function to quit users from chat.
      */
     function handleQuitUsers() {
-        quitUsers({ chatId: chatSelected.chatId, usersToQuit: usersUsernameToQuit }).then((data) => {
+        quitUsers({ id: chatSelected.id, usersToQuit: usersUsernameToQuit }).then((data) => {
             updateChat(data.body);
         }).catch((error) => {
             setNotificationToast({
@@ -59,7 +59,7 @@ export default function TableUsersInGroupChat() {
      * @param {String} userId - user's id.
      */
     function setAdminStatus(userId){
-        updateAdminStatus({chatId : chatSelected.chatId , userId}).then((data) => {
+        updateAdminStatus({chatId : chatSelected.id , userId}).then((data) => {
             updateChat(data.body);
         }).catch((error) => {
             setNotificationToast({
@@ -98,7 +98,7 @@ export default function TableUsersInGroupChat() {
                                             size={30}
                                             className={`${authUserIsAdmin ? 'cursor-pointer-hover' : ''} me-1 mb-2`}
                                             color={user.admin ? 'orange' : 'grey'}
-                                            onClick={() => setAdminStatus(user.userId)}
+                                            onClick={() => setAdminStatus(user.id)}
                                         />
                                     </div>
                                 </td>

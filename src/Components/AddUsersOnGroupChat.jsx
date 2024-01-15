@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import NewChatCard from "./NewChatCard";
 import { searchUsersByOneCondition } from "../Service/UserService";
 import { useNotification } from "../hooks/useNotification";
-import { LIKE, NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
+import { LIKE, NOTIFICATION_SEVERITIES, BACK_HEADERS } from "../Util/UtilTexts";
 import useAuth from "../hooks/useAuth";
 
 
@@ -65,29 +65,29 @@ export default function AddUsersOnGroupChat({
     }
 
     /**
-     * @param {String} user.userId - user's id.
+     * @param {String} user.id - user's id.
      * @param {String} user.username - user's username. 
      * @param {String} user.image - user's image
      */
     function addUserInChat(user) {
-        const flag = usersAlreadyInChat ? alreadyInChat(user.userId) : null;
-        const isInChat = usersForChat.find(userFromChat => userFromChat.userId === user.userId)
-        if(!flag && !isInChat && auth.user.userId !== user.userId){
+        const flag = usersAlreadyInChat ? alreadyInChat(user.id) : null;
+        const isInChat = usersForChat.find(userFromChat => userFromChat.id === user.id)
+        if(!flag && !isInChat && auth.user.id !== user.id){
             setUsersForChat(prev => [...prev, user]);
         }
     }
 
     /** 
-     * @param {String} userId - user's id. 
+     * @param {String} id - user's id. 
      */
-    function quitUserFromChat(userId) {
-        const whithoutUser = usersForChat.filter(userFromChat => userFromChat.userId !== userId);
+    function quitUserFromChat(id) {
+        const whithoutUser = usersForChat.filter(userFromChat => userFromChat.id !== id);
         setUsersForChat(whithoutUser);
     }
 
     /**
      * 
-     * @param {String} user.userId - user's id.
+     * @param {String} user.id - user's id.
      * @param {String} user.username - user's username. 
      * @param {String} user.image - user's image 
      */
@@ -96,21 +96,21 @@ export default function AddUsersOnGroupChat({
     }
 
     /**
-     * @param {String} userId - user's id. 
+     * @param {String} id - user's id. 
      */
-    function quitAdminFromChat(userId) {
-        const whithoutUser = adminsForChat.filter(adminFromChat => adminFromChat.userId !== userId);
+    function quitAdminFromChat(id) {
+        const whithoutUser = adminsForChat.filter(adminFromChat => adminFromChat.id !== id);
         setAdminsForChat(whithoutUser)
     }
 
 
     /**
      * Function to know if the user wanted to add on the chat is already in chat. if the chat is new these function is not necessary.
-     * @param {String} userId - user's id.
+     * @param {String} id - user's id.
      * @returns true if user is already in chat, otherwise false.
      */
-    function alreadyInChat(userId) {
-        const user = usersAlreadyInChat.find(user => user.userId === userId);
+    function alreadyInChat(id) {
+        const user = usersAlreadyInChat.find(user => user.id === id);
         if (user) {
             return true;
         } else {
@@ -132,7 +132,7 @@ export default function AddUsersOnGroupChat({
                         {usersForChat.map((user) => {
                             let isAdmin;
                             const adminUser =
-                                adminsForChat.find((admin) => admin.userId === user.userId);
+                                adminsForChat.find((admin) => admin.id === user.id);
                             if (adminUser) {
                                 isAdmin = true;
                             } else {
@@ -140,8 +140,8 @@ export default function AddUsersOnGroupChat({
                             }
 
                             return (
-                                <NewChatCard key={user.userId}
-                                    userId={user.userId}
+                                <NewChatCard key={user.id}
+                                    id={user.id}
                                     username={user.username}
                                     image={user.image}
                                     onChat={true}
@@ -166,8 +166,8 @@ export default function AddUsersOnGroupChat({
                     <div className="vstack gap-2 h-70 overflow-auto align-items-center">
                         {usersFound.map((user) => {
                             return (
-                                <NewChatCard key={user.userId}
-                                    userId={user.userId}
+                                <NewChatCard key={user.id}
+                                    id={user.id}
                                     username={user.username}
                                     image={user.image}
                                     onChat={false}

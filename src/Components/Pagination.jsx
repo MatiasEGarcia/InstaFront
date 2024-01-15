@@ -1,4 +1,4 @@
-import { Component, useEffect, useRef, useState } from "react";
+import { Component,memo, useEffect, useRef, useState } from "react";
 import { PAG_TYPES } from "../Util/UtilTexts";
 
 /**
@@ -13,7 +13,7 @@ import { PAG_TYPES } from "../Util/UtilTexts";
  * @param {Element} param.observerRoot should be a reference to the element which will work as root.
  * 
  */
-export default function Pagination({
+function Pagination({
     itemsList, 
     pagType, 
     changePage, 
@@ -95,3 +95,5 @@ export default function Pagination({
         </>
     )
 }
+
+export default memo(Pagination)

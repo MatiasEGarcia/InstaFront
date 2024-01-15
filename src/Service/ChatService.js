@@ -62,9 +62,9 @@ export async function create({
 /**
  * Function to set a group chat's image.
  * @param {File} param.img chat's image.
- * @param {String} param.chatId chat's id, whithout this we cannot know wich chat update.
+ * @param {String} param.id chat's id, whithout this we cannot know wich chat update.
  */
-export async function setChatGroupImage({img, chatId}){
+export async function setChatGroupImage({img, id}){
     if(!img instanceof File){
         throw new Error('img is not a file')
     }
@@ -77,7 +77,7 @@ export async function setChatGroupImage({img, chatId}){
         body:formData
     }
     data = await fetchApi({
-        endpoint: `${CHAT_ENDPOINT}/image/${chatId}`,
+        endpoint: `${CHAT_ENDPOINT}/image/${id}`,
         options
     });
     return data;
@@ -87,10 +87,10 @@ export async function setChatGroupImage({img, chatId}){
  * Function to set chat's new name.(only chat type group).
  * 
  * @param {String} param.newName new chat's name.
- * @param {String} param.chatId  new chat's id. 
+ * @param {String} param.id  new chat's id. 
  * @returns {Promise<Object>} Data object with the chat info updated.
  */
-export async function setChatGroupName({newName,chatId}){
+export async function setChatGroupName({newName,id}){
     let data;
     const options = {
         method: 'PUT',
@@ -98,7 +98,7 @@ export async function setChatGroupName({newName,chatId}){
     }
 
     data = await fetchApi({
-        endpoint : `${CHAT_ENDPOINT}/name/${newName}/${chatId}`,
+        endpoint : `${CHAT_ENDPOINT}/name/${newName}/${id}`,
         options
     });
 
@@ -137,13 +137,13 @@ export async function addUsers({chatId,usersToAdd, usersToAddAsAdmins}){
 /**
  * Function to quit users from chat.
  * 
- * @param {String} param.chatId - chat's id.
+ * @param {String} param.id - chat's id.
  * @param {Array} param.usersToQuit - users' username from users to quit.
  */
-export async function quitUsers({chatId, usersToQuit}){
+export async function quitUsers({id, usersToQuit}){
     let data;
     const bodyRequest = {
-        chatId,
+        id,
         usersUsername: usersToQuit
     }
     const options = {

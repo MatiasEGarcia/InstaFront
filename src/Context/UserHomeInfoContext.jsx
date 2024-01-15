@@ -19,7 +19,7 @@ export function UserHomeInfoProvider({children}){
      * @param {String} followId follow's id( to know which follow record update).
      */
     function handlerFollowStatusUpdate({newFollowStatus, followId}){
-        updateFollowStatusByFollowId({newFollowStatus, followId}).then(data => {
+        updateFollowStatusByFollowId({newFollowStatus, id: followId}).then(data => {
             const newFollowModalList = followModalContent.map((follow) => {
                 if(follow.followId === data.body.followId){
                     follow.followStatus = data.body.followStatus;

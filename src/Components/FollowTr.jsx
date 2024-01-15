@@ -16,14 +16,14 @@ export default function FollowTr({item, openAndCloseDropdown,showDropdown}) {//I
     
 
     return (
-        <tr key={item.followId}>
+        <tr key={item.id}>
             <th scope="row">
                 {userIsFollower === true
-                    ? <CardUserSimple userId={item.followed.userId}
+                    ? <CardUserSimple id={item.followed.id}
                         userImage={item.followed.image}
                         username={item.followed.username}
                         size = {{width:"40px" , height : "40px"}} />
-                    : <CardUserSimple userId={item.follower.userId}
+                    : <CardUserSimple id={item.follower.id}
                         userImage={item.follower.image}
                         username={item.follower.username}
                         size = {{width:"40px" , height : "40px"}} />}
@@ -35,11 +35,11 @@ export default function FollowTr({item, openAndCloseDropdown,showDropdown}) {//I
                                      position-relative w-80
                                      cursor-pointer-hover">
                         <div className="d-flex align-items-center p-1"
-                            onClick={() => openAndCloseDropdown(item.followId)}>
+                            onClick={() => openAndCloseDropdown(item.id)}>
                             <p className="m-0 me-1">Change status</p>
                             <ArrowDownSquare />
                         </div>
-                        {showDropdown === item.followId &&
+                        {showDropdown === item.id &&
                             <ul className="position-absolute 
                                             bg-body
                                             border border-dark-subtle rounded 
@@ -54,7 +54,7 @@ export default function FollowTr({item, openAndCloseDropdown,showDropdown}) {//I
 
                                     return (
                                         <li key={status} className="text-center"
-                                             onClick={() => handlerFollowStatusUpdate({newFollowStatus : status, followId : item.followId})}>
+                                             onClick={() => handlerFollowStatusUpdate({newFollowStatus : status, followId : item.id})}>
                                             {status.toUpperCase()}
                                         </li>
                                     );

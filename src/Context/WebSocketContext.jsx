@@ -52,9 +52,9 @@ export function WebSocketProvider({ children }) {
         function onConnected() {
             console.log('CONECTANDO CON WEB SOCKETTTTTTTTTTTTTTT')
             //notification topic
-            stompClient.subscribe(`/user/notifications/${auth.user.userId}/private`, handleServerNotification);
+            stompClient.subscribe(`/user/notifications/${auth.user.id}/private`, handleServerNotification);
             //chat topic
-            stompClient.subscribe(`/chat/${auth.user.userId}`, handleServerNewMessageNotification);
+            stompClient.subscribe(`/chat/${auth.user.id}`, handleServerNewMessageNotification);
 
 
             setSocketConnected(true);
@@ -75,7 +75,7 @@ export function WebSocketProvider({ children }) {
                 msg: payloadBody.notiMessage
             });
             createNotification({
-                notiId: payloadBody.notiId,
+                id: payloadBody.id,
                 notificationType: payloadBody.notificationType, 
                 elementId : payloadBody.elementId,
                 notiMessage: payloadBody.notiMessage,
@@ -93,8 +93,8 @@ export function WebSocketProvider({ children }) {
             })
 
             setNewMessage({
-                chatId: payloadBody.chatDto.chatId,
-                messageId: payloadBody.messageDto.messageId,
+                chatId: payloadBody.chatDto.id,
+                messageId: payloadBody.messageDto.id,
                 body: payloadBody.messageDto.body,
                 userOwner: payloadBody.messageDto.userOwner,
                 sendedAt: payloadBody.messageDto.sendedAt

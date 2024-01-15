@@ -7,7 +7,7 @@ import UserImageProfile from "./UserImageProfile"
 /**
  * 
  * @param {Object} param.item - message's information.
- * @param {String} param.item.messageId - message's id.
+ * @param {String} param.item.id - message's id.
  * @param {String} param.item.body - message's body.
  * @param {String} param.item.userOwner - message's owner username.
  * @returns {JSX.Element} card view for chats in chat container.

@@ -6,7 +6,7 @@ import UserImageProfile from "./UserImageProfile";
 
 /**
  * Component to show cards for NotificationPopover component.
- * @param {String} param.notifId -  notification's id.
+ * @param {String} param.id -  notification's id.
  * @param {NOTIFICATION_TYPE} param.notifType - notification's type.
  * @param {String} param.elementId - element's id, for example the publication's id where a comment was written.
  * @param {String} param.notifMessage - notification's message.
@@ -17,7 +17,7 @@ import UserImageProfile from "./UserImageProfile";
  * @returns 
  */
 export default function NotificationCard({ 
-    notifId, 
+    id, 
     notifType,
     elementId,
     notifMessage, 
@@ -88,7 +88,7 @@ export default function NotificationCard({
             <span className="badge bg-danger rounded-pill
                                        position-absolute top-50 start-100 translate-middle
                                        cursor-pointer-hover"
-                onClick={() => deleteNotificationById(notifId)}
+                onClick={() => deleteNotificationById(id)}
             ><Trash size={15} /></span>
         </div>
     )

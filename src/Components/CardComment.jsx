@@ -6,7 +6,7 @@ import { ChevronDoubleUp, ChevronDoubleDown } from "react-bootstrap-icons";
 import WriteReply from "./WriteReply";
 import CardReply from "./CardReply";
 import useAuth from "../hooks/useAuth";
-import { getByParentId, save } from "../Service/CommentService";
+import { getByParentId, save, updateById, deleteById } from "../Service/CommentService";
 import Pagination from "../Components/Pagination";
 
 
@@ -32,7 +32,9 @@ export default function CardComment({
     updateRootCommentBodyById,
     deleteRootCommentById,
 }) {
+    console.log('se renderizo CardComment')
     const [comment, setComment] = useState(item.body);
+    const [numberOfReplies, setNumberOfReplies] = useState(item.associateCN);
     const [flagWriteReply, setFlagWriteReply] = useState(false);
     const [flagWriteAnotherReply, setFlagWriteAnotherReply] = useState(false);
     const [flagSeeReplies, setFlagSeeReplies] = useState(false);
@@ -56,7 +58,7 @@ export default function CardComment({
     useEffect(() => {
         if (flagReplyPagDetails) {
             const alreadyInList = replies.length;
-            getByParentId({ parentId: item.commentId, ...replyPagDetails }).then(data => {
+            getByParentId({id:item.id , ...replyPagDetails }).then(data => {
                 if (data.body?.list && data.body.pageInfoDto.totalElements > alreadyInList) {
                     setReplies(prev => [...prev, ...data.body.list]);
                     setReplyPagDetails({
@@ -96,10 +98,11 @@ export default function CardComment({
         save({
             body,
             publImgId: item.associatedImg.id,
-            parentId: item.commentId
+            parentId: item.id
         }).then(data => {
             //adding new reply
             setReplies(prev => [...prev, data.body]);
+            setNumberOfReplies(prev => prev + 1);
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -114,7 +117,7 @@ export default function CardComment({
      * @param {String} param.body reply's new content. 
      */
     function updateReplyById({ replyId, body }) {
-        updateById({ commentId: replyId, body }).then(data => {
+        updateById({ id: replyId, body }).then(data => {
             updateReplyOnArray(data.body);
         }).catch(error => {
             setNotificationToast({
@@ -146,7 +149,7 @@ export default function CardComment({
      */
     function updateReplyOnArray(updatedReply) {
         const newReplies = replies.map(reply => {
-            if (reply.commentId === updatedReply.commentId) {
+            if (reply.id === updatedReply.id) {
                 return updatedReply;
             }
             return reply;
@@ -159,7 +162,7 @@ export default function CardComment({
      * @param {String} replyId - reply's id.
      */
     function quitReplyFromArrayById(replyId) {
-        const newReplies = replies.filter(reply => reply.commentId !== replyId);
+        const newReplies = replies.filter(reply => reply.id !== replyId);
         setReplies(newReplies);
     };
 
@@ -207,15 +210,15 @@ export default function CardComment({
                         </div>
                         <div className="h-20 mt-1">
                             {/**Only if the comment don't have replies yet */}
-                            {item.associateCN === 0 && !flagWriteReply &&
+                            {item.associateCN === '0' && !flagWriteReply &&
                                 <button className="btn btn-light btn-sm ms-1" onClick={handlerActiveReply}>
                                     Write a reply
                                 </button>
                             }
                             {/**Only the the owner can delete or change comment */}
-                            {item.ownerUser.userId === auth.user.userId &&
+                            {item.ownerUser.id === auth.user.id &&
                                 <>
-                                    <button className="btn btn-light btn-sm ms-1" onClick={() => deleteRootCommentById(item.commentId)}>
+                                    <button className="btn btn-light btn-sm ms-1" onClick={() => deleteRootCommentById(item.id)}>
                                         Delete
                                     </button>
                                     {!flagChangeComment &&
@@ -230,17 +233,17 @@ export default function CardComment({
                                             </button>
                                             <button
                                                 className="btn btn-light btn-sm ms-1"
-                                                onClick={() => updateRootCommentBodyById({ commentId: item.commentId, body: comment })}>
+                                                onClick={() => updateRootCommentBodyById({ id: item.id, body: comment })}>
                                                 Save
                                             </button>
                                         </>
                                     }
                                 </>
                             }
-                            {!flagWriteReply && item.associateCN !== 0 &&
+                            {!flagWriteReply && numberOfReplies !== 0 &&
                                 <button className="btn btn-light btn-sm ms-3" onClick={handlerSeeReplies}>
                                     See replies
-                                    <small className="mx-1">{item.associateCN}</small>
+                                    <small className="mx-1">{numberOfReplies}</small>
                                     {flagSeeReplies ? <ChevronDoubleUp /> : <ChevronDoubleDown />}
                                 </button>
                             }

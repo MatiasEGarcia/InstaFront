@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { InfoCircle } from "react-bootstrap-icons";
 import { Link } from "react-router-dom";
-import { create, getAllByChat, setMessagesWatched } from "../../Service/MessageService";
+import { create, getAllByChatId, setMessagesWatchedByChatId } from "../../Service/MessageService";
 import { BACK_HEADERS, CHAT_TYPE, DIR_DESC_DIRECTION, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
 import useChat from "../../hooks/UseChat";
 import { useNotification } from "../../hooks/useNotification";
@@ -11,7 +11,7 @@ import ChatMessage from "../ChatMessage";
 import Modal from "../Modal";
 import Pagination from "../Pagination";
 import UserImageProfile from "../UserImageProfile";
-//SE REPITEN LOS MENSAJESSSSSSSSSSSSSSSSS
+
 const basePagDetail = {
     pageNo: 0,
     pageSize: 20,
@@ -28,7 +28,7 @@ const basePagDetail = {
  * 
  * @returns {JSX.Element} Chat messages
  */
-export default function ChatMain({ delChatFromChatList }) {
+export default function ChatMain() {
     const [groupInfoModal, setGroupInfoModal] = useState(false);
     const [messagesList, setMessagesList] = useState([]);
     const [pagDetails, setPagDetails] = useState(basePagDetail);
@@ -49,7 +49,7 @@ export default function ChatMain({ delChatFromChatList }) {
      * search chat's last messages.
      */
     useEffect(() => {
-        getAllByChat({ chatId: chatSelected.chatId, ...basePagDetail }).then((data) => {
+        getAllByChatId({ id: chatSelected.id, ...basePagDetail }).then((data) => {
             if (data.body?.list) {
                 const reverseList = data.body.list.reverse();
                 setMessagesList(reverseList);
@@ -70,12 +70,12 @@ export default function ChatMain({ delChatFromChatList }) {
                 msg: error.message
             });
         });
-    }, [chatSelected.chatId]);
+    }, [chatSelected.id]);
 
     //use effect to set all messages from chat as watched by auth user.
     useEffect(() => {
         if (chatSelected.messagesNoWatched !== "0") {
-            setMessagesWatched(chatSelected.chatId).then((data) => {
+            setMessagesWatchedByChatId(chatSelected.id).then((data) => {
                 const newChat = {
                     ...chatSelected,
                     messagesNoWatched: "0"
@@ -88,7 +88,7 @@ export default function ChatMain({ delChatFromChatList }) {
                 })
             });
         }
-    }, [chatSelected.chatId])
+    }, [chatSelected.id])
 
 
     /**
@@ -96,7 +96,7 @@ export default function ChatMain({ delChatFromChatList }) {
      */
     useEffect(() => {
         if (pagDetailsFlag) {
-            getAllByChat({ chatId: chatSelected.chatId, ...pagDetails }).then((data) => {
+            getAllByChatId({ id: chatSelected.id, ...pagDetails }).then((data) => {
                 if (data.body?.list && data.body.pageInfoDto.totalElements >= messagesList.length) {
                     const reverseList = data.body.list.reverse();
                     setMessagesList((prevMessageList) => [...reverseList, ...prevMessageList]);
@@ -123,7 +123,7 @@ export default function ChatMain({ delChatFromChatList }) {
      * if new message chat is the same than the chatSelected.
      */
     useEffect(() => {
-        if(newMessage.chatId === chatSelected.chatId){
+        if(newMessage.chatId === chatSelected.id){
             setMessagesList([...messagesList, newMessage])
         }
     }, [newMessage]);
@@ -145,7 +145,7 @@ export default function ChatMain({ delChatFromChatList }) {
         const message = newMessageRef.current.value;
 
         create({
-            chatId: chatSelected.chatId,
+            chatId: chatSelected.id,
             message
         }).then((data) => {
             setMessagesList([...messagesList, data.body]);

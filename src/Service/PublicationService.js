@@ -45,7 +45,7 @@ export async function getAllByAuthUser({
     const params = new URLSearchParams({
         page: pageNo || '0',
         pageSize: pageSize || '20',
-        sortField: sortField || 'publImgId',
+        sortField: sortField || 'id',
         sortDir: sortDir || DIR_ASC_DIRECTION
     });
 
@@ -144,7 +144,7 @@ export async function getById({id,pageNo, pageSize,sortField , sortDir}){
     const params = new URLSearchParams({
         page : pageNo || '0',
         pageSize : pageSize || '20',
-        sortField : sortField || 'publImgId',
+        sortField : sortField || 'id',
         sortDir : sortDir || DIR_ASC_DIRECTION
     })
 

@@ -66,7 +66,7 @@ function SearchPopover({ hidePopover, container}) {
                                     <UserImageProfile imgWith="60px" imgHeight="60px" img={user.image}/>
                                     <span className="ps-2 fs-5">{user.username}</span>
                                 </div>
-                                <Link to={`/userHome/${user.userId}`} className="btn btn-sm btn-link">
+                                <Link to={`/userHome/${user.id}`} className="btn btn-sm btn-link">
                                     Visit
                                 </Link>
                             </button>

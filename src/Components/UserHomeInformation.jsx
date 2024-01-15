@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { findUsersThatWantToFollowYou, usersYouWantFollowButIsNotAllowedYet, updateFollowStatusByFollowerId } from "../Service/FollowService";
-import { getGeneralUserInfo } from "../Service/UserService";
+import { getGeneralUserInfoById } from "../Service/UserService";
 import { BACK_HEADERS, FOLLOWED_LABEL, FOLLOWED_STATUS, FOLLOWERS_LABEL, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PUBLICATIONS_LABEL } from "../Util/UtilTexts";
 import useAuth from "../hooks/useAuth";
 import { useNotification } from "../hooks/useNotification";
@@ -11,7 +11,7 @@ import Loading from "./Loading";
 import Modal from "./Modal";
 import UserImageProfile from "./UserImageProfile";
 import useUserHomeInfo from "../hooks/useUserHomeInfo";
-import { follow, unFollow } from "../Service/FollowService";
+import { follow, unFollowByFollowedId } from "../Service/FollowService";
 
 const basePagDetail = {
     pageNo: 0,
@@ -46,7 +46,7 @@ export default function UsersHomeInformation() {
     //UseEffect to get general user info of the user seleceted
     useEffect(() => {
         setLoading(true);
-        getGeneralUserInfo(userId).then((data) => {
+        getGeneralUserInfoById(userId).then((data) => {
             setUserVisited(data.body);
         }).catch((error) => {
             setNotificationToast({
@@ -66,7 +66,7 @@ export default function UsersHomeInformation() {
     useEffect(() => {
         if (pagDetailsFlag) {
             if (userIsFollower === false) { //with this I know what function a need to do to get more follow records
-                findUsersThatWantToFollowYou({ ...pagDetails, authUserId: auth.user.userId }).then(data => {
+                findUsersThatWantToFollowYou({ ...pagDetails, id: auth.user.id }).then(data => {
                     const numberOfElementsAlreadyInModal = followModalContent.length;//to don't keep adding last users when they are already in the modal list.
                     if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInModal) {
                         //I want to have follow records from prev request and new request
@@ -83,7 +83,7 @@ export default function UsersHomeInformation() {
                     });
                 });
             } else {
-                usersYouWantFollowButIsNotAllowedYet({ ...pagDetails, authUserId: auth.user.userId })
+                usersYouWantFollowButIsNotAllowedYet({ ...pagDetails, id: auth.user.id })
                     .then(data => {
                         const numberOfElementsAlreadyInModal = followModalContent.length;//to don't keep adding last users when they are already in the modal list.
                         if (data.body?.list && data.body.pageInfoDto.totalElements > numberOfElementsAlreadyInModal) {
@@ -122,7 +122,7 @@ export default function UsersHomeInformation() {
      * function to open follow model with info about users who want to follow you, but you haven't allowed it yet.
      */
     function whoWantToFollowYou() {
-        findUsersThatWantToFollowYou({ ...basePagDetail, authUserId: auth.user.userId }).then(data => {
+        findUsersThatWantToFollowYou({ ...basePagDetail, id: auth.user.id }).then(data => {
             if (data.body?.list) {
                 setFollowModalContent(data.body.list);
                 setUserIsFollower(false);
@@ -149,7 +149,7 @@ export default function UsersHomeInformation() {
      * function to open the following model with information about users you want to follow, but are not yet allowed.
      */
     function whoYouWantToFollow() {
-        usersYouWantFollowButIsNotAllowedYet({ ...basePagDetail, authUserId: auth.user.userId })
+        usersYouWantFollowButIsNotAllowedYet({ ...basePagDetail, id: auth.user.id })
             .then(data => {
                 if (data.body?.list) {
                     setFollowModalContent(data.body.list);
@@ -177,7 +177,7 @@ export default function UsersHomeInformation() {
     * Function to follow the user selected
     */
     function followHanlder() {
-        follow(userVisited.user.userId).then(data => {
+        follow(userVisited.user.id).then(data => {
             setUserVisited({ ...userVisited, social: { ...userVisited.social, followStatus: data.body.followStatus } });
         }).catch(error => {
             setNotificationToast({
@@ -191,7 +191,7 @@ export default function UsersHomeInformation() {
      * Function to stop following the selected user.
      */
     function unfollowHandler() {
-        unFollow(userVisited.user.userId).then(data => {
+        unFollowByFollowedId(userVisited.user.id).then(data => {
             setUserVisited({ ...userVisited, social: { ...userVisited.social, followStatus: data.body.followStatus } });
         }).catch(error => {
             setNotificationToast({
@@ -208,7 +208,7 @@ export default function UsersHomeInformation() {
      * @param {String} followerId - follower's id.
      */
     function updateFollowFollowStatusByFollower({ newFollowStatus, followerId }) {
-        updateFollowStatusByFollowerId({ newFollowStatus, followerId }).then(data => {
+        updateFollowStatusByFollowerId({ newFollowStatus, id : followerId }).then(data => {
             setUserVisited({
                 ...userVisited,
                 social : {

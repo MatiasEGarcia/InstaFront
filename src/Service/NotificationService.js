@@ -17,7 +17,7 @@ export async function getPersonalNotifications({
     const params = new URLSearchParams({
         page: page || '0',
         pageSize: pageSize || '20',
-        sortField: sortField || 'notiId',
+        sortField: sortField || 'id',
         sortDir: sortDir || DIR_ASC_DIRECTION,
     });
     const options = {
@@ -34,17 +34,17 @@ export async function getPersonalNotifications({
 /**
  * Function to delete notification record by id.
  * 
- * @param {String} notiId notification id. 
+ * @param {String} id notification's id. 
  * @returns {Promise<Object} data object with the body of the response.
  */
-export async function deletePersonalNotificationById(notiId){
+export async function deletePersonalNotificationById(id){
     let data;
     const options = {
         method : 'DELETE',
         headers:{}
     }
     data = await fetchApi({
-        endpoint: `${NOTIFICATIONS_ENDPOINT}/${notiId}`,
+        endpoint: `${NOTIFICATIONS_ENDPOINT}/${id}`,
         options
     });
     return data;

@@ -27,15 +27,15 @@ export async function create({message , chatId}){
 
 /**
  * Async function to get messages from a specific chat, by chat's id.
- * @param {String} param.chatId - chat's id
+ * @param {String} param.id - chat's id
  * @param {String} param.page page number in case of pagination.
  * @param {String} param.pagSize page size in case of pagination.
  * @param {String} param.sortDir sort direction(ASC, DESC).
  * @param {String} param.sortField field by sort
  * @returns {Promise<Object>} Data body with chat messages or a header with info.
  */
-export async function getAllByChat({
-    chatId,pageNo, pageSize, sortDir, sortField
+export async function getAllByChatId({
+    id,pageNo, pageSize, sortDir, sortField
 }){
     let data;
     const params = new URLSearchParams({
@@ -50,7 +50,7 @@ export async function getAllByChat({
     };
 
     data = await fetchApi({
-        endpoint : `${MESSAGES_ENDPOINT}/${chatId}?${params.toString()}`,
+        endpoint : `${MESSAGES_ENDPOINT}/getMessagesByChatId/${id}?${params.toString()}`,
         options 
     });
 
@@ -59,10 +59,10 @@ export async function getAllByChat({
 
 /**
  * Function to set all messages from a chat as watched by auth user.
- * @param {String} chatId - chat's id
+ * @param {String} id - chat's id
  * @returns {Promise<Object>} data object with the body of the response.(in best case chat object with messagesWatched updated).
  */
-export async function setMessagesWatched(chatId){
+export async function setMessagesWatchedByChatId(id){
     let data;
     const options = {
         method: 'PUT',
@@ -70,7 +70,7 @@ export async function setMessagesWatched(chatId){
     }
 
     data = await fetchApi({
-        endpoint : `${MESSAGES_ENDPOINT}/watchedAll/${chatId}`,
+        endpoint : `${MESSAGES_ENDPOINT}/watchedAllByChatId/${id}`,
         options
     });
     return data;

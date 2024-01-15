@@ -3,7 +3,7 @@ import { PlusCircle, DashCircle, Star } from "react-bootstrap-icons";
 
 /**
  * 
- * @param {String} param.userId - user id.
+ * @param {String} param.id - user's id.
  * @param {String} param.image - user image
  * @param {Object} param.size - object with image size.
  * @param {Boolean} param.onChat - check to see if this card shows a user to add to the chat or to remove. false if the user is not in chat yet, and true if is.
@@ -13,7 +13,7 @@ import { PlusCircle, DashCircle, Star } from "react-bootstrap-icons";
  * @returns {JSX.Element} - The rendered card component for chat creation.
  */
 export default function NewChatCard({
-    userId,
+    id,
     image,
     username,
     size = { width: "60px", height: "60px" },
@@ -34,7 +34,7 @@ export default function NewChatCard({
             </div>
             {!onChat &&
                 <PlusCircle size={60} className="cursor-pointer-hover" color="green"
-                    onClick={() => addUserInChat({ userId, image, username })} />
+                    onClick={() => addUserInChat({ id, image, username })} />
             }
             {onChat &&
                 <>
@@ -43,11 +43,11 @@ export default function NewChatCard({
                     className="cursor-pointer-hover me-1" 
                     color={isAdmin === true ? 'orange' : 'grey'}
                     onClick={isAdmin === true ? 
-                        () => quitAdminFromChat(userId) :
-                         () => addAdminInChat({ userId, image, username })}
+                        () => quitAdminFromChat(id) :
+                         () => addAdminInChat({ id, image, username })}
                     />
                 <DashCircle size={60} className="cursor-pointer-hover" color="green"
-                    onClick={() => quitUserFromChat(userId)} />
+                    onClick={() => quitUserFromChat(id)} />
                 </>
             }
         </div>

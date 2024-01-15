@@ -22,7 +22,7 @@ function PublicationCard({ showModal, width, item }) {
     return (
         <div className={`card ${width}`}>
             <div className="card-header d-flex justify-content-between">
-                <Link className="btn" to={`/userHome/${item.userOwner.userId}`}>
+                <Link className="btn" to={`/userHome/${item.userOwner.id}`}>
                     <UserImageProfile imgWith="60px" imgHeight="60px" img={item.userOwner.image} />
                     <span className="ps-2 fs-5">{item.userOwner.username}</span>
                 </Link>

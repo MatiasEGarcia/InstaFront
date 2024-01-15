@@ -31,16 +31,16 @@ export function NotificationProvider({ children }) {
 
     /**
      * Create a notification and add to the notification popover in navigation var.
-     * @param {String} props.notiId notification id.
+     * @param {String} props.id notification id.
      * @param {String} props.notiMessage - notification message (What is the notification about?)
      * @param {Object} props.fromWho - user that produced the action(follow,like,etc) and in consequence 
      * create the notification.
      * @param {NOTIFICATION_TYPE} props.notificationType - type of notification (like theme, follow theme, etc).
      * @param {Date} pros.createdAt - from when is the notification.
      */
-    function createNotification({ notiId, notificationType, notiMessage, fromWho, createdAt}) {
+    function createNotification({ id, notificationType, notiMessage, fromWho, createdAt}) {
         setNotificationList(prevNotificationList => [...prevNotificationList, {
-            notiId,
+            id,
             notificationType,
             notiMessage,
             fromWho,
@@ -53,7 +53,7 @@ export function NotificationProvider({ children }) {
      * @param {String} notificationId notification id.
      */
     function deleteNotificationFromNotificationPopover(notificationId){
-        setNotificationList(notificationList.filter((notif) => notif.notiId !== notificationId));
+        setNotificationList(notificationList.filter((notif) => notif.id !== notificationId));
     }
 
 

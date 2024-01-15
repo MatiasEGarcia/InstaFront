@@ -1,17 +1,15 @@
-import { useModal } from "../../hooks/useModal";
-import Modal from "../Modal";
-import PublicationModal from "../PublicationModal";
-import { Link } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
-import UserImageProfile from "../UserImageProfile";
-import { DIR_DESC_DIRECTION, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { getAllByFollowedUsers } from "../../Service/PublicationService";
+import { DIR_DESC_DIRECTION, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
+import useAuth from "../../hooks/useAuth";
 import { useNotification } from "../../hooks/useNotification";
 import Loading from "../Loading";
+import Modal from "../Modal";
 import Pagination from "../Pagination";
 import PublicationCard from "../PublicationCard";
-import { getById } from "../../Service/PublicationService";
+import PublicationModal from "../PublicationModal";
+import UserImageProfile from "../UserImageProfile";
 
 const basePagDetails = {
     pageNo: 0,//first page is 0
@@ -97,7 +95,7 @@ function HomeMain() {
                     </div>
                     <aside className="d-none d-lg-block col-lg-4 mt-5">
                         <ul className="nav flex-column gap-3">
-                            <Link to={`/userHome/${auth.user.userId}`} className="nav-item btn btn-light w-80 d-flex justify-content-between">
+                            <Link to={`/userHome/${auth.user.id}`} className="nav-item btn btn-light w-80 d-flex justify-content-between">
                                 <div>
                                     <UserImageProfile imgWith="60px"
                                         imgHeight="60px"

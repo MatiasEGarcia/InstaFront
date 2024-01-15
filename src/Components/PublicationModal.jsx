@@ -31,7 +31,7 @@ export default function PublicationModal({ setModalState, id }) {
     const [publication, setPublication] = useState({});
     const [loading, setLoading] = useState(true);
     const [rootComments, setRootComments] = useState([]);
-    const [commentsPagDetailsFlag, setCommentsPagDetiailsFlag] = useState(true);
+    const [commentsPagDetailsFlag, setCommentsPagDetiailsFlag] = useState(false);
     const [commentsPagDetails, setCommentsPagDetails] = useState(commentBasePagDetails);
     const { setNotificationToast } = useNotification();
     const refNewComment = useRef();
@@ -43,12 +43,15 @@ export default function PublicationModal({ setModalState, id }) {
     useEffect(() => {
         setLoading(true);
         getById({ id, ...commentBasePagDetails }).then(data => {
-            setPublication(data.body); //en el backend tengo que editar esto
+            setPublication(data.body); 
             if(data.body.rootComments.list){
                 setRootComments(data.body.rootComments.list);
             }
             setCommentsPagDetiailsFlag(false)
-            setCommentsPagDetails(data.body.rootComments.pageInfoDto);
+            setCommentsPagDetails({
+                ...commentsPagDetails,
+                ...data.body.rootComments.pageInfoDto
+            });
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -65,12 +68,12 @@ export default function PublicationModal({ setModalState, id }) {
     */
     useEffect(() => {
         if (commentsPagDetailsFlag) {
-            const numberOfElementsAlreadyInList = rootComments.lenght;
-            getByPublcationId({ publicationId: id, ...commentsPagDetails }).then(data => {
+            const numberOfElementsAlreadyInList = rootComments.length;
+            getByPublcationId({ id, ...commentsPagDetails }).then(data => {
                 if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
-                    setRootComments(prev => [...prev, data.body.list]);
+                    setRootComments(prev => [...prev, ...data.body.list]);
                     setCommentsPagDetails({
-                        ...pagDetails,
+                        ...commentsPagDetails,
                         ...data.body.pageInfoDto,
                     })
                     setCommentsPagDetails(false);
@@ -125,8 +128,8 @@ export default function PublicationModal({ setModalState, id }) {
      * @param {String} param.body comment new content.
      * @param {String} param.isRootComment  to know if comment is root or not, if is root true, if not false.
      */
-    function updateRootCommentBodyById({commentId, body}){
-        updateById({commentId,body}).then(data => {
+    function updateRootCommentBodyById({id, body}){
+        updateById({id,body}).then(data => {
             updateRootCommentOnArray(data.body);
         }).catch(error => {
             setNotificationToast({

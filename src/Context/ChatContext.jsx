@@ -56,9 +56,9 @@ export function ChatProvider({ children }) {
      * the same than chatSelected
      */
     useEffect(()=> {
-        if(newMessage.chatId !== chatSelected.chatId){
+        if(newMessage.chatId !== chatSelected.id){
             const newChatList = chatList.map((chat) => {
-                if(chat.chatId === newMessage.chatId){
+                if(chat.id === newMessage.chatId){
                     const msgNoWatchedNumber = Number(chat.messagesNoWatched);
                     chat.messagesNoWatched = msgNoWatchedNumber + 1;
                 }
@@ -72,7 +72,7 @@ export function ChatProvider({ children }) {
      * To update chat last message when there is a new message from websocket.
      */
     useEffect(() => {
-        const chat = chatList.find(chat => chat.chatId === newMessage.chatId);
+        const chat = chatList.find(chat => chat.id === newMessage.chatId);
         updChatUserWNewMessage({
             ...chat,
             lastMessage : newMessage.body,
@@ -110,12 +110,12 @@ export function ChatProvider({ children }) {
     */
     function setChatContent(chat) {
         if (chat.type === CHAT_TYPE[0]) {
-            const otherUser = chat.users.find((user) => user.userId !== auth.user.userId);
+            const otherUser = chat.users.find((user) => user.id !== auth.user.id);
             const newChatPrivate = {
                 ...chat,
                 name: otherUser.username,
                 image: otherUser.image,
-                otherUserId: otherUser.userId
+                otherUserId: otherUser.id
             }
             return newChatPrivate;
         }
@@ -128,14 +128,14 @@ export function ChatProvider({ children }) {
      * @param {String} chatId  chat's id
      */
     function selectChat(chatId) {
-        const chat = chatList.find((chat) => chat.chatId === chatId);
+        const chat = chatList.find((chat) => chat.id === chatId);
         if (chat.type === CHAT_TYPE[0]) {
-            const otherUser = chat.users.find((user) => user.userId !== auth.user.userId);
+            const otherUser = chat.users.find((user) => user.id !== auth.user.id);
             setChatSelected({
                 ...chat,
                 image: otherUser.image,
                 name: otherUser.username,
-                otherUserId: otherUser.userId
+                otherUserId: otherUser.id
             });
         } else {
             setChatSelected(chat);
@@ -168,7 +168,7 @@ export function ChatProvider({ children }) {
      */
     function updateChat(chatUpdated) {
         const newChatList = chatList.map((chat) => {
-            if (chat.chatId === chatUpdated.chatId) {
+            if (chat.id === chatUpdated.id) {
                 return chatUpdated;
             }
             return chat;
@@ -182,7 +182,7 @@ export function ChatProvider({ children }) {
      * we add the new chatUpdated to the front of the array.
      */
     function updChatUserWNewMessage(chatUpdated){
-        const chatListWhithoutChatUdpated = chatList.filter(chat => chat.chatId !== chatUpdated.chatId);
+        const chatListWhithoutChatUdpated = chatList.filter(chat => chat.id !== chatUpdated.id);
         setChatList([chatUpdated,...chatListWhithoutChatUdpated]);
 
     }
