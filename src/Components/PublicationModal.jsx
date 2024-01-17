@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import UserImageProfile from "./UserImageProfile";
 import Pagination from "./Pagination";
 import CardComment from "./CardComment";
+import { usePag } from "../hooks/usePag";
 
 
 const commentBasePagDetails = {
@@ -30,9 +31,15 @@ const commentBasePagDetails = {
 export default function PublicationModal({ setModalState, id }) {
     const [publication, setPublication] = useState({});
     const [loading, setLoading] = useState(true);
-    const [rootComments, setRootComments] = useState([]);
-    const [commentsPagDetailsFlag, setCommentsPagDetiailsFlag] = useState(false);
-    const [commentsPagDetails, setCommentsPagDetails] = useState(commentBasePagDetails);
+    const {elements,
+        setElements,
+        pagDetails,
+        setPagDetails,
+        flagPagDetails,
+        setFlagPagDetails,
+        changePage,
+        updateElementById,
+        quitElementById} = usePag({...commentBasePagDetails});
     const { setNotificationToast } = useNotification();
     const refNewComment = useRef();
 
@@ -42,16 +49,12 @@ export default function PublicationModal({ setModalState, id }) {
      */
     useEffect(() => {
         setLoading(true);
-        getById({ id, ...commentBasePagDetails }).then(data => {
+        getById({ id, ...pagDetails }).then(data => {
             setPublication(data.body); 
             if(data.body.rootComments.list){
-                setRootComments(data.body.rootComments.list);
+                setElements(data.body.rootComments.list);
             }
-            setCommentsPagDetiailsFlag(false)
-            setCommentsPagDetails({
-                ...commentsPagDetails,
-                ...data.body.rootComments.pageInfoDto
-            });
+            setPagDetails(prev => {return {...prev, ...data.body.rootComments.pageInfoDto}});
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -67,18 +70,15 @@ export default function PublicationModal({ setModalState, id }) {
     * To get more comments
     */
     useEffect(() => {
-        if (commentsPagDetailsFlag) {
-            const numberOfElementsAlreadyInList = rootComments.length;
-            getByPublcationId({ id, ...commentsPagDetails }).then(data => {
+        if (flagPagDetails) {
+            const numberOfElementsAlreadyInList = elements.length;
+            getByPublcationId({ id, ...pagDetails }).then(data => {
                 if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
-                    setRootComments(prev => [...prev, ...data.body.list]);
-                    setCommentsPagDetails({
-                        ...commentsPagDetails,
-                        ...data.body.pageInfoDto,
-                    })
-                    setCommentsPagDetails(false);
+                    setElements(prev => [...prev, ...data.body.list]);
+                    setPagDetails(prev => { return {...prev, ...data.body.pageInfoDto} });
+                    setFlagPagDetails(false);
                 } else if (data.headers) {
-                    console.log(data.headers.get(BACK_HEADERS[0]));
+                    console.info(data.headers.get(BACK_HEADERS[0]));
                 }
             }).catch(error => {
                 setNotificationToast({
@@ -87,20 +87,7 @@ export default function PublicationModal({ setModalState, id }) {
                 });
             });
         }
-    }, [commentsPagDetails]);
-
-    /**
-     * To change page in pagination.
-     * @param {String} newPageNo - new page number 
-     */
-    function changePage(newPageNo) {
-        setCommentsPagDetails({
-            ...commentsPagDetails,
-            pageNo: newPageNo
-        });
-        setCommentsPagDetiailsFlag(true);
-    }
-
+    }, [pagDetails]);
     /**
      * To save root comments.
      * 
@@ -113,7 +100,7 @@ export default function PublicationModal({ setModalState, id }) {
             publImgId
         }).then(data => {
             //adding new comemnt
-           setRootComments(prev => [data.body , ...prev]);
+           setElements(prev => [data.body , ...prev]);
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -130,7 +117,7 @@ export default function PublicationModal({ setModalState, id }) {
      */
     function updateRootCommentBodyById({id, body}){
         updateById({id,body}).then(data => {
-            updateRootCommentOnArray(data.body);
+            updateElementById(data.body);
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -145,7 +132,7 @@ export default function PublicationModal({ setModalState, id }) {
      */
     function deleteRootCommentById(commentId){
         deleteById(commentId).then(data => {
-            quitRootCommentFromArray(commentId);
+            quitElementById(commentId);
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -153,29 +140,6 @@ export default function PublicationModal({ setModalState, id }) {
             })
         })
     };
-
-    /**
-     * To add the updated comment on root comments array an quit the old version.
-     * @param {Object} updatedComment - updated comment 
-     */
-    function updateRootCommentOnArray(updatedComment){
-        const newRootComments = rootComments.map(comment => {
-            if(comment.commentId === updatedComment.commentId){
-                return updatedComment;
-            }
-            return comment;
-        });
-        setRootComments(newRootComments)
-    };
-
-    /**
-     *  To quit a comment from root comments array;
-     * @param {String} commentId - comment's id.
-     */
-    function quitRootCommentFromArray(commentId){
-        const newRootComments = rootComments.filter(comment => comment.commentId !== commentId);
-        setRootComments(newRootComments);
-    }
 
 
     if (loading) {
@@ -207,10 +171,10 @@ export default function PublicationModal({ setModalState, id }) {
                         </div>
                         <div className="card-body h-70 mh-70  overflow-auto">
                             <Pagination
-                                itemsList={rootComments}
+                                itemsList={elements}
                                 pagType={PAG_TYPES[0]}
                                 changePage={changePage}
-                                pagDetails={commentsPagDetails}
+                                pagDetails={pagDetails}
                                 ComponentToDisplayItem={props => <CardComment updateRootCommentBodyById = {updateRootCommentBodyById}
                                     deleteRootCommentById={deleteRootCommentById} {...props} />}
                             />

@@ -1,28 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { findUsersThatWantToFollowYou, usersYouWantFollowButIsNotAllowedYet, updateFollowStatusByFollowerId } from "../Service/FollowService";
-import { getGeneralUserInfoById } from "../Service/UserService";
+import { findUsersThatWantToFollowYou, follow, unFollowByFollowedId, updateFollowStatusByFollowerId, usersYouWantFollowButIsNotAllowedYet } from "../Service/FollowService";
 import { BACK_HEADERS, FOLLOWED_LABEL, FOLLOWED_STATUS, FOLLOWERS_LABEL, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PUBLICATIONS_LABEL } from "../Util/UtilTexts";
 import useAuth from "../hooks/useAuth";
 import { useNotification } from "../hooks/useNotification";
+import useUserHomeInfo from "../hooks/useUserHomeInfo";
 import FollowModal from "./FollowModal";
 import Loading from "./Loading";
 import Modal from "./Modal";
 import UserImageProfile from "./UserImageProfile";
-import useUserHomeInfo from "../hooks/useUserHomeInfo";
-import { follow, unFollowByFollowedId } from "../Service/FollowService";
-
-const basePagDetail = {
-    pageNo: 0,
-    pageSize: 10,
-    totalPages: undefined,
-    totalElements: undefined,
-    sortField: undefined,
-    sortDir: undefined
-}
-
-
 /**
  * 
  * 
@@ -31,98 +17,23 @@ const basePagDetail = {
  */
 export default function UsersHomeInformation() {
     const [followModalState, setFollowModalState] = useState(false);//used by Modal component to know if should show the modal or not
-    const [pagDetails, setPagDetails] = useState(basePagDetail);
-    const [pagDetailsFlag, setPagDetailsFlag] = useState(false);//??, is for the useEffect that is listening pagDetails, because changes pagDetails content too, and with this I avoid a loop. I will only put on true when the client wants to change the page.
-    const [loading, setLoading] = useState(false);
-    const { userVisited, setUserVisited,
-        followModalContent, setFollowModalContent,
-        userIsFollower, setUserIsFollower } = useUserHomeInfo();
+    const { userVisited, 
+        setUserVisited,
+        setFollowModalContent,
+        setUserIsFollower, 
+        pagDetails, 
+        setPagDetails, 
+        basePagDetails } = useUserHomeInfo();
     const { auth } = useAuth();
-    const navigate = useNavigate();
     const { setNotificationToast } = useNotification();
     const { userId } = useParams();
-
-
-    //UseEffect to get general user info of the user seleceted
-    useEffect(() => {
-        setLoading(true);
-        getGeneralUserInfoById(userId).then((data) => {
-            setUserVisited(data.body);
-        }).catch((error) => {
-            setNotificationToast({
-                sev: NOTIFICATION_SEVERITIES[1],
-                msg: error.message
-            });
-            navigate("/home");
-        }).finally(() => {
-            setLoading(false);
-        });
-    }, [userId]);
-
-    /**
-     * This useEffect will be execute when the user wants the follow records from the next page.
-     * First will be called one of these methods {@link whoWantToFollowYou} or {@link whoYouWantToFollow}
-     */
-    useEffect(() => {
-        if (pagDetailsFlag) {
-            if (userIsFollower === false) { //with this I know what function a need to do to get more follow records
-                findUsersThatWantToFollowYou({ ...pagDetails, id: auth.user.id }).then(data => {
-                    const numberOfElementsAlreadyInModal = followModalContent.length;//to don't keep adding last users when they are already in the modal list.
-                    if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInModal) {
-                        //I want to have follow records from prev request and new request
-                        setFollowModalContent([...followModalContent, ...data.body.list]);
-                        setPagDetails({
-                            ...pagDetails,
-                            ...data.body.pageInfoDto
-                        });
-                    }
-                }).catch((error) => {
-                    setNotificationToast({
-                        sev: NOTIFICATION_SEVERITIES[1],
-                        msg: error.message
-                    });
-                });
-            } else {
-                usersYouWantFollowButIsNotAllowedYet({ ...pagDetails, id: auth.user.id })
-                    .then(data => {
-                        const numberOfElementsAlreadyInModal = followModalContent.length;//to don't keep adding last users when they are already in the modal list.
-                        if (data.body?.list && data.body.pageInfoDto.totalElements > numberOfElementsAlreadyInModal) {
-                            //I want to have follow records from prev request and new request
-                            setFollowModalContent([...followModalContent, data.body.list]);
-                            setPagDetails({
-                                ...pagDetails,
-                                ...data.body.pageInfoDto
-                            })
-                        }
-                    }).catch(error => {
-                        setNotificationToast({
-                            sev: NOTIFICATION_SEVERITIES[1],
-                            msg: error.message
-                        });
-                    });
-            }
-            setPagDetailsFlag(false);
-        }
-    }, [pagDetails]);
-
-
-    /**
-    * Function to change current page in the pagination
-    * @param {String} newPageNo new Page 
-    */
-    function changePage(newPageNo) {
-        setPagDetails({
-            ...pagDetails,
-            ['pageNo']: newPageNo
-        })
-        setPagDetailsFlag(true);
-    }
+    
 
     /**
      * function to open follow model with info about users who want to follow you, but you haven't allowed it yet.
      */
     function whoWantToFollowYou() {
-        findUsersThatWantToFollowYou({ ...basePagDetail, id: auth.user.id }).then(data => {
+        findUsersThatWantToFollowYou({ ...basePagDetails, id: auth.user.id }).then(data => {
             if (data.body?.list) {
                 setFollowModalContent(data.body.list);
                 setUserIsFollower(false);
@@ -149,7 +60,7 @@ export default function UsersHomeInformation() {
      * function to open the following model with information about users you want to follow, but are not yet allowed.
      */
     function whoYouWantToFollow() {
-        usersYouWantFollowButIsNotAllowedYet({ ...basePagDetail, id: auth.user.id })
+        usersYouWantFollowButIsNotAllowedYet({ ...basePagDetails, id: auth.user.id })
             .then(data => {
                 if (data.body?.list) {
                     setFollowModalContent(data.body.list);
@@ -208,12 +119,12 @@ export default function UsersHomeInformation() {
      * @param {String} followerId - follower's id.
      */
     function updateFollowFollowStatusByFollower({ newFollowStatus, followerId }) {
-        updateFollowStatusByFollowerId({ newFollowStatus, id : followerId }).then(data => {
+        updateFollowStatusByFollowerId({ newFollowStatus, id: followerId }).then(data => {
             setUserVisited({
                 ...userVisited,
-                social : {
+                social: {
                     ...userVisited.social,
-                    followedFollowStatus : data.body.followStatus
+                    followedFollowStatus: data.body.followStatus
                 }
             });
         }).catch(error => {
@@ -225,13 +136,7 @@ export default function UsersHomeInformation() {
     }
 
 
-    if (loading) {
-        return (
-            <div className="row p-3">
-                <Loading spaceToTake={LOADING_OPTIONS[1]} />
-            </div>
-        )
-    }
+
 
 
     return (
@@ -273,7 +178,7 @@ export default function UsersHomeInformation() {
 
                         </div>
                     }
-                    {auth.user.userId === userId &&
+                    {auth.user.id === userId &&
                         <div className="ms-3 d-flex gap-2">
                             <button className="btn btn-light" onClick={whoWantToFollowYou}>Want to follow you</button>
                             <button className="btn btn-light" onClick={whoYouWantToFollow}>You want to follow</button>
@@ -287,9 +192,7 @@ export default function UsersHomeInformation() {
                 </div>
             </div>
             <Modal modalState={followModalState} setModalState={setFollowModalState}>
-                <FollowModal setModalState={setFollowModalState}
-                    pagDetails={pagDetails}
-                    changePage={changePage} />
+                <FollowModal setModalState={setFollowModalState} />
             </Modal>
         </div>
     )

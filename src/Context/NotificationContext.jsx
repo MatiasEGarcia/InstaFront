@@ -35,15 +35,17 @@ export function NotificationProvider({ children }) {
      * @param {String} props.notiMessage - notification message (What is the notification about?)
      * @param {Object} props.fromWho - user that produced the action(follow,like,etc) and in consequence 
      * create the notification.
+     * @param {Object} props.toWho - user that receives the notification
      * @param {NOTIFICATION_TYPE} props.notificationType - type of notification (like theme, follow theme, etc).
      * @param {Date} pros.createdAt - from when is the notification.
      */
-    function createNotification({ id, notificationType, notiMessage, fromWho, createdAt}) {
+    function createNotification({ id, notificationType, notiMessage, fromWho, toWho, createdAt}) {
         setNotificationList(prevNotificationList => [...prevNotificationList, {
             id,
             notificationType,
             notiMessage,
             fromWho,
+            toWho,
             createdAt
           }]);
     }

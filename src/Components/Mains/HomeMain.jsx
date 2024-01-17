@@ -10,6 +10,7 @@ import Pagination from "../Pagination";
 import PublicationCard from "../PublicationCard";
 import PublicationModal from "../PublicationModal";
 import UserImageProfile from "../UserImageProfile";
+import { usePag } from "../../hooks/usePag";
 
 const basePagDetails = {
     pageNo: 0,//first page is 0
@@ -26,17 +27,23 @@ const basePagDetails = {
  */
 function HomeMain() {
     const [loading, setLoading] = useState(true);
-    const [publicationSelectedId , setPublicationSelectedId] = useState();
+    const [publicationSelectedId, setPublicationSelectedId] = useState();
     const [modalState, setModalState] = useState(false);
-    const [pagDetails, setPagDetails] = useState(basePagDetails);
-    const [pagDetailsFlag, setPagDetailsFlag] = useState(true);//??, is for the useEffect that is listening pagDetails, because changes pagDetails content too, and with this I avoid a loop. I will only put on true when the client wants to change the page.
-    const [listPublications, setListPublications] = useState([]);
+    const {
+        elements : listPublications,
+        pagDetails,
+        flagPagDetails,
+        setFlagPagDetails,
+        setElements : setListPublications,
+        setPagDetails,
+        changePage,
+    } = usePag({ ...basePagDetails, initialFlagPagDetails: true });
     const { auth } = useAuth();
-    const {setNotificationToast} = useNotification();
+    const { setNotificationToast } = useNotification();
 
     //use effect to get last publications from followed users
     useEffect(() => {
-        if (pagDetailsFlag) {
+        if (flagPagDetails) {
             getAllByFollowedUsers({ ...pagDetails }).then(data => {
                 const numberOfElementsAlreadyInList = listPublications.length;
                 if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
@@ -46,7 +53,7 @@ function HomeMain() {
                         ...data.body.pageInfoDto
                     });
                 }
-                setPagDetailsFlag(false);
+                setFlagPagDetails(false);
             }).catch(error => {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[1],
@@ -58,23 +65,15 @@ function HomeMain() {
         }
     }, [pagDetails]);
 
-    function changePage(newPageNo) {
-        setPagDetails({
-            ...pagDetails,
-            pageNo: newPageNo
-        })
-        setPagDetailsFlag(true);
-    }
-
     /**
      * Function to open and pass to modal an id to search a publication
      * @param {String} id - publication's id 
      */
-    function selectPublication(id){
+    function selectPublication(id) {
         setPublicationSelectedId(id);
         setModalState(true);
     }
-     
+
 
     return (
         <main className="col-12 col-md-8 col-xl-10">

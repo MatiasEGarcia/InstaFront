@@ -5,6 +5,7 @@ import { BACK_HEADERS, CHAT_TYPE, LOADING_OPTIONS, NOTIFICATION_SEVERITIES } fro
 import useAuth from "../hooks/useAuth";
 import Loading from "../Components/Loading";
 import useWebSocket from "../hooks/useWebSocket";
+import { usePag } from "../hooks/usePag";
 
 const basePagDetail = {
     pageNo: 0,
@@ -15,32 +16,34 @@ const ChatContext = createContext();
 
 export function ChatProvider({ children }) {
     const [chatSelected, setChatSelected] = useState({});
-    const [chatListPageDetails, setChatListPageDetails] = useState(basePagDetail);
-    const [chatListPageDetailsFlag, setListChatPageDetailsFlag] = useState(false);
-    const [chatList, setChatList] = useState([]);
     const [loading, setLoading] = useState(true);
     const { setNotificationToast } = useNotification();
     const { auth } = useAuth();
-    const {newMessage} = useWebSocket();
+    const { newMessage } = useWebSocket();
+    const { elements,
+        setElements,
+        pagDetails,
+        setPagDetails,
+        changePage,
+        flagPagDetails,
+        setFlagPagDetails,
+        updateElementByIdAndAddItAtFront } = usePag({ ...basePagDetail });
 
     /**
      * UseEffect to execute in mount moment and search authUser's chats.
      */
     useEffect(() => {
         setLoading(true);
-        getChats({ ...chatListPageDetails }).then((data) => {
+        getChats({ ...pagDetails }).then((data) => {
             if (data.body?.list) {
-                setChatList(data.body.list);//I'll use scroll pagination so I will add new list elemnents and old list elements. 
+                setElements(data.body.list);//I'll use scroll pagination so I will add new list elemnents and old list elements.
+                setPagDetails(prev => { return { ...prev, ...data.body.pageInfoDto } }); 
             } else if (data.headers) {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[2],
                     msg: data.headers.get(BACK_HEADERS[0])
                 })
             }
-            setChatListPageDetails({
-                ...chatListPageDetails,
-                ...data.body?.pageInfoDto
-            });
         }).catch((error) => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -55,43 +58,40 @@ export function ChatProvider({ children }) {
      * Use effect to execute when there is some new Message and the chat owner is not 
      * the same than chatSelected
      */
-    useEffect(()=> {
-        if(newMessage.chatId !== chatSelected.id){
-            const newChatList = chatList.map((chat) => {
-                if(chat.id === newMessage.chatId){
+    useEffect(() => {
+        if (newMessage.chatId !== chatSelected.id) {
+            const newChatList = elements.map((chat) => {
+                if (chat.id === newMessage.chatId) {
                     const msgNoWatchedNumber = Number(chat.messagesNoWatched);
                     chat.messagesNoWatched = msgNoWatchedNumber + 1;
                 }
                 return chat;
             })
-            setChatList(newChatList);
+            setElements(newChatList);
         }
-    },[newMessage]);
+    }, [newMessage]);
 
     /**
      * To update chat last message when there is a new message from websocket.
      */
     useEffect(() => {
-        const chat = chatList.find(chat => chat.id === newMessage.chatId);
-        updChatUserWNewMessage({
-            ...chat,
-            lastMessage : newMessage.body,
-        })
-    },[newMessage])
+        if (newMessage.chatId) { 
+            const chat = elements.find(chat => chat.id === newMessage.chatId);
+            updateElementByIdAndAddItAtFront({ ...chat, lastMessage: newMessage.body });
+        }
+    }, [newMessage])
 
 
     /**
-     * UseEffect to search next AuthUser's chats and add them to the chatList with previous chats in paginations page.
+     * UseEffect to search next AuthUser's chats and add them to
+     *  the chatList with previous chats in paginations page.
      */
     useEffect(() => {
-        if (chatListPageDetailsFlag) {
-            getChats({ ...chatListPageDetails }).then((data) => {
-                setChatList([...chatList, ...data.body.list]);//I'll use scroll pagination so I will add new list elemnents and old list elements. 
-                setChatListPageDetails({
-                    ...chatListPageDetails,
-                    ...data.body.pageInfoDto
-                });
-                setListChatPageDetailsFlag(false);
+        if (flagPagDetails) {
+            getChats({ ...pagDetails }).then((data) => {
+                setElements(prev => [...prev, ...data.body.list]);//I'll use scroll pagination so I will add new list elemnents and old list elements. 
+                setPagDetails(prev => { return { ...prev, ...data.body.pageInfoDto } });
+                setFlagPagDetails(false);
             }).catch((error) => {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES,
@@ -99,7 +99,7 @@ export function ChatProvider({ children }) {
                 })
             });
         }
-    }, [chatListPageDetails]);
+    }, [pagDetails]);
 
     /**
     * This function has to be applied to each chat in auth user's chatList, to see if is private, if is, 
@@ -128,7 +128,7 @@ export function ChatProvider({ children }) {
      * @param {String} chatId  chat's id
      */
     function selectChat(chatId) {
-        const chat = chatList.find((chat) => chat.id === chatId);
+        const chat = elements.find((chat) => chat.id === chatId);
         if (chat.type === CHAT_TYPE[0]) {
             const otherUser = chat.users.find((user) => user.id !== auth.user.id);
             setChatSelected({
@@ -143,23 +143,11 @@ export function ChatProvider({ children }) {
     }
 
     /**
-    * Function to change current page in the chat pagination
-    * @param {String} newPageNo new Page 
-    */
-    function changeChatPage(newPageNo) {
-        chatListPageDetails({
-            ...chatListPageDetails,
-            ['pageNo']: newPageNo
-        })
-        setListChatPageDetailsFlag(true);
-    }
-
-    /**
      * Function to add new chat created in chatList.
      * @param {*} newChat 
      */
     function addChatToChatList(newChat) {
-        setChatList([newChat,...chatList]);
+        setElements(prev => [newChat, ...prev]);
     }
 
     /**
@@ -167,24 +155,14 @@ export function ChatProvider({ children }) {
      * @param {Object} chatUpdated chat updated.
      */
     function updateChat(chatUpdated) {
-        const newChatList = chatList.map((chat) => {
+        const newChatList = elements.map((chat) => {
             if (chat.id === chatUpdated.id) {
                 return chatUpdated;
             }
             return chat;
         });
-        setChatList(newChatList);
+        setElements(newChatList);
         setChatSelected(chatUpdated);
-    }
-
-    /**
-     * Function to update a chat when a user write a new message.
-     * we add the new chatUpdated to the front of the array.
-     */
-    function updChatUserWNewMessage(chatUpdated){
-        const chatListWhithoutChatUdpated = chatList.filter(chat => chat.id !== chatUpdated.id);
-        setChatList([chatUpdated,...chatListWhithoutChatUdpated]);
-
     }
 
     if (loading) {
@@ -195,14 +173,15 @@ export function ChatProvider({ children }) {
 
     return (
         <ChatContext.Provider value={{
+            pagDetails,
             chatSelected,
             selectChat,
-            chatList,
+            chatList: elements,
             setChatContent,
-            changeChatPage,
+            changeChatPage: changePage,
             addChatToChatList,
             updateChat,
-            updChatUserWNewMessage
+            updChatUserWNewMessage: updateElementByIdAndAddItAtFront
         }}>
             {children}
         </ChatContext.Provider>

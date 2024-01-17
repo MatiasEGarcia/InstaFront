@@ -143,7 +143,7 @@ export async function addUsers({chatId,usersToAdd, usersToAddAsAdmins}){
 export async function quitUsers({id, usersToQuit}){
     let data;
     const bodyRequest = {
-        id,
+        chatId : id,
         usersUsername: usersToQuit
     }
     const options = {

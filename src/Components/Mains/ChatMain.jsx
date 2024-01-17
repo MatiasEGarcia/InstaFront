@@ -11,6 +11,7 @@ import ChatMessage from "../ChatMessage";
 import Modal from "../Modal";
 import Pagination from "../Pagination";
 import UserImageProfile from "../UserImageProfile";
+import { usePag } from "../../hooks/usePag";
 
 const basePagDetail = {
     pageNo: 0,
@@ -30,12 +31,16 @@ const basePagDetail = {
  */
 export default function ChatMain() {
     const [groupInfoModal, setGroupInfoModal] = useState(false);
-    const [messagesList, setMessagesList] = useState([]);
-    const [pagDetails, setPagDetails] = useState(basePagDetail);
-    const [pagDetailsFlag, setPagDetailsFlag] = useState(false);
     const { setNotificationToast } = useNotification();
-    const { chatSelected, updateChat,updChatUserWNewMessage } = useChat();
+    const { chatSelected, updateChat, updChatUserWNewMessage } = useChat();
     const { newMessage } = useWebSocket();
+    const { elements,
+        setElements,
+        pagDetails,
+        flagPagDetails,
+        setPagDetails,
+        setFlagPagDetails,
+        changePage } = usePag({ ...basePagDetail });
     const newMessageRef = useRef();
     const messageBottomDivOverflow = useRef();
     const refMessagesContent = useRef();
@@ -43,7 +48,7 @@ export default function ChatMain() {
     useEffect(() => {
         //set scroll at the bottom
         messageBottomDivOverflow.current?.scrollIntoView({ behavior: "smooth" });
-    },[]);
+    }, []);
 
     /**
      * search chat's last messages.
@@ -52,17 +57,14 @@ export default function ChatMain() {
         getAllByChatId({ id: chatSelected.id, ...basePagDetail }).then((data) => {
             if (data.body?.list) {
                 const reverseList = data.body.list.reverse();
-                setMessagesList(reverseList);
-                setPagDetails({
-                    ...pagDetails,
-                    ...data.body.pageInfoDto
-                });
+                setElements(reverseList);
+                setPagDetails(prev => { return {...prev, ...data.body.pageInfoDto} } );
             } else if (data.headers) {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[2],
                     msg: data.headers.get(BACK_HEADERS[0])
                 })
-                setMessagesList([]);
+                setElements([]);
             }
         }).catch((error) => {
             setNotificationToast({
@@ -95,15 +97,12 @@ export default function ChatMain() {
      * if there is some change in pageDetails, means that the user wants to get more messages.
      */
     useEffect(() => {
-        if (pagDetailsFlag) {
+        if (flagPagDetails) {
             getAllByChatId({ id: chatSelected.id, ...pagDetails }).then((data) => {
-                if (data.body?.list && data.body.pageInfoDto.totalElements >= messagesList.length) {
+                if (data.body?.list && data.body.pageInfoDto.totalElements >= elements.length) {
                     const reverseList = data.body.list.reverse();
-                    setMessagesList((prevMessageList) => [...reverseList, ...prevMessageList]);
-                    setPagDetails({
-                        ...pagDetails,
-                        ...data.body.pageInfoDto
-                    });
+                    setElements((prev) => [...reverseList, ...prev]);
+                    setPagDetails(prev => { return {...prev, ...data.body.pageInfoDto} } );
                 } else if (data.headers) {
                     console.info(data.headers.get(BACK_HEADERS[0]));
                 }
@@ -113,7 +112,7 @@ export default function ChatMain() {
                     msg: error.message
                 });
             }).finally(() => {
-                setPagDetailsFlag(false);
+                setFlagPagDetails(false);
             });
         }
     }, [pagDetails]);
@@ -123,8 +122,8 @@ export default function ChatMain() {
      * if new message chat is the same than the chatSelected.
      */
     useEffect(() => {
-        if(newMessage.chatId === chatSelected.id){
-            setMessagesList([...messagesList, newMessage])
+        if (newMessage.chatId === chatSelected.id) {
+            setElements(prev => [...prev, newMessage])
         }
     }, [newMessage]);
 
@@ -132,10 +131,10 @@ export default function ChatMain() {
      * listen new messages and change scroll height.
      */
     useEffect(() => {
-        if (pagDetails.pageNo === 0 || pagDetailsFlag) {
+        if (pagDetails.pageNo === 0 || flagPagDetails) {
             messageBottomDivOverflow.current?.scrollIntoView({ behavior: "smooth" });
-        } 
-    }, [messagesList]);
+        }
+    }, [elements]);
 
 
     /**
@@ -148,12 +147,12 @@ export default function ChatMain() {
             chatId: chatSelected.id,
             message
         }).then((data) => {
-            setMessagesList([...messagesList, data.body]);
+            setElements(prev => [...elements, data.body]);
             newMessageRef.current.value = '';
             //we update last message, so we can see it in chat list.
             updChatUserWNewMessage({
                 ...chatSelected,
-                lastMessage : message
+                lastMessage: message
             })
             //send the user view to the new bottom.
             messageBottomDivOverflow.current?.scrollIntoView({ behavior: "smooth" });
@@ -163,18 +162,6 @@ export default function ChatMain() {
                 msg: error.message
             });
         });
-    }
-
-    /**
-     * To change the page in pagination.
-     * @param {String} newPageNo new page in pagination.
-     */
-    function changeMessagePage(newPageNo) {
-        setPagDetails({
-            ...pagDetails,
-            pageNo: newPageNo
-        });
-        setPagDetailsFlag(true);
     }
 
     /**
@@ -209,18 +196,18 @@ export default function ChatMain() {
                     </button>
                 </div>
                 <div className="card-body overflow-auto" ref={refMessagesContent}>
-                    {!messagesList &&
+                    {!elements &&
                         <div>
                             <p className="m-0">No messages yet</p>
                         </div>
                     }
-                    {messagesList &&
+                    {elements &&
                         <Pagination
-                            itemsList={messagesList}
+                            itemsList={elements}
                             pagType={PAG_TYPES[1]}
                             pagDetails={pagDetails}
-                            changePage={changeMessagePage}
-                            observerRoot = {refMessagesContent.current}
+                            changePage={changePage}
+                            observerRoot={refMessagesContent.current}
                             ComponentToDisplayItem={(props) => <ChatMessage {...props} />}
                         />
                     }

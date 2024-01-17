@@ -1,32 +1,38 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getAllByAuthUser } from "../Service/PublicationService";
-import { BACK_HEADERS, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../Util/UtilTexts";
+import { BACK_HEADERS, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../Util/UtilTexts";
 import { useNotification } from "../hooks/useNotification";
-import Loading from "./Loading";
 import Modal from "./Modal";
 import Pagination from "./Pagination";
 import PublicationCard from "./PublicationCard";
 import PublicationModal from "./PublicationModal";
+import { usePag } from "../hooks/usePag";
 
 const basePagDetails = {
     pageNo: 0,//first page is 0
-    pageSize: 5,
+    pageSize: 3,
     totalPages: undefined,
     totalElements: undefined,
     sortField: undefined,
     sortDir: undefined
 }
 
+
 export default function UsersHomePublications() {
+    console.log("entro en usersHomePublications");
     const [publicationModalState, setPublicationModalState] = useState(false);//used by Modal component to know if should show the modal or not
     const [publicationSelectedId, setPublicationSelectedId] = useState();
-    const [userPublications, setUserPublications] = useState([]);
-    const [pagDetailsFlag, setPagDetailsFlag] = useState(true);
-    const [pagDetails, setPagDetails] = useState(basePagDetails);
+    const { elements: userPublications,
+        setElements: setUserPublications,
+        pagDetails,
+        setPagDetails,
+        flagPagDetails,
+        setFlagPagDetails,
+        changePage } = usePag({ ...basePagDetails, initialFlagPagDetails: true });
     const [loading, setLoading] = useState(true);
     const { setNotificationToast } = useNotification();
-    const { publicationId,userId } = useParams();
+    const { publicationId, userId } = useParams();
 
     useEffect(() => {
         if (publicationId) {
@@ -34,19 +40,6 @@ export default function UsersHomePublications() {
             setPublicationModalState(true);
         }
     }, [publicationId])
-
-
-    /**
-     * Function to change current page in the pagination.
-     * @param {String} newPageNo new page 
-     */
-    function changePage(newPageNo) {
-        setPagDetails({
-            ...pagDetails,
-            ['pageNo']: newPageNo
-        });
-        setPagDetailsFlag(true);
-    }
 
     /**
      * Function to show a modal with publication selected information.
@@ -62,7 +55,7 @@ export default function UsersHomePublications() {
     * useEffect to load all the current user Publications at the beggining.
     */
     useEffect(() => {
-        if (pagDetailsFlag) {
+        if (flagPagDetails) {
             setLoading(true);
             const numberOfElementsAlreadyInList = userPublications.length;
             getAllByAuthUser({ ...pagDetails, ownerId: userId }).then((data) => {
@@ -82,7 +75,7 @@ export default function UsersHomePublications() {
                 });
             }).finally(() => {
                 setLoading(false);
-                setPagDetailsFlag(false);
+                setFlagPagDetails(false);
             });
         }
     }, [pagDetails]);
@@ -114,11 +107,11 @@ export default function UsersHomePublications() {
             });
         }).finally(() => {
             setLoading(false);
-            setPagDetailsFlag(false);
+            setFlagPagDetails(false);
         });
     }, [userId]);
 
- 
+
 
     return (
         <div className="row p-3 border d-flex justify-content-center gap-5">
@@ -131,7 +124,7 @@ export default function UsersHomePublications() {
                     width="w-80 w-sm-75 w-xl-30" {...props} />}
             />
             <Modal modalState={publicationModalState} setModalState={setPublicationModalState}>
-                    <PublicationModal setModalState={setPublicationModalState} id={publicationSelectedId} />
+                <PublicationModal setModalState={setPublicationModalState} id={publicationSelectedId} />
             </Modal>
         </div>
     )

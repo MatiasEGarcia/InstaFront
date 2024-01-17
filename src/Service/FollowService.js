@@ -59,7 +59,7 @@ export async function updateFollowStatusByFollowId({newFollowStatus, id}){
     }
     const params = new URLSearchParams({
         followStatus : newFollowStatus,
-        followId : id
+        id
     });
     data = await fetchApi({
         endpoint: `${FOLLOW_ENDPOINT}/updateFollowStatus?${params.toString()}`,
@@ -111,7 +111,7 @@ export async function findUsersThatWantToFollowYou({
     const params = new URLSearchParams({
         page: pageNo || '0',
         pageSize: pageSize || '10',
-        sortField: 'followId',
+        sortField: 'id',
         sortDir: sortDir || DIR_ASC_DIRECTION
     })
 
@@ -166,7 +166,7 @@ export async function usersYouWantFollowButIsNotAllowedYet({
     const params = new URLSearchParams({
         page: pageNo || '0',
         pageSize: pageSize || '10',
-        sortField: 'followId',
+        sortField: 'id',
         sortDir: sortDir || DIR_ASC_DIRECTION
     })
 

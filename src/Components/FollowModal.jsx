@@ -7,16 +7,17 @@ import Pagination from "./Pagination";
 
 /**
  * @param {Function} param.setModalState - function to close currently modal.
- * @param {Boolean} param.pagDetails - pagination details. 
- * @param {Function} changePage - function to change page in the Pagination.
  * @returns {JSX.Element}  Component with the content that will be display when we want to see the follow info in a modal.
  */
-export default function FollowModal({ 
-    pagDetails,setModalState, changePage
+export default function FollowModal({
+    setModalState
 }) {
     //popover to show follow status dropdown
     const [showDropdown, setShowDropdown] = useState(''); // should contain the id of the follow
-    const {followModalContent} = useUserHomeInfo();
+    const { followModalContent, //follow records
+        changePage,
+        pagDetails // follow recors pagDetails
+    } = useUserHomeInfo();
     const refFollowCardBody = useRef();
 
     /**
@@ -32,7 +33,7 @@ export default function FollowModal({
     }
 
     function closeModal() {
-        setModalState(false);
+        setModalState(prev => !prev);
     }
 
 
@@ -51,14 +52,14 @@ export default function FollowModal({
                             </tr>
                         </thead>
                         <tbody>
-                            <Pagination 
-                                itemsList = {followModalContent}
-                                pagType = {PAG_TYPES[0]} 
-                                pagDetails = {pagDetails}
-                                changePage = {changePage}
-                                observerRoot = {refFollowCardBody.current}
-                                ComponentToDisplayItem = {(props) => <FollowTr openAndCloseDropdown={openAndCloseDropdown}
-                                    showDropdown={showDropdown} {...props}/>}/>
+                            <Pagination
+                                itemsList={followModalContent}
+                                pagType={PAG_TYPES[0]}
+                                pagDetails={pagDetails}
+                                changePage={changePage}
+                                observerRoot={refFollowCardBody.current}
+                                ComponentToDisplayItem={(props) => <FollowTr openAndCloseDropdown={openAndCloseDropdown}
+                                    showDropdown={showDropdown} {...props} />} />
                         </tbody>
                     </table>
                 </div>

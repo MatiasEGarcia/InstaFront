@@ -80,6 +80,7 @@ export function WebSocketProvider({ children }) {
                 elementId : payloadBody.elementId,
                 notiMessage: payloadBody.notiMessage,
                 fromWho: payloadBody.fromWho,
+                toWho : payloadBody.toWho,
                 createdAt: payloadBody.createdAt
             });
         }

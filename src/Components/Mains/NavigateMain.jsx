@@ -7,6 +7,7 @@ import Pagination from "../Pagination";
 import NavigateCard from "../NavigateCard";
 import Loading from "../Loading";
 import PublicationModal from "../PublicationModal";
+import { usePag } from "../../hooks/usePag";
 
 const basePagDetail = {
     pageNo: 0,
@@ -21,13 +22,19 @@ export default function NavigateMain() {
     const [loading, setLoading] = useState(true);
     const [modal, setModal] = useState(false);
     const [publicationSelectedId, setPublicationSelectedId] = useState();
-    const [listPublications, setListPublications] = useState([]);
-    const [pagDetails, setPagDetails] = useState(basePagDetail);
-    const [pagDetailsFlag, setPagDetailsFlag] = useState(true);
+    const {
+        elements : listPublications,
+        setElements : setListPublications,
+        pagDetails,
+        setPagDetails,
+        flagPagDetails,
+        setFlagPagDetails,
+        changePage
+    } = usePag({...basePagDetail, initialFlagPagDetails : true});
     const { setNotificationToast } = useNotification();
     
     useEffect(() => {
-        if (pagDetailsFlag) {
+        if (flagPagDetails) {
             getAllByOwnerVisible({ ...pagDetails }).then(data => {
                 const numberOfElementsAlreadyInList = listPublications.length;
                 if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
@@ -37,7 +44,7 @@ export default function NavigateMain() {
                         ...data.body.pageInfoDto
                     });
                 };
-                setPagDetailsFlag(false);
+                setFlagPagDetails(false);
             }).catch(error => {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[1],
@@ -48,15 +55,7 @@ export default function NavigateMain() {
             });
         }
     }, [pagDetails]);
-
-    function changePage(newPageNo) {
-        setPagDetails({
-            ...pagDetails,
-            pageNo: newPageNo
-        });
-        setPagDetailsFlag(true);
-    }
-
+    
     /**
      * @param {String} id - publication's id
      */

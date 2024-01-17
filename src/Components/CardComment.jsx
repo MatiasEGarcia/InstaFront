@@ -8,6 +8,7 @@ import CardReply from "./CardReply";
 import useAuth from "../hooks/useAuth";
 import { getByParentId, save, updateById, deleteById } from "../Service/CommentService";
 import Pagination from "../Components/Pagination";
+import { usePag } from "../hooks/usePag";
 
 
 //Associated comment base pagination details.
@@ -32,15 +33,22 @@ export default function CardComment({
     updateRootCommentBodyById,
     deleteRootCommentById,
 }) {
-    console.log('se renderizo CardComment')
     const [comment, setComment] = useState(item.body);
     const [numberOfReplies, setNumberOfReplies] = useState(item.associateCN);
     const [flagWriteReply, setFlagWriteReply] = useState(false);
     const [flagWriteAnotherReply, setFlagWriteAnotherReply] = useState(false);
     const [flagSeeReplies, setFlagSeeReplies] = useState(false);
-    const [replies, setReplies] = useState([]);
-    const [flagReplyPagDetails, setFlagReplyPagDetails] = useState(false);
-    const [replyPagDetails, setReplyPagDetails] = useState(repliesBasePagDetails);
+    const {
+        elements,
+        setElements,
+        pagDetails,
+        setPagDetails,
+        flagPagDetails,
+        setFlagPagDetails,
+        changePage,
+        updateElementById,
+        quitElementById
+    } = usePag({...repliesBasePagDetails,initialFlagPagDetails : false});
     const [flagChangeComment, setFlagChangeComment] = useState(false);
     const { auth } = useAuth();
     const { setNotificationToast } = useNotification();
@@ -56,18 +64,15 @@ export default function CardComment({
 
 
     useEffect(() => {
-        if (flagReplyPagDetails) {
-            const alreadyInList = replies.length;
-            getByParentId({id:item.id , ...replyPagDetails }).then(data => {
+        if (flagPagDetails) {
+            const alreadyInList = elements.length;
+            getByParentId({id:item.id , ...pagDetails }).then(data => {
                 if (data.body?.list && data.body.pageInfoDto.totalElements > alreadyInList) {
-                    setReplies(prev => [...prev, ...data.body.list]);
-                    setReplyPagDetails({
-                        ...replyPagDetails,
-                        ...data.body.pageInfoDto
-                    });
-                    setFlagReplyPagDetails(false);
+                    setElements(prev => [...prev, ...data.body.list]);
+                    setPagDetails(prev => {return {...prev, ...data.body.pageInfoDto}});
+                    setFlagPagDetails(false);
                 } else if (data.header) {
-                    console.log(data.headers.get(BACK_HEADERS[0]));
+                    console.info(data.headers.get(BACK_HEADERS[0]));
                 }
             }).catch(error => {
                 setNotificationToast({
@@ -76,19 +81,7 @@ export default function CardComment({
                 })
             });
         }
-    }, [flagReplyPagDetails]);
-
-    /**
-     * To change page in pagination.
-     * @param {String} newPageNo - new page number 
-     */
-    function changePage(newPageNo) {
-        setReplyPagDetails({
-            ...replyPagDetails,
-            pageNo: newPageNo
-        });
-        setFlagReplyPagDetails(true);
-    }
+    }, [flagPagDetails]);
 
     /**
      * TO save a reply.
@@ -101,7 +94,7 @@ export default function CardComment({
             parentId: item.id
         }).then(data => {
             //adding new reply
-            setReplies(prev => [...prev, data.body]);
+            setElements(prev => [...prev, data.body]);
             setNumberOfReplies(prev => prev + 1);
         }).catch(error => {
             setNotificationToast({
@@ -118,7 +111,7 @@ export default function CardComment({
      */
     function updateReplyById({ replyId, body }) {
         updateById({ id: replyId, body }).then(data => {
-            updateReplyOnArray(data.body);
+            updateElementById(data.body);
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -133,8 +126,7 @@ export default function CardComment({
      */
     function deleteReplyById(replyId) {
         deleteById(replyId).then(data => {
-            console.info(data.body);
-            quitReplyFromArrayById(replyId);
+            quitElementById(replyId);
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -142,29 +134,6 @@ export default function CardComment({
             })
         })
     }
-
-    /**
-     * To add the updated comment on replies array an quit the old version.
-     * @param {Object} updatedReply - updated comment 
-     */
-    function updateReplyOnArray(updatedReply) {
-        const newReplies = replies.map(reply => {
-            if (reply.id === updatedReply.id) {
-                return updatedReply;
-            }
-            return reply;
-        });
-        setReplies(newReplies)
-    };
-
-    /**
-     *  To quit a reply from replies array;
-     * @param {String} replyId - reply's id.
-     */
-    function quitReplyFromArrayById(replyId) {
-        const newReplies = replies.filter(reply => reply.id !== replyId);
-        setReplies(newReplies);
-    };
 
     function handlerChangeButton() {
         setFlagChangeComment(!flagChangeComment);
@@ -180,7 +149,7 @@ export default function CardComment({
 
     function handlerSeeReplies() {
         setFlagSeeReplies(!flagSeeReplies);
-        setFlagReplyPagDetails(true);
+        setFlagPagDetails(true);
     }
     function handleChange(newComment) {
         setComment(newComment)
@@ -252,13 +221,13 @@ export default function CardComment({
                 </div>
             </div>
             {flagWriteReply && <WriteReply saveReply={saveReply} cancel={handlerActiveReply} />}
-            {flagSeeReplies && replies.length !== 0 &&
+            {flagSeeReplies && elements.length !== 0 &&
                 <div className="overflow-auto" style={{maxHeight: '300px'}}>
                     <Pagination
-                        itemsList={replies}
+                        itemsList={elements}
                         pagType={PAG_TYPES[0]}
                         changePage={changePage}
-                        pagDetails={replyPagDetails}
+                        pagDetails={pagDetails}
                         ComponentToDisplayItem={props => <CardReply updateReplyById={updateReplyById}
                             deleteReplyById={deleteReplyById} {...props} />}
                     />

@@ -1,7 +1,6 @@
-import { useParams } from "react-router-dom";
+import { UserHomeInfoProvider } from "../../Context/UserHomeInfoContext";
 import UsersHomeInformation from "../UserHomeInformation";
 import UsersHomePublications from "../UserHomePublications";
-import { UserHomeInfoProvider } from "../../Context/UserHomeInfoContext";
 
 /**
  * @returns {JSX.Element} - Main component for user home page. where should be its publications,followers ,etc.
@@ -12,7 +11,7 @@ function UserMainHome() {
             <UserHomeInfoProvider >
                 <UsersHomeInformation />
             </UserHomeInfoProvider>
-            <UsersHomePublications />
+            <UsersHomePublications  />
         </main>
     )
 }

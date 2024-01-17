@@ -15,7 +15,7 @@ import Pagination from "../Pagination";
  */
 function ChatContainer() {
     const [newChatModal, setNewChatModal] = useState(false);
-    const {chatList, changeChatPage , setChatContent , chatSelected} = useChat();
+    const {chatList, pagDetails, changeChatPage, setChatContent, chatSelected} = useChat();
     const { auth } = useAuth();
     const refChatListDiv = useRef();
 
@@ -56,6 +56,7 @@ function ChatContainer() {
                         <Pagination
                             itemsList={chatList}
                             pageType={PAG_TYPES[0]}
+                            pagDetails = {pagDetails}
                             changePage={changeChatPage}
                             observerRoot = {refChatListDiv.current}
                             mapItem={setChatContent}
