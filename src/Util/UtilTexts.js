@@ -58,3 +58,7 @@ export const SCROLL_POSITIONS = ['start' , 'center', 'end'];
 //ERROR
 export const REQUIRED_PARAM = 'Some required param was not given.'
 
+export const WICH_FOLLOW = {
+    FOLLOWER : 'FOLLOWER',
+    FOLLOWED : 'FOLLOWED',
+}

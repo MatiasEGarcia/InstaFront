@@ -1,12 +1,13 @@
-import { DIR_ASC_DIRECTION } from "../Util/UtilTexts";
+import { DIR_ASC_DIRECTION, REQUIRED_PARAM } from "../Util/UtilTexts";
 import { USERS_ENDPOINT } from "../Util/endpoints";
 import fetchApi from "./FetchServices";
+import { getAllByAuthUser } from "./PublicationService";
 
 /**
  * Function to save web socket token for connection in local storage 
  * @param {String} webSocketAuthToken - web socket token
  */
-function setWebSocketToken(webSocketAuthToken){
+function setWebSocketToken(webSocketAuthToken) {
     localStorage.setItem('webSocketToken', webSocketAuthToken);
 }
 
@@ -231,3 +232,25 @@ export async function getWebSocketToken() {
     })
     setWebSocketToken(data.body.webSocketAuthToken);
 }
+
+
+/**
+ * Function to get basic user visited info and its publications
+ * @param {Number} param.pageNo number of the page in pagination.
+ * @param {Number} param.pageSize number of elements for page in pagination.
+ * @param {String} param.sortField field to sort.
+ * @param {String} param.sortDir direction to sort.
+ * @returns {Object} returns an object with the generalInfo and publications of the userVisited.
+ */
+export async function getVisitedUserData({ userVisitedId,
+    pageNo, pageSize, sortField, sortDir, }) {
+    if (!userVisitedId) {
+        throw new Error(REQUIRED_PARAM);
+    };
+    let allData = {};
+    //errors are handled on components.
+    allData.generalInfo = await getGeneralUserInfoById(userVisitedId);
+    allData.publications = await getAllByAuthUser({pageNo, pageSize, sortField, sortDir, ownerId : userVisitedId});
+
+    return allData;
+}; 
