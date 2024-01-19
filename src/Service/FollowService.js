@@ -33,12 +33,12 @@ export async function follow(followedId){
 export async function unFollowByFollowedId(id){
     let data;
     const options = {
-        method: 'POST',
+        method: 'DELETE',
         headers: {},
     };
 
     data = await fetchApi({
-        endpoint: `${FOLLOW_ENDPOINT}/${id}`,
+        endpoint : `${FOLLOW_ENDPOINT}/byFollowedId/${id}`,
         options
     })
 

@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react";
-import { follow, unFollowByFollowedId, updateFollowStatusByFollowerId } from "../../Service/FollowService";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { follow, unFollowByFollowedId, updateFollowStatusByFollowId, updateFollowStatusByFollowerId } from "../../Service/FollowService";
 import { getAllByAuthUser } from "../../Service/PublicationService";
-import { getVisitedUserData } from "../../Service/UserService";
+import { getGeneralUserInfoById } from "../../Service/UserService";
+import { BACK_HEADERS, FOLLOWED_STATUS, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
 import { useNotification } from "../../hooks/useNotification";
 import { usePag } from "../../hooks/usePag";
 import FollowModal from "../FollowModal";
+import Loading from "../Loading";
 import Modal from "../Modal";
 import Pagination from "../Pagination";
+import PublicationCard from "../PublicationCard";
 import PublicationModal from "../PublicationModal";
 import UserImageProfile from "../UserImageProfile";
 import UserVisitedSocialInfo from "../UserVisitedSocialInfo";
-import { useParams } from "react-router-dom";
-import Loading from "../Loading";
-import { LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES, BACK_HEADERS } from "../../Util/UtilTexts";
-import PublicationCard from "../PublicationCard";
+import useAuth from "../../hooks/useAuth";
 
 
 const publicationsBasePagDetails = {
@@ -25,10 +26,6 @@ const publicationsBasePagDetails = {
     sortDir: undefined
 }
 
-TENGO UNNNNNNNNNNNNNNNNNNNNNNN ENORME PROBLEMA ACA, COMO TRATO DE PEDIR LOS DATOS DEL USUARIO VISITADO JUNTOS, OSEA
-SU SOCIAL INFO Y PUBLICACIONES, CUANDO NO HAY PUBLICACIONES Y OBTENGO UN ERROR, POR EJMEPLO 
-Las imagenes del usuario no son visibles porque aun no has solicitado seguirte <- , TAMPOCO PUEDO OBTENER SU SOCIAL INFO,
-PORQUE AMBOS METODOS ESTAN EN UNO SOLO
 /**
  * @returns {JSX.Element} - Main component for user home page. where should be its publications,followers ,etc.
  */
@@ -49,6 +46,7 @@ function UserMainHome() {
         changePage: publicationsChangePage
     } = usePag({ ...publicationsBasePagDetails });
     const { setNotificationToast } = useNotification();
+    const {auth} = useAuth();
     const { publicationId, userId } = useParams();
 
     useEffect(() => {
@@ -60,26 +58,41 @@ function UserMainHome() {
 
     //UseEffect to get general user info of the user seleceted and it's publications.
     useEffect(() => {
-        const numberOfElementsAlreadyInList = publications.length;
         setLoading(true);
-        getVisitedUserData({ userVisitedId: userId, ...publicationsPagDetails }).then(data => {
-            //setting user information
-            setUserVisitedInfo(data.generalInfo.body);
-            //setting publication's user.
-            if (data.publications.body?.list &&
-                data.publications.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
-                setPublications(data.publications.body.list);
-                setPublicationsPagDetails(prev => {
-                    return { ...prev, ...data.publications.body.pageInfoDto };
-                })
-            } else if (data.publications.headers) {
-                console.info(data.publications.headers.get(BACK_HEADERS[0]));
+        setPublications([]);//we quit all the previous publications. 
+        Promise.allSettled([
+            getGeneralUserInfoById(userId),
+            getAllByAuthUser({ ownerId: userId, ...publicationsBasePagDetails })
+        ]).then(values => {
+            const [{ value: valueGeneralUser, reason: reasonGeneralUser },
+                { value: valueALLByAuth, reason: reasonAllByAuth }] = values;
+
+            //checking user visited general information
+            if (valueGeneralUser) {
+                setUserVisitedInfo(valueGeneralUser.body);
+            } else if (reasonGeneralUser) {
+                setNotificationToast({
+                    sev: NOTIFICATION_SEVERITIES[1],
+                    msg: reasonGeneralUser.message
+                });
             }
-        }).catch(error => {
-            setNotificationToast({
-                sev: NOTIFICATION_SEVERITIES[1],
-                msg: error.message
-            });
+
+            //checking user visited's publications.
+            if (valueALLByAuth) {
+                if (valueALLByAuth.body?.list) {
+                    setPublications(valueALLByAuth.body.list);
+                    setPublicationsPagDetails(prev => {
+                        return { ...prev, ...valueALLByAuth.body.pageInfoDto };
+                    })
+                } else if (valueALLByAuth.headers) {
+                    console.info(valueALLByAuth.headers.get(BACK_HEADERS[0]));
+                }
+            } else if (reasonAllByAuth) {
+                setNotificationToast({
+                    sev: NOTIFICATION_SEVERITIES[1],
+                    msg: reasonAllByAuth.message
+                });
+            }
         }).finally(() => {
             setLoading(false);
         });
@@ -158,10 +171,10 @@ function UserMainHome() {
     * Function to follow the user selected
     */
     function followHandler() {
-        follow(userVisited.user.id).then(data => {
+        follow(userVisitedInfo.user.id).then(data => {
             setUserVisitedInfo(prev => {
                 return {
-                    ...prev, social: { ...prev.social, followStatus: data.body.followStatus }
+                    ...prev, social: { ...prev.social, followerFollowStatus: data.body.followStatus }
                 }
             });
         }).catch(error => {
@@ -176,16 +189,19 @@ function UserMainHome() {
      * Function to stop following the selected user.
      */
     function unfollowHandler() {
-        unFollowByFollowedId(userVisited.user.id).then(data => {
+        unFollowByFollowedId(userVisitedInfo.user.id).then(data => {
             setUserVisitedInfo(prev => {
-                return { ...prev, social: { ...prev.social, followStatus: data.body.followStatus } }
+                return {
+                    ...prev, social: { ...prev.social, followerFollowStatus: FOLLOWED_STATUS[3] }
+                }
             });
+            console.info(data.body.message)
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
                 msg: error.message
             });
-        });
+        })
     }
 
     if (loading) {

@@ -12,6 +12,12 @@ export const USERNAME_LABEL = 'Username';
 export const PASSWORD_LABEL = 'Password';
 
 export const FOLLOWED_STATUS = ['ACCEPTED','REJECTED','IN_PROCESS','NOT_ASKED'];
+export const FOLLOW_STATUS_LABEL = {
+    ACCEPTED : 'Accepted',
+    REJECTED : 'Rejected',
+    IN_PROCESS : 'In process',
+    NOT_ASKED : 'Not asked'
+}
 export const FOLLOWED_LABEL= 'Followed';
 export const FOLLOWERS_LABEL= 'Followers';
 export const PUBLICATIONS_LABEL = 'Publications';

@@ -1,5 +1,5 @@
 import { ArrowDownSquare } from "react-bootstrap-icons";
-import { FOLLOWED_STATUS } from "../Util/UtilTexts";
+import { FOLLOWED_STATUS, FOLLOW_STATUS_LABEL } from "../Util/UtilTexts";
 import CardUserSimple from "./CardUserSimple";
 
 /**
@@ -12,7 +12,7 @@ import CardUserSimple from "./CardUserSimple";
  * @returns {JSX.Element} tr for follow model's table of follows records
  */
 export default function FollowTr({
-    item, 
+    item,
     openAndCloseDropdown,
     showDropdown,
     handlerFollowStatusUpdate,
@@ -26,14 +26,15 @@ export default function FollowTr({
                     ? <CardUserSimple id={item.followed.id}
                         userImage={item.followed.image}
                         username={item.followed.username}
-                        size = {{width:"40px" , height : "40px"}} />
+                        size={{ width: "40px", height: "40px" }} />
                     : <CardUserSimple id={item.follower.id}
                         userImage={item.follower.image}
                         username={item.follower.username}
-                        size = {{width:"40px" , height : "40px"}} />}
+                        size={{ width: "40px", height: "40px" }} />}
             </th>
             <td>
-                <p className="my-1">{item.followStatus}</p>
+                {item.followStatus === FOLLOWED_STATUS[1] && <p className="my-1">{FOLLOW_STATUS_LABEL.REJECTED}</p>}
+                {item.followStatus === FOLLOWED_STATUS[2] && <p className="my-1">{FOLLOW_STATUS_LABEL.IN_PROCESS}</p>}
                 {!userIsFollower &&
                     <div className="border border-dark rounded 
                                      position-relative w-80
@@ -50,16 +51,17 @@ export default function FollowTr({
                                             w-100 p-0"
                                 style={{ listStyle: 'none' }}>
                                 {FOLLOWED_STATUS.map((status) => {
-                                    if (item.followStatus === status) {
-                                        return
-                                    } else if (status == FOLLOWED_STATUS[3]) {
+                                    //if status is not asked or if the status of the item is already the status iterated don't show it.
+                                    if (item.followStatus === status || status == FOLLOWED_STATUS[3]) {
                                         return
                                     }
 
                                     return (
                                         <li key={status} className="text-center"
-                                             onClick={() => handlerFollowStatusUpdate({newFollowStatus : status, followId : item.id})}>
-                                            {status.toUpperCase()}
+                                            onClick={() => handlerFollowStatusUpdate({ newFollowStatus: status, followId: item.id })}>
+                                            {status === FOLLOWED_STATUS[0] && <p className="my-1">{FOLLOW_STATUS_LABEL.ACCEPTED}</p>}
+                                            {status === FOLLOWED_STATUS[1] && <p className="my-1">{FOLLOW_STATUS_LABEL.REJECTED}</p>}
+                                            {status === FOLLOWED_STATUS[2] && <p className="my-1">{FOLLOW_STATUS_LABEL.IN_PROCESS}</p>}
                                         </li>
                                     );
                                 })}

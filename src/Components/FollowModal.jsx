@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { XSquare } from "react-bootstrap-icons";
-import { PAG_TYPES, WICH_FOLLOW , LOADING_OPTIONS, NOTIFICATION_SEVERITIES, BACK_HEADERS} from "../Util/UtilTexts";
+import { PAG_TYPES, WICH_FOLLOW, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, BACK_HEADERS, FOLLOWED_STATUS } from "../Util/UtilTexts";
 import FollowTr from "./FollowTr";
 import Pagination from "./Pagination";
-import {usePag} from "../hooks/usePag";
+import { usePag } from "../hooks/usePag";
 import Loading from "./Loading";
-import { findUsersThatWantToFollowYou, usersYouWantFollowButIsNotAllowedYet, updateFollowStatusByFollowId} from "../Service/FollowService";
+import { findUsersThatWantToFollowYou, usersYouWantFollowButIsNotAllowedYet, updateFollowStatusByFollowId } from "../Service/FollowService";
 import useAuth from "../hooks/useAuth";
 import { useNotification } from "../hooks/useNotification";
 
@@ -39,11 +39,11 @@ export default function FollowModal({
         changePage: followsChangePage
     } = usePag({ ...followsBasePagDetail });
     const refFollowCardBody = useRef();
-    const {setNotificationToast} = useNotification();
-    const {auth} = useAuth();
+    const { setNotificationToast } = useNotification();
+    const { auth } = useAuth();
 
     /**
-     * To get follow records.
+     * To get follow records at the beggining.
      */
     useEffect(() => {
         if (wichFollows === WICH_FOLLOW.FOLLOWED) {
@@ -87,6 +87,52 @@ export default function FollowModal({
         setLoading(false);
     }, []);
 
+    useEffect(() => {
+        if (flagFollowsPagDetails) {
+            const numberOfElementsAlreadyInList = follows.length;
+            if (wichFollows === WICH_FOLLOW.FOLLOWED) {
+                findUsersThatWantToFollowYou({ ...followsPagDetails, id: auth.user.id }).then(data => {
+                    if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
+                        setFollows(prev => [...prev, ...data.body.list]);
+                        setUserIsFollower(false);
+                        setFollowsPagDetails({
+                            ...followsPagDetails,
+                            ...data.body.pageInfoDto
+                        })
+                    } else if (data.headers) {
+                        console.info(data.headers.get(BACK_HEADERS[0]));
+                    }
+                }).catch((error) => {
+                    setNotificationToast({
+                        sev: NOTIFICATION_SEVERITIES[1],
+                        msg: error.message
+                    });
+                });
+            } else if (wichFollows === WICH_FOLLOW.FOLLOWER) {
+                usersYouWantFollowButIsNotAllowedYet({ ...followsPagDetails, id: auth.user.id })
+                    .then(data => {
+                        if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
+                            setFollows(prev => [...prev, ...data.body.list]);
+                            setUserIsFollower(true);
+                            setFollowsPagDetails({
+                                ...followsPagDetails,
+                                ...data.body.pageInfoDto
+                            })
+                        } else if (data.headers) {
+                            console.info(data.headers.get(BACK_HEADERS[0]));
+                        }
+                    }).catch(error => {
+                        setNotificationToast({
+                            sev: NOTIFICATION_SEVERITIES[1],
+                            msg: error.message
+                        });
+                    });
+            }
+            setFlagFollowsPagDetails(false);
+        }
+    }, [followsPagDetails]);
+
+
     /**
      * Function to change follow status in some record.
      * 
@@ -95,14 +141,14 @@ export default function FollowModal({
      */
     function handlerFollowStatusUpdate({ newFollowStatus, followId }) {
         updateFollowStatusByFollowId({ newFollowStatus, id: followId }).then(data => {
-            const newFollowModalList = followModalContent.map((follow) => {
+            const newFollowModalList = follows.map((follow) => {
                 if (follow.followId === data.body.followId) {
                     follow.followStatus = data.body.followStatus;
                 }
                 return follow;
             });
             // to have updated info in the modal.
-            setFollowModalContent([...newFollowModalList]);
+            setFollows([...newFollowModalList]);
 
             //if the status is ACCEPTED then I will add 1 more in numberFollowers of the userVisited.(it should be authenticated user)
             if (data.body.followStatus === FOLLOWED_STATUS[0]) {
