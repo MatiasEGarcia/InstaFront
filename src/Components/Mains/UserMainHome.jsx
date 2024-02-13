@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { follow, unFollowByFollowedId, updateFollowStatusByFollowId, updateFollowStatusByFollowerId } from "../../Service/FollowService";
 import { getAllByAuthUser } from "../../Service/PublicationService";
 import { getGeneralUserInfoById } from "../../Service/UserService";
-import { BACK_HEADERS, FOLLOWED_STATUS, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
+import { BACK_HEADERS, FOLLOWED_STATUS, ITEM_LIKED, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES ,WICH_FOLLOW} from "../../Util/UtilTexts";
 import { useNotification } from "../../hooks/useNotification";
 import { usePag } from "../../hooks/usePag";
 import FollowModal from "../FollowModal";
@@ -15,6 +15,7 @@ import PublicationModal from "../PublicationModal";
 import UserImageProfile from "../UserImageProfile";
 import UserVisitedSocialInfo from "../UserVisitedSocialInfo";
 import useAuth from "../../hooks/useAuth";
+import { create, deleteByPublicationId } from "../../Service/LikeService";
 
 
 const publicationsBasePagDetails = {
@@ -43,10 +44,10 @@ function UserMainHome() {
         setPagDetails: setPublicationsPagDetails,
         flagPagDetails: publicationsFlagPagDetails,
         setFlagPagDetails: setPublicationsFlagPagDetails,
-        changePage: publicationsChangePage
+        changePage: publicationsChangePage,
+        updateElementById : updatePublicationById
     } = usePag({ ...publicationsBasePagDetails });
     const { setNotificationToast } = useNotification();
-    const {auth} = useAuth();
     const { publicationId, userId } = useParams();
 
     useEffect(() => {
@@ -204,6 +205,42 @@ function UserMainHome() {
         })
     }
 
+    /**
+     * Function to like a publication by id.
+     * @param {String} id - publication's id. 
+     */
+    function likePublication(id){
+        create({
+            itemId : id,
+            decision : true,
+            type : ITEM_LIKED.PULICATED_IMAGE
+        }).then(data => {
+            updatePublicationById(data.body);
+        }).catch(error => {
+            setNotificationToast({
+                sev : NOTIFICATION_SEVERITIES[1],
+                msg: error.message
+            })
+        });
+    }
+
+    /**
+     * Function to remove like from a publication.
+     * @param {String} id - publication's id.
+     */
+    function removeLike(id){
+        deleteByPublicationId(id).then(data => {
+            updatePublicationById(data.body);
+        }).catch(error => {
+            setNotificationToast({
+                sev : NOTIFICATION_SEVERITIES[1],
+                msg: error.message
+            });
+        });
+    }
+
+
+
     if (loading) {
         return (
             <main className="col-12 col-md-8 col-xl-10">
@@ -248,7 +285,7 @@ function UserMainHome() {
                     changePage={publicationsChangePage}
                     pagDetails={publicationsPagDetails}
                     ComponentToDisplayItem={(props) => <PublicationCard showModal={showModalPublication}
-                        width="w-80 w-sm-75 w-xl-30" {...props} />}
+                        width="w-80 w-sm-75 w-xl-30" likePublication={likePublication} removeLike={removeLike} {...props} />}
                 />
                 <Modal modalState={publicationModalState} setModalState={setPublicationModalState}>
                     <PublicationModal setModalState={setPublicationModalState} id={publicationSelectedId} />

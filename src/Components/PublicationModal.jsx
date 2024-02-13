@@ -1,14 +1,16 @@
 import { useRef, useState, useEffect } from "react";
-import { LOADING_OPTIONS, DIR_DESC_DIRECTION, PAG_TYPES, NOTIFICATION_SEVERITIES, BACK_HEADERS  } from "../Util/UtilTexts";
+import { HeartFill, Heart } from "react-bootstrap-icons";
+import { LOADING_OPTIONS, DIR_DESC_DIRECTION, PAG_TYPES, NOTIFICATION_SEVERITIES, BACK_HEADERS, ITEM_LIKED } from "../Util/UtilTexts";
 import { useNotification } from "../hooks/useNotification";
 import { getById } from "../Service/PublicationService";
-import { getByPublcationId, save, deleteById, updateById} from "../Service/CommentService";
+import { getByPublcationId, save, deleteById, updateById } from "../Service/CommentService";
 import Loading from "./Loading";
 import { Link } from "react-router-dom";
 import UserImageProfile from "./UserImageProfile";
 import Pagination from "./Pagination";
 import CardComment from "./CardComment";
 import { usePag } from "../hooks/usePag";
+import { create, deleteByPublicationId } from "../Service/LikeService";
 
 
 const commentBasePagDetails = {
@@ -31,7 +33,7 @@ const commentBasePagDetails = {
 export default function PublicationModal({ setModalState, id }) {
     const [publication, setPublication] = useState({});
     const [loading, setLoading] = useState(true);
-    const {elements,
+    const { elements,
         setElements,
         pagDetails,
         setPagDetails,
@@ -39,7 +41,7 @@ export default function PublicationModal({ setModalState, id }) {
         setFlagPagDetails,
         changePage,
         updateElementById,
-        quitElementById} = usePag({...commentBasePagDetails});
+        quitElementById } = usePag({ ...commentBasePagDetails });
     const { setNotificationToast } = useNotification();
     const refNewComment = useRef();
 
@@ -50,11 +52,11 @@ export default function PublicationModal({ setModalState, id }) {
     useEffect(() => {
         setLoading(true);
         getById({ id, ...pagDetails }).then(data => {
-            setPublication(data.body); 
-            if(data.body.rootComments.list){
+            setPublication(data.body);
+            if (data.body.rootComments.list) {
                 setElements(data.body.rootComments.list);
             }
-            setPagDetails(prev => {return {...prev, ...data.body.rootComments.pageInfoDto}});
+            setPagDetails(prev => { return { ...prev, ...data.body.rootComments.pageInfoDto } });
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -75,7 +77,7 @@ export default function PublicationModal({ setModalState, id }) {
             getByPublcationId({ id, ...pagDetails }).then(data => {
                 if (data.body?.list && data.body.pageInfoDto.totalElements >= numberOfElementsAlreadyInList) {
                     setElements(prev => [...prev, ...data.body.list]);
-                    setPagDetails(prev => { return {...prev, ...data.body.pageInfoDto} });
+                    setPagDetails(prev => { return { ...prev, ...data.body.pageInfoDto } });
                     setFlagPagDetails(false);
                 } else if (data.headers) {
                     console.info(data.headers.get(BACK_HEADERS[0]));
@@ -100,7 +102,7 @@ export default function PublicationModal({ setModalState, id }) {
             publImgId
         }).then(data => {
             //adding new comemnt
-           setElements(prev => [data.body , ...prev]);
+            setElements(prev => [data.body, ...prev]);
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -115,8 +117,8 @@ export default function PublicationModal({ setModalState, id }) {
      * @param {String} param.body comment new content.
      * @param {String} param.isRootComment  to know if comment is root or not, if is root true, if not false.
      */
-    function updateRootCommentBodyById({id, body}){
-        updateById({id,body}).then(data => {
+    function updateRootCommentBodyById({ id, body }) {
+        updateById({ id, body }).then(data => {
             updateElementById(data.body);
         }).catch(error => {
             setNotificationToast({
@@ -130,7 +132,7 @@ export default function PublicationModal({ setModalState, id }) {
      * To delete a root comment from the publication's comments.
      * @param {String} commentId - comment's id.
      */
-    function deleteRootCommentById(commentId){
+    function deleteRootCommentById(commentId) {
         deleteById(commentId).then(data => {
             quitElementById(commentId);
         }).catch(error => {
@@ -140,6 +142,40 @@ export default function PublicationModal({ setModalState, id }) {
             })
         })
     };
+
+    /**
+     * Function to like a publication by id.
+     * @param {String} id - publication's id. 
+     */
+    function likePublication(id) {
+        create({
+            itemId : id,
+            decision : true,
+            type : ITEM_LIKED.PULICATED_IMAGE
+        }).then(data => {
+            setPublication(data.body);
+        }).catch(error => {
+            setNotificationToast({
+                sev: NOTIFICATION_SEVERITIES[1],
+                msg : error.message
+            });
+        });
+    }
+
+    /**
+     * Function to remove like from a publication.
+     * @param {String} id - publication's id. 
+     */
+    function removeLike(id){
+        deleteByPublicationId(id).then(data => {
+            setPublication(data.body);
+        }).catch(error => {
+            setNotificationToast({
+                sev : NOTIFICATION_SEVERITIES[1],
+                msg : error.message
+            })
+        });
+    }
 
 
     if (loading) {
@@ -175,11 +211,23 @@ export default function PublicationModal({ setModalState, id }) {
                                 pagType={PAG_TYPES[0]}
                                 changePage={changePage}
                                 pagDetails={pagDetails}
-                                ComponentToDisplayItem={props => <CardComment updateRootCommentBodyById = {updateRootCommentBodyById}
+                                ComponentToDisplayItem={props => <CardComment updateRootCommentBodyById={updateRootCommentBodyById}
                                     deleteRootCommentById={deleteRootCommentById} {...props} />}
                             />
                         </div>
-                        <div className="card-footer h-15 d-flex align-items-center">
+                        <div className="card-footer h-15 d-flex flex-column justify-content-between">
+                            <div>
+                                {publication.liked === null &&
+                                    <Heart size={25}
+                                        className="cursor-pointer-hover"
+                                        onClick={() => likePublication(publication.id)}
+                                    />}
+                                {publication.liked !== null && publication.liked === 'true' &&
+                                    <HeartFill color="red" size={25}
+                                        className="cursor-pointer-hover"
+                                        onClick={() => removeLike(publication.id)}
+                                    />}
+                            </div>
                             <div className="input-group">
                                 <input
                                     type="text"

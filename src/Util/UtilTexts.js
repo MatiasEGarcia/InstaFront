@@ -68,3 +68,8 @@ export const WICH_FOLLOW = {
     FOLLOWER : 'FOLLOWER',
     FOLLOWED : 'FOLLOWED',
 }
+
+export const ITEM_LIKED = {
+    COMMENT : 'COMMENT',
+    PULICATED_IMAGE : 'PULICATED_IMAGE'
+}

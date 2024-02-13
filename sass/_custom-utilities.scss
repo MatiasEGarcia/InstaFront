@@ -29,7 +29,7 @@ $utilities: map-merge($map1: $utilities,
       class: cursor,
       state: hover,
       values: auto pointer grab,
-    )
+    ) /*example -> cursor-pointer-hover*/
   )
 );
 

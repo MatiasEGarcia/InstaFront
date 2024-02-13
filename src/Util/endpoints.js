@@ -7,3 +7,4 @@ export const NOTIFICATIONS_ENDPOINT = `${API_ENDPOINT}/notifications`;
 export const CHAT_ENDPOINT = `${API_ENDPOINT}/chats`;
 export const MESSAGES_ENDPOINT = `${API_ENDPOINT}/messages`;
 export const COMMENTS_ENDPOINT = `${API_ENDPOINT}/comments`;
+export const LIKES_ENDPOINT = `${API_ENDPOINT}/like`;

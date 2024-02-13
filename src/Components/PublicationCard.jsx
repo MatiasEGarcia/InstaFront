@@ -1,4 +1,4 @@
-import { Heart } from "react-bootstrap-icons";
+import { HeartFill, Heart } from "react-bootstrap-icons";
 import UserImageProfile from "./UserImageProfile";
 import { Link } from "react-router-dom";
 
@@ -8,9 +8,11 @@ import { Link } from "react-router-dom";
  * @param {Function} props.showModal - will open a modal that have the publication info + comentaries.
  * @param {String} props.width - publication card width.
  * @param {Object} props.item - publication content.
+ * @param {Function} props.likePublication - function to like the current publication.
+ * @param {Function} props.removeLike - function to remove like from the current publication.
  * @returns {JSX.Element} - The rendered Publication component.
  */
-function PublicationCard({ showModal, width, item }) {
+function PublicationCard({ showModal, width, item, likePublication, removeLike }) {
     const utcLocalCreateAt = new Date(item.createdAt);
     const options = {
         month: "numeric",
@@ -39,16 +41,23 @@ function PublicationCard({ showModal, width, item }) {
             <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center">
                     <p className="card-title fs-3 pt-3">Card Title</p>
-                    <button className="btn fs-2">
-                        <Heart />
-                    </button>
+                    {item.liked === null && 
+                        <Heart size={40}
+                               className="cursor-pointer-hover"
+                               onClick={() => likePublication(item.id)}
+                        />}
+                    {item.liked !== null && item.liked === 'true' &&
+                         <HeartFill color="red" size={40} 
+                                className="cursor-pointer-hover"
+                                onClick={() => removeLike(item.id)}
+                         />}
                 </div>
                 <div>
                     <p>{item.description}</p>
                 </div>
             </div>
             <div className="card-footer">
-                <button type="button" className="btn btn-success" onClick={() => showModal(item.id)}> 
+                <button type="button" className="btn btn-success" onClick={() => showModal(item.id)}>
                     See comentaries
                 </button>
             </div>
