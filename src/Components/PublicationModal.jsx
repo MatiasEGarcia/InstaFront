@@ -149,15 +149,15 @@ export default function PublicationModal({ setModalState, id }) {
      */
     function likePublication(id) {
         create({
-            itemId : id,
-            decision : true,
-            type : ITEM_LIKED.PULICATED_IMAGE
+            itemId: id,
+            decision: true,
+            type: ITEM_LIKED.PULICATED_IMAGE
         }).then(data => {
             setPublication(data.body);
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
-                msg : error.message
+                msg: error.message
             });
         });
     }
@@ -166,13 +166,13 @@ export default function PublicationModal({ setModalState, id }) {
      * Function to remove like from a publication.
      * @param {String} id - publication's id. 
      */
-    function removeLike(id){
+    function removeLike(id) {
         deleteByPublicationId(id).then(data => {
             setPublication(data.body);
         }).catch(error => {
             setNotificationToast({
-                sev : NOTIFICATION_SEVERITIES[1],
-                msg : error.message
+                sev: NOTIFICATION_SEVERITIES[1],
+                msg: error.message
             })
         });
     }
@@ -216,17 +216,22 @@ export default function PublicationModal({ setModalState, id }) {
                             />
                         </div>
                         <div className="card-footer h-15 d-flex flex-column justify-content-between">
-                            <div>
-                                {publication.liked === null &&
-                                    <Heart size={25}
-                                        className="cursor-pointer-hover"
-                                        onClick={() => likePublication(publication.id)}
-                                    />}
-                                {publication.liked !== null && publication.liked === 'true' &&
-                                    <HeartFill color="red" size={25}
-                                        className="cursor-pointer-hover"
-                                        onClick={() => removeLike(publication.id)}
-                                    />}
+                            <div className="d-flex">
+                                <div className="me-2">
+                                    {publication.liked === null &&
+                                        <Heart size={25}
+                                            className="cursor-pointer-hover"
+                                            onClick={() => likePublication(publication.id)}
+                                        />}
+                                    {publication.liked !== null && publication.liked === 'true' &&
+                                        <HeartFill color="red" size={25}
+                                            className="cursor-pointer-hover"
+                                            onClick={() => removeLike(publication.id)}
+                                        />}
+                                </div>
+                                {publication.numberPositiveLikes !== null && publication.numberPositiveLikes !== '0' 
+                                && <p className="m-0">{publication.numberPositiveLikes} likes </p>}
+
                             </div>
                             <div className="input-group">
                                 <input
