@@ -29,8 +29,13 @@ export function WebSocketProvider({ children }) {
         //web socket connection only if user is authenticated and socketConnected is false
         if (auth.user && !socketConnected) {
             getWebSocketToken().then(() => {
-                console.log('obtuvimos websocket tokens')
-                setTokensOk(true);
+                //we got web socket token so we making connection
+                const sockJsProtocols = ['websocket'];
+                let sock = new SockJS(`http://localhost:8080/ws/connect?authentication=${localStorage.getItem('webSocketToken')}`,
+                    null,
+                    { transports: sockJsProtocols });
+                stompClient = over(sock);
+                stompClient.connect({}, onConnected, onError);
             }).catch((error) => {
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[1],
@@ -38,25 +43,14 @@ export function WebSocketProvider({ children }) {
                 });
             });
         };
-
-        if (tokensOk && auth.user) {
-            //making connection
-            const sockJsProtocols = ['websocket'];
-            let sock = new SockJS(`http://localhost:8080/ws/connect?authentication=${localStorage.getItem('webSocketToken')}`,
-                null,
-                { transports: sockJsProtocols });
-            stompClient = over(sock);
-            stompClient.connect({}, onConnected, onError);
-        }
-
+        /**
+         * Making connection and suscribe to topics
+         */
         function onConnected() {
-            console.log('CONECTANDO CON WEB SOCKETTTTTTTTTTTTTTT')
             //notification topic
             stompClient.subscribe(`/user/notifications/${auth.user.id}/private`, handleServerNotification);
             //chat topic
             stompClient.subscribe(`/chat/${auth.user.id}`, handleServerNewMessageNotification);
-
-
             setSocketConnected(true);
         }
 
@@ -67,6 +61,10 @@ export function WebSocketProvider({ children }) {
             });
         }
 
+        /**
+         * If there is some new notification to the current user.
+         * @param {*} payload 
+         */
         function handleServerNotification(payload) {
             const payloadBodyString = payload.body;
             const payloadBody = JSON.parse(payloadBodyString);
@@ -76,15 +74,19 @@ export function WebSocketProvider({ children }) {
             });
             createNotification({
                 id: payloadBody.id,
-                notificationType: payloadBody.notificationType, 
-                elementId : payloadBody.elementId,
+                notificationType: payloadBody.notificationType,
+                elementId: payloadBody.elementId,
                 notiMessage: payloadBody.notiMessage,
                 fromWho: payloadBody.fromWho,
-                toWho : payloadBody.toWho,
+                toWho: payloadBody.toWho,
                 createdAt: payloadBody.createdAt
             });
         }
 
+        /**
+         * If there is some new message to the current user by web socket.
+         * @param {*} payload 
+         */
         function handleServerNewMessageNotification(payload) {
             const payloadBodyString = payload.body;
             const payloadBody = JSON.parse(payloadBodyString);
@@ -103,6 +105,9 @@ export function WebSocketProvider({ children }) {
         }
 
 
+        /**
+         * will execute when the current user logout.
+         */
         if (!auth.user && socketConnected) {
             if (stompClient) {
                 console.log('desconectando sockets')
@@ -110,12 +115,12 @@ export function WebSocketProvider({ children }) {
                 setSocketConnected(false);
             }
         }
-    }, [auth, tokensOk]);
+    }, [auth]);
 
 
 
     return (
-        <WebSocketContext.Provider value={{newMessage}}>
+        <WebSocketContext.Provider value={{ newMessage }}>
             {children}
         </WebSocketContext.Provider>
     )
