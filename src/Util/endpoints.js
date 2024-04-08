@@ -8,3 +8,4 @@ export const CHAT_ENDPOINT = `${API_ENDPOINT}/chats`;
 export const MESSAGES_ENDPOINT = `${API_ENDPOINT}/messages`;
 export const COMMENTS_ENDPOINT = `${API_ENDPOINT}/comments`;
 export const LIKES_ENDPOINT = `${API_ENDPOINT}/like`;
+export const SOCKET_ENDPOINT = `${API_ENDPOINT}/socket`;

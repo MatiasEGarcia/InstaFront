@@ -1,5 +1,5 @@
 import { DIR_ASC_DIRECTION, REQUIRED_PARAM } from "../Util/UtilTexts";
-import { USERS_ENDPOINT } from "../Util/endpoints";
+import { SOCKET_ENDPOINT, USERS_ENDPOINT } from "../Util/endpoints";
 import fetchApi from "./FetchServices";
 import { getAllByAuthUser } from "./PublicationService";
 
@@ -227,7 +227,7 @@ export async function getWebSocketToken() {
         headers: {}//I need this even empty for fetchApi function
     }
     data = await fetchApi({
-        endpoint: `${USERS_ENDPOINT}/webSocketToken`,
+        endpoint: `${SOCKET_ENDPOINT}/token`,
         options
     })
     setWebSocketToken(data.body.webSocketAuthToken);
