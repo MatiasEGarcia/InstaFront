@@ -181,3 +181,43 @@ export async function getPublicationsGeneralInfo(id){
     });
     return data;
 }
+
+/**
+ * Like a publication.
+ * @param {String} publicationId - publication's id.  
+ * @returns {Promise<Object>} publication already liked.
+ */
+export async function likePublication(publicationId){
+    let data;
+    const options = {
+        method : 'POST',
+        headers:{
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({itemId: publicationId, decision : true}) //true = liked
+    };
+
+    data = await fetchApi({
+        endpoint: `${PUBLICATION_ENDPOINT}/likePublication`,
+        options
+    });
+    return data;
+}
+
+/**
+ * Delete a like record by it's itemId(in this case the itemId will be the publication's id).
+ * @param {String} publicationId - publication's itemId. 
+ * @returns {Promise<Object>} publication withhout the like.
+ */
+export async function deleteLikeOnPublication(publicationId){
+    let data;
+    const options = {
+        method : 'DELETE',
+        headers : {}
+    };
+    data = await fetchApi({
+        endpoint : `${PUBLICATION_ENDPOINT}/delLikePublication/${publicationId}`,
+        options
+    });
+    return data;
+}

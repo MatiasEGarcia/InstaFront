@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { HeartFill, Heart } from "react-bootstrap-icons";
-import { LOADING_OPTIONS, DIR_DESC_DIRECTION, PAG_TYPES, NOTIFICATION_SEVERITIES, BACK_HEADERS, ITEM_LIKED } from "../Util/UtilTexts";
+import { LOADING_OPTIONS, DIR_DESC_DIRECTION, PAG_TYPES, NOTIFICATION_SEVERITIES, BACK_HEADERS } from "../Util/UtilTexts";
 import { useNotification } from "../hooks/useNotification";
-import { getById } from "../Service/PublicationService";
+import { getById, deleteLikeOnPublication, likePublication as likePublicationService } from "../Service/PublicationService";
 import { getByPublcationId, save, deleteById, updateById } from "../Service/CommentService";
 import Loading from "./Loading";
 import { Link } from "react-router-dom";
@@ -10,7 +10,6 @@ import UserImageProfile from "./UserImageProfile";
 import Pagination from "./Pagination";
 import CardComment from "./CardComment";
 import { usePag } from "../hooks/usePag";
-import { create, deleteByPublicationId } from "../Service/LikeService";
 
 
 const commentBasePagDetails = {
@@ -143,39 +142,37 @@ export default function PublicationModal({ setModalState, id }) {
         })
     };
 
-    /**
+     /**
      * Function to like a publication by id.
      * @param {String} id - publication's id. 
      */
-    function likePublication(id) {
-        create({
-            itemId: id,
-            decision: true,
-            type: ITEM_LIKED.PULICATED_IMAGE
-        }).then(data => {
-            setPublication(data.body);
+     function likePublication(id){
+        likePublicationService(id).then(data => {
+            updatePublicationById(data.body);
         }).catch(error => {
             setNotificationToast({
-                sev: NOTIFICATION_SEVERITIES[1],
+                sev : NOTIFICATION_SEVERITIES[1],
                 msg: error.message
+                
             });
         });
-    }
+    };
+
 
     /**
      * Function to remove like from a publication.
-     * @param {String} id - publication's id. 
+     * @param {String} id - publication's id.
      */
-    function removeLike(id) {
-        deleteByPublicationId(id).then(data => {
-            setPublication(data.body);
+    function removeLike(id){
+        deleteLikeOnPublication(id).then(data => {
+            updatePublicationById(data.body);
         }).catch(error => {
             setNotificationToast({
-                sev: NOTIFICATION_SEVERITIES[1],
+                sev : NOTIFICATION_SEVERITIES[1],
                 msg: error.message
-            })
-        });
-    }
+            });
+        })
+    };
 
 
     if (loading) {

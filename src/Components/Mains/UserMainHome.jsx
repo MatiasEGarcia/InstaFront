@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { follow, getFollowGeneralInfo, unFollowByFollowedId, updateFollowStatusByFollowId, updateFollowStatusByFollowerId } from "../../Service/FollowService";
-import { getAllByAuthUser, getPublicationsGeneralInfo } from "../../Service/PublicationService";
-import { getBasicUserInfo, getUserBasicInfoById } from "../../Service/UserService";
-import { BACK_HEADERS, FOLLOWED_STATUS, ITEM_LIKED, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES ,WICH_FOLLOW} from "../../Util/UtilTexts";
+import { follow, getFollowGeneralInfo, unFollowByFollowedId, updateFollowStatusByFollowerId } from "../../Service/FollowService";
+import { deleteLikeOnPublication, getAllByAuthUser, getPublicationsGeneralInfo, likePublication as likePublicationService} from "../../Service/PublicationService";
+import {getUserBasicInfoById } from "../../Service/UserService";
+import { BACK_HEADERS, FOLLOWED_STATUS, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES ,WICH_FOLLOW} from "../../Util/UtilTexts";
 import { useNotification } from "../../hooks/useNotification";
 import { usePag } from "../../hooks/usePag";
 import FollowModal from "../FollowModal";
@@ -14,7 +14,6 @@ import PublicationCard from "../PublicationCard";
 import PublicationModal from "../PublicationModal";
 import UserImageProfile from "../UserImageProfile";
 import UserVisitedSocialInfo from "../UserVisitedSocialInfo";
-import { create, deleteByPublicationId } from "../../Service/LikeService";
 
 
 const publicationsBasePagDetails = {
@@ -241,36 +240,32 @@ function UserMainHome() {
      * @param {String} id - publication's id. 
      */
     function likePublication(id){
-        create({
-            itemId : id,
-            decision : true,
-            type : ITEM_LIKED.PULICATED_IMAGE
-        }).then(data => {
+        likePublicationService(id).then(data => {
             updatePublicationById(data.body);
         }).catch(error => {
             setNotificationToast({
                 sev : NOTIFICATION_SEVERITIES[1],
                 msg: error.message
-            })
+                
+            });
         });
-    }
+    };
+
 
     /**
      * Function to remove like from a publication.
      * @param {String} id - publication's id.
      */
     function removeLike(id){
-        deleteByPublicationId(id).then(data => {
+        deleteLikeOnPublication(id).then(data => {
             updatePublicationById(data.body);
         }).catch(error => {
             setNotificationToast({
                 sev : NOTIFICATION_SEVERITIES[1],
                 msg: error.message
             });
-        });
-    }
-
-
+        })
+    };
 
     if (loading) {
         return (
