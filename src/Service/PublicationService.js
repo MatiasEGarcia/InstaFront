@@ -161,4 +161,23 @@ export async function getById({id,pageNo, pageSize,sortField , sortDir}){
         options
     });
     return data;
+};
+
+/**
+ * Async function To get publications' general info, like how many publications has a user. 
+ * @param {String} id - user's id.
+ * @returns {Promise<object>} publication's general info form user passed.
+ */
+export async function getPublicationsGeneralInfo(id){
+    let data;
+    const options = {
+        method : 'GET',
+        headers : {}       
+    };
+
+    data = await fetchApi({
+        endpoint : `${PUBLICATION_ENDPOINT}/publicationGInfo/${id}`,
+        options
+    });
+    return data;
 }

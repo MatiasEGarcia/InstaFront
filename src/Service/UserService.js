@@ -1,4 +1,4 @@
-import { DIR_ASC_DIRECTION, REQUIRED_PARAM } from "../Util/UtilTexts";
+import { DIR_ASC_DIRECTION, EQUAL, REQUIRED_PARAM } from "../Util/UtilTexts";
 import { SOCKET_ENDPOINT, USERS_ENDPOINT } from "../Util/endpoints";
 import fetchApi from "./FetchServices";
 import { getAllByAuthUser } from "./PublicationService";
@@ -101,26 +101,6 @@ export async function getBasicUserInfo() {
         endpoint: `${USERS_ENDPOINT}/userBasicInfo`,
         options
     });
-    return data;
-}
-
-/**
- * 
- * @param {String} id  id of the user wanted.
- * @returns {Promise<Object>} data object with the body of the response.
- */
-export async function getGeneralUserInfoById(id) {
-    let data;
-    const options = {
-        method: 'GET',
-        headers: {}
-    }
-
-    data = await fetchApi({
-        endpoint: `${USERS_ENDPOINT}/generalInfoById/${id}`,
-        options
-    });
-
     return data;
 }
 
@@ -233,4 +213,30 @@ export async function getWebSocketToken() {
     setWebSocketToken(data.body.webSocketAuthToken);
 }
 
+/**
+ * Get user's basic information from its id.
+ * @param {String} id - id from user wanted to find. 
+ * @returns {Promise<Object>} Data object with user basic info.
+ */
+export async function getUserBasicInfoById(id){
+    let data;
+    const bodyRequest = {
+        column : 'id',
+        value: id,
+        dateValue: false,
+        operation: EQUAL
+    };
 
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(bodyRequest)
+    };
+
+    data = await fetchApi({
+        endpoint: `${USERS_ENDPOINT}/searchOne/oneCondition`,
+        options
+    });
+}

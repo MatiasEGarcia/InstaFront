@@ -204,3 +204,25 @@ export async function usersYouWantFollowButIsNotAllowedYet({
 
     return data;
 }
+
+/**
+ * Async function to get follow general info between auth user and the the user given.
+ * @param {String} id - user's id to compare with auth user.
+ * @returns {Promise<Object>} object with follow general info.
+ */
+export async function getFollowGeneralInfo(id){
+    let data;
+    const options = {
+        method : 'GET',
+        headers : {}
+    };
+
+    data = await fetchApi({
+        endpoint : `${FOLLOW_ENDPOINT}/followGeneralInfo/${id}`,
+        options
+    });
+
+    return data;
+}
+
+

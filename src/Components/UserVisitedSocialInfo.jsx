@@ -26,7 +26,7 @@ function UserVisitedSocialInfo({
     handlerFollowModal
 }) {
     const {auth} = useAuth();
-
+   
 
     return (
         <>

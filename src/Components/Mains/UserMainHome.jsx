@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { follow, unFollowByFollowedId, updateFollowStatusByFollowId, updateFollowStatusByFollowerId } from "../../Service/FollowService";
-import { getAllByAuthUser } from "../../Service/PublicationService";
-import { getGeneralUserInfoById } from "../../Service/UserService";
+import { follow, getFollowGeneralInfo, unFollowByFollowedId, updateFollowStatusByFollowId, updateFollowStatusByFollowerId } from "../../Service/FollowService";
+import { getAllByAuthUser, getPublicationsGeneralInfo } from "../../Service/PublicationService";
+import { getBasicUserInfo, getUserBasicInfoById } from "../../Service/UserService";
 import { BACK_HEADERS, FOLLOWED_STATUS, ITEM_LIKED, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES ,WICH_FOLLOW} from "../../Util/UtilTexts";
 import { useNotification } from "../../hooks/useNotification";
 import { usePag } from "../../hooks/usePag";
@@ -14,7 +14,6 @@ import PublicationCard from "../PublicationCard";
 import PublicationModal from "../PublicationModal";
 import UserImageProfile from "../UserImageProfile";
 import UserVisitedSocialInfo from "../UserVisitedSocialInfo";
-import useAuth from "../../hooks/useAuth";
 import { create, deleteByPublicationId } from "../../Service/LikeService";
 
 
@@ -36,7 +35,11 @@ function UserMainHome() {
     const [wichFollows, setWichFollows] = useState();
     const [publicationModalState, setPublicationModalState] = useState(false);
     const [publicationSelectedId, setPublicationSelectedId] = useState();
-    const [userVisitedInfo, setUserVisitedInfo] = useState({});
+    const [userVisitedInfo, setUserVisitedInfo] = useState({
+        user: null,
+        social: null,
+        pInfo: null   //publications info (like how many publications the user has).
+    });
     const {
         elements: publications,
         setElements: setPublications,
@@ -62,31 +65,58 @@ function UserMainHome() {
         setLoading(true);
         setPublications([]);//we quit all the previous publications. 
         Promise.allSettled([
-            getGeneralUserInfoById(userId),
-            getAllByAuthUser({ ownerId: userId, ...publicationsBasePagDetails })
+            getUserBasicInfoById(userId),
+            getFollowGeneralInfo(userId),
+            getPublicationsGeneralInfo(userId),
+            getAllByAuthUser({ ownerId: userId, ...publicationsBasePagDetails })//publications
         ]).then(values => {
-            const [{ value: valueGeneralUser, reason: reasonGeneralUser },
-                { value: valueALLByAuth, reason: reasonAllByAuth }] = values;
+            const [{value: valueBasicUserInfoById, reason: reasonBasicUserInfoById}, 
+                    {value: valueFollowGInfo, reason: reasonFollowGInfo},
+                    {value: valuePublicationGInfo, reason: reasonPublicationGInfo}, 
+                    {value: valueAllByAuth, reason: reasonAllByAuth}] = values;
 
-            //checking user visited general information
-            if (valueGeneralUser) {
-                setUserVisitedInfo(valueGeneralUser.body);
-            } else if (reasonGeneralUser) {
+            //checking user visited general info.
+            if(valueBasicUserInfoById){
+                setUserVisitedInfo({...userVisitedInfo, user : valueBasicUserInfoById.body});
+            }else if(reasonBasicUserInfoById){
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[1],
-                    msg: reasonGeneralUser.message
+                    msg: reasonBasicUserInfoById.message
                 });
-            }
+            };
+            //checking user's social general info.
+            if(valueFollowGInfo){
+                setUserVisitedInfo(prev => {
+                    return {...prev, social: valueFollowGInfo.body};
+                });
+            }else if(reasonFollowGInfo){
+                setNotificationToast({
+                    sev: NOTIFICATION_SEVERITIES[1],
+                    msg: reasonFollowGInfo.message
+                });
+            };
+
+            //checking user's publication general info.
+            if(valuePublicationGInfo){
+                setUserVisitedInfo(prev => {
+                    return { ...prev, pInfo: valuePublicationGInfo.body};
+                });
+            }else if(reasonPublicationGInfo){
+                setNotificationToast({
+                    sev: NOTIFICATION_SEVERITIES[1],
+                    msg: reasonPublicationGInfo.message
+                });
+            };
 
             //checking user visited's publications.
-            if (valueALLByAuth) {
-                if (valueALLByAuth.body?.list) {
-                    setPublications(valueALLByAuth.body.list);
+            if (valueAllByAuth) {
+                if (valueAllByAuth.body?.list) {
+                    setPublications(valueAllByAuth.body.list);
                     setPublicationsPagDetails(prev => {
-                        return { ...prev, ...valueALLByAuth.body.pageInfoDto };
+                        return { ...prev, ...valueAllByAuth.body.pageInfoDto };
                     })
-                } else if (valueALLByAuth.headers) {
-                    console.info(valueALLByAuth.headers.get(BACK_HEADERS[0]));
+                } else if (valueAllByAuth.headers) {
+                    console.info(valueAllByAuth.headers.get(BACK_HEADERS[0]));
                 }
             } else if (reasonAllByAuth) {
                 setNotificationToast({
@@ -94,6 +124,7 @@ function UserMainHome() {
                     msg: reasonAllByAuth.message
                 });
             }
+
         }).finally(() => {
             setLoading(false);
         });
@@ -264,7 +295,7 @@ function UserMainHome() {
                         username={userVisitedInfo.user?.username}
                         followerFollowStatus={userVisitedInfo.social?.followerFollowStatus}
                         followedFollowStatus={userVisitedInfo.social?.followedFollowStatus}
-                        numberPublications={userVisitedInfo.social?.numberPublications}
+                        numberPublications={userVisitedInfo.pInfo?.numberOfPublications}
                         numberFollowers={userVisitedInfo.social?.numberFollowers}
                         numberFollowed={userVisitedInfo.social?.numberFollowed}
                         updateFollowFollowStatusByFollower={updateFollowFollowStatusByFollower}
