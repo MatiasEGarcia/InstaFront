@@ -24,17 +24,17 @@ export default function NewChatModal({ closeModal }) {
      * Function to create a chat.
      */
     function createChat() {
-        const usersForChatUsernames = usersForChat.map((user) => {
-            return user.username;
+        const usersIdForChat = usersForChat.map((user) => {
+            return user.id;
         });
-        const adminsForChatUsernames = adminsForChat.map((user) => {
-            return user.username;
+        const adminsIdForChat = adminsForChat.map((user) => {
+            return user.id;
         });
         create({
             name: groupNameInputRef?.current?.value,
             type: chatType,
-            usersToAdd: usersForChatUsernames,
-            usersToAddAsAdmins: adminsForChatUsernames
+            usersToAdd: usersIdForChat,
+            usersToAddAsAdmins: adminsIdForChat
         })
             .then((data) => {
                 console.log(data.body);

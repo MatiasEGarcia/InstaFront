@@ -30,8 +30,8 @@ export async function getChats({
  * 
  * @param {String} param.name in case the chat group, this will be it's name.
  * @param {CHAT_TYPE} param.type type of chat. 
- * @param {Array} param.usersToAdd array of users' username to add in chat.
- * @param {Array} param.usersTOAddAsAdmins array of users' username to add in chat as admins. auhtUser is not necessary to add. 
+ * @param {Array} param.usersToAdd array of users' id to add in chat.
+ * @param {Array} param.usersTOAddAsAdmins array of users' id to add in chat as admins. auhtUser is not necessary to add. 
  * @returns {Promise<Object>} Data object with the new chat.
  */
 export async function create({
@@ -108,8 +108,8 @@ export async function setChatGroupName({newName,id}){
 /**
  * Function to add users.
  * @param {String} param.chatId - chat's id.
- * @param {Array} param.usersToAdd - users' username to add in chat.
- * @param {Array} param.usersToAddAsAdmins - users' username to add in chat as admin. (should be inside of usersToAdd too.) 
+ * @param {Array} param.usersToAdd - users' id to add in chat.
+ * @param {Array} param.usersToAddAsAdmins - users' id to add in chat as admin. (should be inside of usersToAdd too.) 
  */
 export async function addUsers({chatId,usersToAdd, usersToAddAsAdmins}){
     let data;
@@ -138,13 +138,13 @@ export async function addUsers({chatId,usersToAdd, usersToAddAsAdmins}){
  * Function to quit users from chat.
  * 
  * @param {String} param.id - chat's id.
- * @param {Array} param.usersToQuit - users' username from users to quit.
+ * @param {Array} param.usersToQuit - users' id from users to quit.
  */
 export async function quitUsers({id, usersToQuit}){
     let data;
     const bodyRequest = {
         chatId : id,
-        usersUsername: usersToQuit
+        usersId: usersToQuit
     }
     const options = {
         method : 'DELETE',
@@ -194,12 +194,12 @@ export async function updateAdminStatus({chatId, userId}){
 function setUsersAsAdmins({users , admins}){
     let arrUsersToSave = [];
 
-    users.forEach((username) =>{
+    users.forEach((userId) =>{
         let userToSave = {
-            username
+            userId
         };
 
-        admins.includes(username) ? userToSave.admin = true : userToSave.admin = false;
+        admins.includes(userId) ? userToSave.admin = true : userToSave.admin = false;
 
         arrUsersToSave.push(userToSave);
     });

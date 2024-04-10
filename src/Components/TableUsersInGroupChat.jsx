@@ -10,7 +10,7 @@ import { NOTIFICATION_SEVERITIES } from "../Util/UtilTexts";
 
 export default function TableUsersInGroupChat() {
     const [authUserIsAdmin, setAuthUserIsAdmin] = useState();
-    const [usersUsernameToQuit, setUsersUsernameToQuit] = useState([]); //list of users' username to quit of chat
+    const [usersIdToQuit, setUsersIdToQuit] = useState([]); //list of users' username to quit of chat
     const { chatSelected, updateChat } = useChat();
     const { setNotificationToast } = useNotification();
     const { auth } = useAuth();
@@ -22,15 +22,18 @@ export default function TableUsersInGroupChat() {
     }, []);
 
     /**
-    * Function to add user username to quit it from chat group.
-    * @param {String} username - user's username 
+    * Function to add user'id to quit it from chat group.
+    * @param {String} id - user's username 
     */
-    function setUserUsernameToQuit(username) {
-        if (usersUsernameToQuit.includes(username)) {
-            const listWithoutUser = usersUsernameToQuit.filter(usernameQuit => usernameQuit !== username);
-            setUsersUsernameToQuit(listWithoutUser);
+    function setUserToQuit(id) {
+        if(!authUserIsAdmin){ //only admins can set users to quit
+            return;
+        }
+        if (usersIdToQuit.includes(id)) {
+            const listWithoutUser = usersIdToQuit.filter(usernameQuit => usernameQuit !== id);
+            setUsersIdToQuit(listWithoutUser);
         } else {
-            setUsersUsernameToQuit(prev => [...prev, username]);
+            setUsersIdToQuit(prev => [...prev, id]);
         }
     }
 
@@ -38,7 +41,10 @@ export default function TableUsersInGroupChat() {
      * Function to quit users from chat.
      */
     function handleQuitUsers() {
-        quitUsers({ id: chatSelected.id, usersToQuit: usersUsernameToQuit }).then((data) => {
+        if(!authUserIsAdmin){ //only admins can quit users.
+            return;
+        }
+        quitUsers({ id: chatSelected.id, usersToQuit: usersIdToQuit }).then((data) => {
             updateChat(data.body);
         }).catch((error) => {
             setNotificationToast({
@@ -46,7 +52,7 @@ export default function TableUsersInGroupChat() {
                 msg: error.message
             });
         }).finally(() => {
-            setUsersUsernameToQuit([]);
+            setUsersIdToQuit([]);
         });
     }
 
@@ -59,6 +65,9 @@ export default function TableUsersInGroupChat() {
      * @param {String} userId - user's id.
      */
     function setAdminStatus(userId){
+        if(!authUserIsAdmin){ //only admins can change admins status
+            return;
+        }
         updateAdminStatus({chatId : chatSelected.id , userId}).then((data) => {
             updateChat(data.body);
         }).catch((error) => {
@@ -77,7 +86,7 @@ export default function TableUsersInGroupChat() {
                         <th></th>
                         <th className="d-flex justify-content-evenly align-items-center">
                             <p className="m-0 text-center">Take out</p>
-                            {usersUsernameToQuit.length != 0 &&
+                            {usersIdToQuit.length != 0 &&
                                 <ArrowDownCircle className="cursor-pointer-hover" size={30} onClick={goToQuitButton} />}
                         </th>
                     </tr>
@@ -85,7 +94,7 @@ export default function TableUsersInGroupChat() {
                 <tbody className="position-relative">
                     {chatSelected.users.map((user) => {
                         return (
-                            <tr key={user.userId}>
+                            <tr key={user.id}>
                                 <td className="border-end">
                                     <div className="w-70 d-flex justify-content-between align-items-center">
                                         <Link to={`/userHome/${user.userId}`} className="btn m-0 p-0">
@@ -105,9 +114,9 @@ export default function TableUsersInGroupChat() {
                                 <td className="text-center">
                                     <Trash size={50}
                                         className={`${authUserIsAdmin ? 'cursor-pointer-hover' : ''}
-                                                         ${usersUsernameToQuit.includes(user.username) ? '' : 'opacity-25'}`}
+                                                         ${usersIdToQuit.includes(user.id) ? '' : 'opacity-25'}`}
                                         color="red"
-                                        onClick={() => setUserUsernameToQuit(user.username)} />
+                                        onClick={() => setUserToQuit(user.id)} />
                                 </td>
                             </tr>
                         )
@@ -116,7 +125,7 @@ export default function TableUsersInGroupChat() {
                 <tfoot ref={refButtonQuitUsers}>
                     <tr>
                         <td></td>
-                        {usersUsernameToQuit.length !== 0 &&
+                        {usersIdToQuit.length !== 0 &&
                             <td className="text-center">
                                 <button className="mt-2 btn btn-danger" onClick={handleQuitUsers}>
                                     Quit users

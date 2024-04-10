@@ -73,10 +73,13 @@ function UserMainHome() {
                     {value: valueFollowGInfo, reason: reasonFollowGInfo},
                     {value: valuePublicationGInfo, reason: reasonPublicationGInfo}, 
                     {value: valueAllByAuth, reason: reasonAllByAuth}] = values;
-
+                    console.log(valueBasicUserInfoById.body);
             //checking user visited general info.
             if(valueBasicUserInfoById){
-                setUserVisitedInfo({...userVisitedInfo, user : valueBasicUserInfoById.body});
+                setUserVisitedInfo(prev => {
+                    return {...prev, user : valueBasicUserInfoById.body};
+                   
+                });
             }else if(reasonBasicUserInfoById){
                 setNotificationToast({
                     sev: NOTIFICATION_SEVERITIES[1],

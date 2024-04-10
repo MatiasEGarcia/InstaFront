@@ -94,13 +94,12 @@ export function WebSocketProvider({ children }) {
                 sev: NOTIFICATION_SEVERITIES[2],
                 msg: "Tienes un nuevo mensaje"
             })
-
             setNewMessage({
-                chatId: payloadBody.chatDto.id,
-                messageId: payloadBody.messageDto.id,
-                body: payloadBody.messageDto.body,
-                userOwner: payloadBody.messageDto.userOwner,
-                sendedAt: payloadBody.messageDto.sendedAt
+                chatId: payloadBody.chatInfo.id,
+                messageId: payloadBody.messageInfo.id,
+                body: payloadBody.messageInfo.body,
+                userOwner: payloadBody.messageInfo.userOwner,
+                sendedAt: payloadBody.messageInfo.sendedAt
             });
         }
 

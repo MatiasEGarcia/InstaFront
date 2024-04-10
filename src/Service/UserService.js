@@ -239,4 +239,6 @@ export async function getUserBasicInfoById(id){
         endpoint: `${USERS_ENDPOINT}/searchOne/oneCondition`,
         options
     });
+    
+    return data;
 }

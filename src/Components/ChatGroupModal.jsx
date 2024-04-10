@@ -86,17 +86,16 @@ export default function ChatGroupModal({ closeModal }) {
     }
 
     function saveNewUsers(){
-        const usersToAdd = usersForChat.map((user) => {
-            return user.username;
+        const usersIdToAdd = usersForChat.map((user) => {
+            return user.id;
         });
-        const usersToAddAsAdmins = adminsForChat.map((user) => {
-            return user.username;
+        const usersIdToAddAsAdmins = adminsForChat.map((user) => {
+            return user.id;
         });
-
         addUsers({
-             chatId : chatSelected.chatId,
-             usersToAdd,
-             usersToAddAsAdmins
+             chatId : chatSelected.id,
+             usersToAdd: usersIdToAdd,
+             usersToAddAsAdmins: usersIdToAddAsAdmins
             }).then((data) =>{
             updateChat(data.body);
         }).catch((error) => {
