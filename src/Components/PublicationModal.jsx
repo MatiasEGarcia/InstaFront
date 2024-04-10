@@ -39,7 +39,7 @@ export default function PublicationModal({ setModalState, id }) {
         flagPagDetails,
         setFlagPagDetails,
         changePage,
-        updateElementById,
+        updateElementById : updatePublicationById,
         quitElementById } = usePag({ ...commentBasePagDetails });
     const { setNotificationToast } = useNotification();
     const refNewComment = useRef();
@@ -93,12 +93,12 @@ export default function PublicationModal({ setModalState, id }) {
      * To save root comments.
      * 
      * @param {Stirng} param.body comment's content.
-     * @param {String} param.publImgId publication's id.
+     * @param {String} param.pId publication's id.
      */
-    function saveRootComment({ body, publImgId }) {
+    function saveRootComment({ body, pId }) {
         save({
             body,
-            publImgId
+            pId  
         }).then(data => {
             //adding new comemnt
             setElements(prev => [data.body, ...prev]);
@@ -239,7 +239,7 @@ export default function PublicationModal({ setModalState, id }) {
                                     ref={refNewComment} />
                                 <span
                                     className="input-group-text btn btn-light"
-                                    onClick={() => saveRootComment({ body: refNewComment.current.value, publImgId: id })}>
+                                    onClick={() => saveRootComment({ body: refNewComment.current.value, pId: id })}>
                                     Comment
                                 </span>
                             </div>

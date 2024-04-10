@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getAllByFollowedUsers } from "../../Service/PublicationService";
+import { getAllByFollowedUsers, likePublication as likePublicationService, deleteLikeOnPublication } from "../../Service/PublicationService";
 import { DIR_DESC_DIRECTION, LOADING_OPTIONS, NOTIFICATION_SEVERITIES, PAG_TYPES } from "../../Util/UtilTexts";
 import useAuth from "../../hooks/useAuth";
 import { useNotification } from "../../hooks/useNotification";
@@ -37,6 +37,7 @@ function HomeMain() {
         setElements : setListPublications,
         setPagDetails,
         changePage,
+        updateElementById : updatePublicationById
     } = usePag({ ...basePagDetails, initialFlagPagDetails: true });
     const { auth } = useAuth();
     const { setNotificationToast } = useNotification();
@@ -74,6 +75,37 @@ function HomeMain() {
         setModalState(true);
     }
 
+    /**
+     * Function to like a publication by id.
+     * @param {String} id - publication's id. 
+     */
+    function likePublication(id){
+        likePublicationService(id).then(data => {
+            updatePublicationById(data.body);
+        }).catch(error => {
+            setNotificationToast({
+                sev : NOTIFICATION_SEVERITIES[1],
+                msg: error.message
+                
+            });
+        });
+    };
+
+    /**
+     * Function to remove like from a publication.
+     * @param {String} id - publication's id.
+     */
+    function removeLike(id){
+        deleteLikeOnPublication(id).then(data => {
+            updatePublicationById(data.body);
+        }).catch(error => {
+            setNotificationToast({
+                sev : NOTIFICATION_SEVERITIES[1],
+                msg: error.message
+            });
+        })
+    };
+
 
     return (
         <main className="col-12 col-md-8 col-xl-10">
@@ -89,6 +121,8 @@ function HomeMain() {
                                 pagDetails={pagDetails}
                                 changePage={changePage}
                                 ComponentToDisplayItem={(props) => <PublicationCard showModal={selectPublication}
+                                    likePublication = {likePublication}
+                                    removeLike = {removeLike}
                                     width="w-75 w-sm-75 w-xl-50" {...props} />}
                             />}
                     </div>

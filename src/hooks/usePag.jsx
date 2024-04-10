@@ -53,7 +53,7 @@ export function usePag({ //is not better to pass an entire objetand on commentar
                 if(element.id === updatedElement.id){
                     return updatedElement;
                 }
-                return comment;
+                return element;
             });
             //set new elements
             return newElements;

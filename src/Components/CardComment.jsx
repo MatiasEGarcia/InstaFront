@@ -34,8 +34,7 @@ export default function CardComment({
     deleteRootCommentById,
 }) {
     const [comment, setComment] = useState(item.body);
-    const [numberOfReplies, setNumberOfReplies] = useState(item.associateCN);
-    const [flagWriteReply, setFlagWriteReply] = useState(false);
+    const [flagWriteReply, setFlagWriteReply] = useState(false); //true when client wants to see comment's replies.
     const [flagWriteAnotherReply, setFlagWriteAnotherReply] = useState(false);
     const [flagSeeReplies, setFlagSeeReplies] = useState(false);
     const {
@@ -52,7 +51,6 @@ export default function CardComment({
     const [flagChangeComment, setFlagChangeComment] = useState(false);
     const { auth } = useAuth();
     const { setNotificationToast } = useNotification();
-
 
     const utcLocalCreateAt = new Date(item.createdAt);
     const options = {
@@ -90,12 +88,12 @@ export default function CardComment({
     function saveReply(body) {
         save({
             body,
-            publImgId: item.associatedImg.id,
+            pId : item.publication.id,
             parentId: item.id
         }).then(data => {
             //adding new reply
             setElements(prev => [...prev, data.body]);
-            setNumberOfReplies(prev => prev + 1);
+            setFlagSeeReplies(prev => !prev);
         }).catch(error => {
             setNotificationToast({
                 sev: NOTIFICATION_SEVERITIES[1],
@@ -209,11 +207,10 @@ export default function CardComment({
                                     }
                                 </>
                             }
-                            {!flagWriteReply && numberOfReplies !== 0 &&
+                            {!flagWriteReply && item.associateCN != 0 &&
                                 <button className="btn btn-light btn-sm ms-3" onClick={handlerSeeReplies}>
-                                    See replies
-                                    <small className="mx-1">{numberOfReplies}</small>
-                                    {flagSeeReplies ? <ChevronDoubleUp /> : <ChevronDoubleDown />}
+                                    <span className="m-0">See replies</span>
+                                    {flagSeeReplies ? <ChevronDoubleUp className="ms-1" /> : <ChevronDoubleDown className="ms-1"/>}
                                 </button>
                             }
                         </div>

@@ -17,7 +17,6 @@ export function WebSocketProvider({ children }) {
         userOwner: undefined,
         sendedAt: undefined
     });
-    const [tokensOk, setTokensOk] = useState(false);
     const [socketConnected, setSocketConnected] = useState(false);
     const { auth } = useAuth();
     const { setNotificationToast, createNotification } = useNotification();

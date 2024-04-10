@@ -7,18 +7,18 @@ import fetchApi from "./FetchServices";
  * To save a new comment.
  * @param {String} param.body - comment's content. (required)
  * @param {String} param.parentId - comment's parent id.
- * @param {String} param.publImgId - comment's publication (required)
+ * @param {String} param.pId - comment's publication (required)
  * @returns {Promise<Object>} Data object with comment created.
  */
-export async function save({body, parentId, publImgId}){
-    if(!body || !publImgId){
+export async function save({body, parentId, pId}){
+    if(!body || !pId){
         throw new Error(REQUIRED_PARAM);
     }
     let data;
     const bodyRequest = {
         body,
         parentId,
-        publImgId
+        pId
     }
     const options = {
         method: 'POST',
